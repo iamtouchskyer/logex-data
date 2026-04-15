@@ -1,1 +1,176 @@
-{"articles":[],"lastUpdated":"2026-04-15"}
+{
+  "articles": [
+    {
+      "slug": "2026-04-15-opc-spec-to-code",
+      "title": "从「LLM 不会定价」到 1686 行机械执行层",
+      "summary": "OPC v0.10b 的核心洞察：LLM 做不了 cardinal 估价，但能做 ordinal 模式识别。一个 session 里把 spec 变成了代码——10 个 red flag、gate logic、delta comparison、criteria lint，全部机械化。",
+      "date": "2026-04-15",
+      "tags": [
+        "opc",
+        "ux-simulation",
+        "mechanical-verification",
+        "red-flags",
+        "testing"
+      ],
+      "project": "opc",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-opc-spec-to-code.png",
+      "path": "2026/04/15/2026-04-15-opc-spec-to-code.json"
+    },
+    {
+      "slug": "2026-04-15-one-session-639-tests-150-dollars",
+      "title": "一个 Session，639 个测试，150 美元：OPC Loop 跑完一整个 Test Coverage 冲刺",
+      "summary": "55 小时的 Claude Code session 里，6 个 AI 角色先吵了 3 轮架，然后一个 20-tick OPC harness 自动跑完了从探索到验收的全流程——最终新增 639 个测试，0 failure。代价是 $150 token 和若干次被 rate limit 打断。",
+      "date": "2026-04-15",
+      "tags": [
+        "opc-loop",
+        "test-coverage",
+        "ai-coding",
+        "claude-code",
+        "multi-agent",
+        "mitsein"
+      ],
+      "project": "mitsein",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-one-session-639-tests-150-dollars.png",
+      "path": "2026/04/15/2026-04-15-one-session-639-tests-150-dollars.json"
+    },
+    {
+      "slug": "2026-04-14-session-brain-from-spike-to-product",
+      "title": "四个 Reviewer 说别做，我做了——27 小时、54M Tokens 之后它上线了",
+      "summary": "Idea-factory 9 节点评估，4 个 reviewer 一致 ITERATE，Devil's Advocate 说 spike 一张卡片都没产出。但 '别当 startup 做' 恰好指明了方向。三次 pivot、23 个 subagent、$49 烧完之后，session-brain.vercel.app 上线了——然后我发现写出来的文章像 ChatGPT，又花了一个小时教它写出像我的东西。",
+      "date": "2026-04-14",
+      "tags": [
+        "session-brain",
+        "opc",
+        "idea-factory",
+        "agent-review",
+        "prompt-engineering",
+        "vite",
+        "react",
+        "vercel",
+        "session-recap"
+      ],
+      "project": "session-brain",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-session-brain-from-spike-to-product.png",
+      "path": "2026/04/14/2026-04-14-session-brain-from-spike-to-product.json"
+    },
+    {
+      "slug": "2026-04-13-opc-skill-evolution",
+      "title": "28 个 Subagent、130 美元、和一个不会付钱的 LLM——OPC 的两天进化",
+      "summary": "一次代码审计开始，4 个 reviewer agent 全部判 FAIL，7 个 Critical+High 全修完之后又被逼出了 quality tier 系统、zero trust 三层验证链、甲乙方合同框架。最后启动 4 个模拟用户讨论 willingness-to-pay gate，才发现 LLM 生成的经济信号根本不是经济信号。148M tokens，487 tool calls，两天一夜，OPC 从 personal tool 变成了一个敢让用户审判的 pipeline。",
+      "date": "2026-04-13",
+      "tags": [
+        "opc",
+        "code-review",
+        "quality-tier",
+        "zero-trust",
+        "subagent",
+        "willingness-to-pay",
+        "testing-integrity",
+        "devil-advocate",
+        "multi-agent"
+      ],
+      "project": "opc",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-13-opc-skill-evolution.png",
+      "path": "2026/04/13/2026-04-13-opc-skill-evolution.json"
+    },
+    {
+      "slug": "2026-04-12-agentmail-idea-factory",
+      "title": "32 个 Subagent 替我做了整个 Ship 流程——$60 之后 AgentMail 上线了",
+      "summary": "一个 AI 邮件服务器从 CONDITIONAL_GO 到 Show HN 就绪，经历了 25 小时的 OPC full-stack pipeline：3 轮 multi-role review、32 个 subagent 并行审查、14 个 bug fix、52 个测试。最值钱的发现不是代码 bug，而是三个独立 reviewer 都在说同一句话时你就知道这是真问题。",
+      "date": "2026-04-12",
+      "tags": [
+        "agentmail",
+        "opc",
+        "idea-factory",
+        "multi-role-review",
+        "security-audit",
+        "python-sdk",
+        "subagent",
+        "ship-flow"
+      ],
+      "project": "agentmail",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-agentmail-idea-factory.png",
+      "path": "2026/04/12/2026-04-12-agentmail-idea-factory.json"
+    },
+    {
+      "slug": "2026-04-12-hermes-agent-marathon",
+      "title": "235M Tokens、$220、128 个 Subagent——一个 Session 里写完一本书",
+      "summary": "一个 hermes-agent session 跑了四天四夜，从 build-advisor V3 review 开始，中途修了一个 memex sync bug，即兴决定用 187 张 Zettelkasten 卡片写一本 7 章的中英双语书，又给 blog 做了全站 SEO/a11y 审计，还跑了一个产品方向评估 pipeline。128 个 subagent、1305 次 tool call、$220 的 API 成本——这可能是单个 Claude Code session 能做的事情的极限测试。",
+      "date": "2026-04-12",
+      "tags": [
+        "hermes",
+        "opc",
+        "multi-agent",
+        "book-writing",
+        "build-advisor",
+        "memex",
+        "zettelkasten",
+        "a11y",
+        "code-review",
+        "idea-factory"
+      ],
+      "project": "hermes",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-hermes-agent-marathon.png",
+      "path": "2026/04/12/2026-04-12-hermes-agent-marathon.json"
+    },
+    {
+      "slug": "2026-04-12-memex-zettelkasten-system",
+      "title": "575 条 flomo 碎片，31 张 Zettelkasten 卡片，96% 该扔掉",
+      "summary": "把 575 条 flomo 随手记消化成 memex Zettelkasten 卡片，不是机械导入——是让 AI agent 在 22 个 OPC tick、17 个 subagent 的协同下做真正的 digest。最后发现商业洞察类卡片比 AI 类有价值得多，而「该扔的比该留的重要」这件事本身就是最大的 insight。",
+      "date": "2026-04-12",
+      "tags": [
+        "memex",
+        "zettelkasten",
+        "flomo",
+        "opc",
+        "agent-review",
+        "knowledge-management",
+        "digest"
+      ],
+      "project": "memex",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memex-zettelkasten-system.png",
+      "path": "2026/04/12/2026-04-12-memex-zettelkasten-system.json"
+    },
+    {
+      "slug": "2026-04-09-societas-agent-platform",
+      "title": "199M tokens 和 $220 之后，我得到了什么：给一个 agent 平台做知识蒸馏的全过程",
+      "summary": "一个 session 跨越 4 天，烧掉 199M tokens，花了 $220，生成了 21 篇带 file:line 证据的架构参考文档、一个可复用的 advisor builder skill、还顺手 review 了自己的 34 个 skills 目录。这不是一篇关于效率的文章——这是一篇关于 AI 怎么在 YOLO 模式下自己跑飞、又怎么被拉回来的故事。",
+      "date": "2026-04-09",
+      "tags": [
+        "mitsein",
+        "societas",
+        "knowledge-distillation",
+        "advisor",
+        "opc",
+        "claude-code-skill",
+        "yolo-mode",
+        "state-machine"
+      ],
+      "project": "mitsein",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-societas-agent-platform.png",
+      "path": "2026/04/09/2026-04-09-societas-agent-platform.json"
+    },
+    {
+      "slug": "2026-03-24-supercrew-plugin-system",
+      "title": "三天、57M Tokens、六条战线——一个 session 里同时打完博客双语、开源推广、和 plugin 体系",
+      "summary": "一个 session 横跨三天，同时推进 Astro 博客双语改造、memex 开源推广（LinkedIn + Glama + awesome-mcp-servers）、msft-model 切换 skill、linkedin-skills marketplace plugin。14 个 subagent 并行，387 次 tool call，$59 烧完之后发现最大的坑不是代码——是 LinkedIn 不支持 markdown。",
+      "date": "2026-03-24",
+      "tags": [
+        "supercrew",
+        "plugin",
+        "i18n",
+        "astro",
+        "linkedin",
+        "memex",
+        "msft-model",
+        "marketplace",
+        "open-source",
+        "copilot-api"
+      ],
+      "project": "supercrew",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-03-24-supercrew-plugin-system.png",
+      "path": "2026/03/24/2026-03-24-supercrew-plugin-system.json"
+    }
+  ],
+  "lastUpdated": "2026-04-15"
+}
