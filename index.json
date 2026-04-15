@@ -1,6 +1,25 @@
 {
   "articles": [
     {
+      "slug": "2026-04-15-8-days-589b-tokens-from-skill-to-factory",
+      "title": "8 天 589B Token：从一个 Skill 到一座工厂",
+      "summary": "一个 Claude Code session 跑了 8 天不关，从零构建 Idea Factory skill，集成到 OPC 流水线，跑完 9 节点真实 pipeline，最后变成能批量生产 consumer app 的 dream-works 工厂。89 个 subagent、3700 次 tool call、$1600 的账单——这不是 demo，是一次真正的 agent 产能极限测试。",
+      "date": "2026-04-15",
+      "tags": [
+        "agent-system",
+        "opc",
+        "idea-factory",
+        "pipeline",
+        "startup",
+        "subagent",
+        "long-session",
+        "dream-works"
+      ],
+      "project": "pitch-ideas",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-8-days-589b-tokens-from-skill-to-factory.png",
+      "path": "2026/04/15/2026-04-15-8-days-589b-tokens-from-skill-to-factory.json"
+    },
+    {
       "slug": "2026-04-15-opc-spec-to-code",
       "title": "从「LLM 不会定价」到 1686 行机械执行层",
       "summary": "OPC v0.10b 的核心洞察：LLM 做不了 cardinal 估价，但能做 ordinal 模式识别。一个 session 里把 spec 变成了代码——10 个 red flag、gate logic、delta comparison、criteria lint，全部机械化。",
