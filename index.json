@@ -188,14 +188,15 @@
     {
       "slug": "2026-04-15-unlimited-tokens-what-to-do",
       "title": "假设我有无限的 token，能拿来干啥？",
-      "summary": "一个随口的假设性问题，引发了一场关于 AI token 用途的发散式探索。从 token foundry 到 eval 测试，从漫无目的的头脑风暴到锁定一个真正让人兴奋的方向。",
+      "summary": "一个晚上 11:30 随口抛出的问题，引爆了一场 8 天、6.43 亿 token 的马拉松 session。前 25 个 chunk 记录了从漫无目的的灵感搜索，到锁定 eval 测试方向，再到用 OPC pipeline 跑 Gate 验证的全过程。",
       "date": "2026-04-15",
       "tags": [
-        "idea-discovery",
-        "brainstorming",
-        "token-economics",
-        "eval-testing",
-        "claude-code"
+        "marathon-session",
+        "eval",
+        "opc",
+        "idea-validation",
+        "gate-verification",
+        "token-economics"
       ],
       "project": "idea-factory",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-token.png",
@@ -380,15 +381,16 @@
     },
     {
       "slug": "2026-04-15-session-to-knowledge-logex-self-reference",
-      "title": "从 Session 到知识：Logex 的诞生与自指悖论",
-      "summary": "在 8 天 marathon session 的尾声，用户启动了 /logex——一个把 Claude Code session 转化为博客文章的 pipeline。这篇文章记录了 logex 如何诞生、session paper 的提取逻辑，以及一个工具试图分析自己所产生的 session 时遇到的哲学困境。",
+      "title": "810 行代码把 Session 变成文章：Logex Pipeline 的技术解剖",
+      "summary": "Logex 是一个把 Claude Code session JSONL 日志转化为可发布博客文章的 pipeline。本文拆解它的五阶段架构——parse、chunk、score、segment、publish——以及每个阶段的关键设计决策。",
       "date": "2026-04-15",
       "tags": [
         "logex",
-        "session-paper",
-        "knowledge-extraction",
-        "meta-tooling",
-        "template"
+        "pipeline",
+        "claude-code",
+        "session-analysis",
+        "content-generation",
+        "typescript"
       ],
       "project": "logex",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-session-logex.png",
@@ -794,15 +796,16 @@
     },
     {
       "slug": "2026-04-12-repo-advisor-builder-knowledge-counselor",
-      "title": "Repo Advisor Builder：让每个代码库都有自己的知识顾问",
-      "summary": "记录 repo-advisor-builder skill 从纯文本输出迭代到自带 HTML 交互站点的过程，包括批量同步已有 advisor、OPC 多角色 review、以及 doc count 不足时的 subagent 分治策略。",
+      "title": "用 6-Phase State Machine 量产代码库 Advisor：Builder 的编排逻辑与踩坑实录",
+      "summary": "repo-advisor-builder 不是手写知识文档的过程，而是一个自动化 pipeline：主 agent 调度 subagent 读代码、写文档、跑 audit gate。本文记录用它给 hermes-agent 构建 advisor 时遇到的真实问题——术语漂移、evidence 验证失败、subagent 分工边界。",
       "date": "2026-04-12",
       "tags": [
         "repo-advisor-builder",
+        "subagent-orchestration",
+        "state-machine",
         "knowledge-distillation",
-        "skill-system",
-        "OPC",
-        "HTML-site"
+        "claude-code",
+        "automation-pipeline"
       ],
       "project": "hermes-agent",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-repo-advisor-builder.png",
