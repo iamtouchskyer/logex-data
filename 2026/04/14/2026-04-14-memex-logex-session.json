@@ -1,0 +1,24 @@
+{
+  "slug": "2026-04-14-memex-logex-session",
+  "title": "从 memex 到 logex：为什么每个 session 都值得一篇论文",
+  "summary": "一个下午的 brainstorm 如何从「session 应该留下点什么」的直觉出发，经过 engram、session-brain 等命名迭代，最终收敛为 logex — 一个将 AI session 转化为可检索、可链接的技术文章的系统。",
+  "body": "# 从 memex 到 logex：为什么每个 session 都值得一篇论文\n\n四月十三号下午一点，我盯着 memex 的 Zettelkasten 卡片库和 session-recap 生成的信息图，突然觉得哪里不对。\n\nmemex 很好，它是我的外部大脑，原子化的知识卡片，双链连接，检索方便。session-recap 也不错，每次 session 结束甩一张漂亮的信息图出来，一目了然。但中间有一个巨大的空白地带：session 本身的完整叙事。\n\n一个 Claude Code session 动辄几十个 chunk、几百条消息，里面有设计决策、有踩坑记录、有推翻重来的 trade-off 讨论。memex 抽取的是原子知识——太碎了，丢失了上下文。session-recap 画的是鸟瞰图——太粗了，没有血肉。我需要的是中间这一层：一篇像样的技术文章，带着完整的叙事弧线，记录从问题到解决方案的全过程。\n\n## 第一轮发散：这到底是什么\n\n我启动了 OPC 的 dream-works pipeline，让 PM、architect、第十人一起来审视这个想法。核心问题很快浮出水面：这是 memex 的 feature 还是独立产品？\n\n答案是独立产品。原因很简单——memex 的设计哲学是「原子化」，一张卡片一个 insight，永久有效。而 session paper 的设计哲学是「叙事化」，一篇文章一个故事，带时间线、带上下文、带情绪。它们的粒度不同，消费方式不同，生命周期也不同。memex 卡片可能五年后还在被引用，session paper 更像是技术日记——三个月后你回头看，价值在于「原来当时是这么想的」。\n\n但它们可以共享基础设施。双链是好东西，tag 系统是好东西，没必要重新发明。\n\n## 命名之争：brain、engram、logex\n\n命名花了比预期更多的时间。「session-brain」是第一个候选，直白但太generic。「brain」这个词被用烂了，从 Second Brain 到各种 AI brain 产品，搜索引擎里淹没在噪声中。\n\n然后 engram 出现了——神经科学里「记忆痕迹」的意思。一个 session 在你大脑里留下的刻痕，这个隐喻很精准。我一度确定了这个名字，甚至开始写 implementation plan。\n\n但最后还是换了。engram 的问题是：1）大多数人不认识这个词，需要解释；2）它暗示的是被动的记忆存储，而我想要的是主动的知识提炼。最终定名 logex——log + extraction 的缩写，同时致敬 memex（memory + extraction）。简短，好拼，一听就知道和日志提炼有关。\n\n## 架构决策：flat files 胜出\n\n存储方案的讨论意外地快。选项无非三个：数据库（Supabase/SQLite）、flat files + git repo、或者两者都支持。\n\n我选了 flat files + git repo 作为默认方案。理由：\n\n1. **图文并茂的 markdown 天然适合 git**。文章就是 `.md` 文件，图片放在同级目录，git 追踪变更历史。Obsidian 用户已经验证了这条路走得通。\n2. **零依赖部署**。不需要数据库服务，不需要额外的 infra 成本。一个 GitHub repo 就是完整的数据层。\n3. **可移植性**。换工具的时候，数据就是文件夹里的 markdown，不存在 vendor lock-in。\n\n当然，对于想要全文搜索、多用户协作的场景，数据库方案更合适。所以 logex 的设计是 storage adapter 模式——默认 git repo，可选 Supabase。但 v1 只做 git。YAGNI。\n\n## 关键设计：自动分篇\n\n这是整个系统最有意思的设计点。一个 session 不一定只有一篇文章。你可能上半场在设计 OAuth flow，下半场在调 CSS layout，这是两个完全不同的故事。强行塞进一篇文章只会让两个都写不好。\n\n所以 logex 需要做 topic segmentation：读取 session 的 chunk summaries，识别主题切换的边界，把连续的相关 chunks 归为一组，每组独立成篇。分组的依据包括时间间隔、话题关键词变化、score 分布。低于 0.25 分的 chunk 直接跳过——那些通常是 context continuation 的样板消息或者中断恢复，没有叙事价值。\n\n这个分篇逻辑本身就够写一篇论文了。但 v1 的实现很朴素：主要靠时间间隔 + 关键词聚类，不玩花哨的 NLP。够用就行。\n\n## 复盘：概念阶段的效率\n\n从下午一点开始 brainstorm，到晚上写完 implementation plan，大约六个小时。中间有两次 context overflow 导致 session continuation，丢失了一些讨论上下文（这本身就是 logex 要解决的问题——如果当时有 logex，每次 continuation 之前自动存档，就不会丢了）。\n\n这个阶段最大的收获不是代码，而是一组清晰的设计约束：独立于 memex、flat files 优先、自动分篇、tag + 双链。有了这些约束，后面的实现反而很快。设计阶段多花一小时，实现阶段少踩三个坑，这笔账永远划算。",
+  "heroImage": "",
+  "tags": [
+    "logex",
+    "memex",
+    "product-design",
+    "session-paper",
+    "naming",
+    "architecture"
+  ],
+  "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
+  "project": "logex",
+  "date": "2026-04-14",
+  "duration": "",
+  "stats": {
+    "entries": 8675,
+    "messages": 884,
+    "chunks": 68
+  }
+}

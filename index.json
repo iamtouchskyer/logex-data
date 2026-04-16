@@ -5,7 +5,13 @@
       "title": "从字体不一致到 400 行零依赖 Linter：用 OPC Loop 从零构建 Design Lint",
       "summary": "博客上的字体和颜色问题肉眼能看到但测试抓不住。一个 OPC 3-tick loop 跑完之后，产出了一个零依赖的 visual consistency linter——8 个 bug 被两个独立 reviewer 揪出来，全部修完，regression green。",
       "date": "2026-04-16",
-      "tags": ["design-lint", "opc-loop", "visual-consistency", "claude-code-skill", "zero-deps"],
+      "tags": [
+        "design-lint",
+        "opc-loop",
+        "visual-consistency",
+        "claude-code-skill",
+        "zero-deps"
+      ],
       "project": "blog",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-design-lint-from-scratch.png",
       "path": "2026/04/16/2026-04-16-design-lint-from-scratch.json"
@@ -15,29 +21,17 @@
       "title": "23 小时、$92、44 个 subagent：用 OPC loop 从零到家庭 AI 日历",
       "summary": "一个 session 里，从 Google Calendar clone 重设计到 AI Agent Feed，再到 LLM Pool 三路 fallback——全程 OPC loop 驱动。不是演示，是真实的产品迭代，包括改方向、踩坑、让 agent 互相审查的全过程。",
       "date": "2026-04-16",
-      "tags": ["opc", "family-calendar", "llm-pool", "next.js", "ai-engineering", "subagent"],
+      "tags": [
+        "opc",
+        "family-calendar",
+        "llm-pool",
+        "next.js",
+        "ai-engineering",
+        "subagent"
+      ],
       "project": "family-calendar",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.png",
       "path": "2026/04/16/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.json"
-    },
-    {
-      "slug": "2026-04-15-8-days-589b-tokens-from-skill-to-factory",
-      "title": "8 天 589B Token：从一个 Skill 到一座工厂",
-      "summary": "一个 Claude Code session 跑了 8 天不关，从零构建 Idea Factory skill，集成到 OPC 流水线，跑完 9 节点真实 pipeline，最后变成能批量生产 consumer app 的 dream-works 工厂。89 个 subagent、3700 次 tool call、$1600 的账单——这不是 demo，是一次真正的 agent 产能极限测试。",
-      "date": "2026-04-15",
-      "tags": [
-        "agent-system",
-        "opc",
-        "idea-factory",
-        "pipeline",
-        "startup",
-        "subagent",
-        "long-session",
-        "dream-works"
-      ],
-      "project": "pitch-ideas",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-8-days-589b-tokens-from-skill-to-factory.png",
-      "path": "2026/04/15/2026-04-15-8-days-589b-tokens-from-skill-to-factory.json"
     },
     {
       "slug": "2026-04-15-opc-spec-to-code",
@@ -90,24 +84,206 @@
       "path": "2026/04/15/2026-04-15-visual-regression-marathon.json"
     },
     {
-      "slug": "2026-04-14-session-brain-from-spike-to-product",
-      "title": "四个 Reviewer 说别做，我做了——27 小时、54M Tokens 之后它上线了",
-      "summary": "Idea-factory 9 节点评估，4 个 reviewer 一致 ITERATE，Devil's Advocate 说 spike 一张卡片都没产出。但 '别当 startup 做' 恰好指明了方向。三次 pivot、23 个 subagent、$49 烧完之后，session-brain.vercel.app 上线了——然后我发现写出来的文章像 ChatGPT，又花了一个小时教它写出像我的东西。",
+      "slug": "2026-04-15-token",
+      "title": "假设我有无限的 token，能拿来干啥？",
+      "summary": "一个随口的假设性问题，引发了一场关于 AI token 用途的发散式探索。从 token foundry 到 eval 测试，从漫无目的的头脑风暴到锁定一个真正让人兴奋的方向。",
+      "date": "2026-04-15",
+      "tags": [
+        "idea-discovery",
+        "brainstorming",
+        "token-economics",
+        "eval-testing",
+        "claude-code"
+      ],
+      "project": "idea-factory",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-token.json"
+    },
+    {
+      "slug": "2026-04-15-gate-ai",
+      "title": "用 Gate 筛想法：当 AI 假装自己是投资人",
+      "summary": "设计了 Gate 1/2/3 的验证 pipeline，用 Cohen's kappa 衡量 LLM judge 一致性，用开发者兴趣评分做 Gate 2，用 MCP spike 验证可行性。中间用户一度搞混了方向，意识到自己不想找真人验证，而是要全 AI 模拟。",
+      "date": "2026-04-15",
+      "tags": [
+        "gate-validation",
+        "cohens-kappa",
+        "llm-judge",
+        "opc",
+        "idea-screening",
+        "ai-simulation"
+      ],
+      "project": "idea-factory",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-gate-ai.json"
+    },
+    {
+      "slug": "2026-04-15-skill",
+      "title": "三个 Skill 合并成一条流水线",
+      "summary": "从 tooleval、OPC、idea validation 三个独立工具合并成一个统一的 Idea Factory skill 的过程。涉及 skill vs MCP 的架构选择、与 OPC 的关系定义、以及 self-dogfood 测试。",
+      "date": "2026-04-15",
+      "tags": [
+        "skill-design",
+        "architecture",
+        "pipeline",
+        "opc",
+        "tooleval",
+        "idea-factory",
+        "dogfooding"
+      ],
+      "project": "idea-factory",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-skill.json"
+    },
+    {
+      "slug": "2026-04-15-claude-tick-based",
+      "title": "让 Claude 跑完再来找我：tick-based 自主循环的挫败与重试",
+      "summary": "用户最大的痛点：Claude 总是跑几步就停下来等人类确认。从 /loop 命令到 tick-based agent 设计，从反复的中断沮丧到最终的 progress.md 状态机方案，一场关于 AI 自主性边界的实战。",
+      "date": "2026-04-15",
+      "tags": [
+        "autonomous-agent",
+        "tick-based-loop",
+        "opc-integration",
+        "claude-code-limitations",
+        "agent-autonomy",
+        "state-management"
+      ],
+      "project": "idea-factory",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-claude-tick-based.json"
+    },
+    {
+      "slug": "2026-04-15-100",
+      "title": "杜绝虚假繁荣：100% 测试覆盖率背后的质量信仰",
+      "summary": "在 Idea Factory skill 的打磨过程中，用户对测试覆盖率提出了近乎偏执的要求——100% coverage，而且必须是有效测试。这篇文章记录了从并发安全修复到端到端走查的完整质量攻坚过程，以及'杜绝虚假繁荣'这条质量红线如何把原型推向产品。",
+      "date": "2026-04-15",
+      "tags": [
+        "testing",
+        "quality-engineering",
+        "idea-factory",
+        "test-coverage",
+        "skill-development"
+      ],
+      "project": "idea-factory",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-100.json"
+    },
+    {
+      "slug": "2026-04-15-skill-dream-works",
+      "title": "五个 Skill 的终局之问：dream-works 大一统之路",
+      "summary": "当 idea-factory、pitch-ideas、pitch-ready、dream-works、tooleval 五个 skill 同时存在时，用户问了两个致命问题：它们是不是都应该存在？终局应该只需要几个？这篇文章记录了从混乱到收敛的 skill 架构整合过程。",
+      "date": "2026-04-15",
+      "tags": [
+        "architecture",
+        "skill-consolidation",
+        "dream-works",
+        "tooleval",
+        "naming-convention"
+      ],
+      "project": "dream-works",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-skill-dream-works.json"
+    },
+    {
+      "slug": "2026-04-15-tick-based-loop-agent-ai",
+      "title": "Tick-based Loop Agent：让 AI 通宵替你打磨展示站",
+      "summary": "Dream-works 展示站需要从 landing page 到每个 app 做全面的 UI/UX 升级。用户设计了一个 tick-based loop agent 模式，让 AI 在无人监管的状态下通过 cron 定时器持续迭代。这篇文章解剖了这种'放养式开发'的工程实践和它暴露的问题。",
+      "date": "2026-04-15",
+      "tags": [
+        "agentic-workflow",
+        "tick-based-loop",
+        "dream-works",
+        "vercel",
+        "autonomous-agent",
+        "cron"
+      ],
+      "project": "dream-works",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-tick-based-loop-agent-ai.json"
+    },
+    {
+      "slug": "2026-04-15-session-logex",
+      "title": "从 Session 到知识：Logex 的诞生与自指悖论",
+      "summary": "在 8 天 marathon session 的尾声，用户启动了 /logex——一个把 Claude Code session 转化为博客文章的 pipeline。这篇文章记录了 logex 如何诞生、session paper 的提取逻辑，以及一个工具试图分析自己所产生的 session 时遇到的哲学困境。",
+      "date": "2026-04-15",
+      "tags": [
+        "logex",
+        "session-paper",
+        "knowledge-extraction",
+        "meta-tooling",
+        "template"
+      ],
+      "project": "logex",
+      "heroImage": "",
+      "path": "2026/04/15/2026-04-15-session-logex.json"
+    },
+    {
+      "slug": "2026-04-14-memex-logex-session",
+      "title": "从 memex 到 logex：为什么每个 session 都值得一篇论文",
+      "summary": "一个下午的 brainstorm 如何从「session 应该留下点什么」的直觉出发，经过 engram、session-brain 等命名迭代，最终收敛为 logex — 一个将 AI session 转化为可检索、可链接的技术文章的系统。",
       "date": "2026-04-14",
       "tags": [
-        "session-brain",
-        "opc",
-        "idea-factory",
-        "agent-review",
-        "prompt-engineering",
-        "vite",
-        "react",
-        "vercel",
-        "session-recap"
+        "logex",
+        "memex",
+        "product-design",
+        "session-paper",
+        "naming",
+        "architecture"
       ],
-      "project": "session-brain",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-session-brain-from-spike-to-product.png",
-      "path": "2026/04/14/2026-04-14-session-brain-from-spike-to-product.json"
+      "project": "logex",
+      "heroImage": "",
+      "path": "2026/04/14/2026-04-14-memex-logex-session.json"
+    },
+    {
+      "slug": "2026-04-14-credential",
+      "title": "Credential 自动化：一个看似合理的需求如何变成十六小时的兔子洞",
+      "summary": "为了让 Claude Code 能自动创建 GitHub OAuth App，我从 CLI 方案出发，经过 Playwright GUI 自动化、Edge cookie 导入、跨机器 credential 共享，最后发现这条路的 ROI 远不如手动操作十分钟。",
+      "date": "2026-04-14",
+      "tags": [
+        "credential-management",
+        "oauth",
+        "playwright",
+        "automation",
+        "yagni",
+        "anti-pattern"
+      ],
+      "project": "logex",
+      "heroImage": "",
+      "path": "2026/04/14/2026-04-14-credential.json"
+    },
+    {
+      "slug": "2026-04-14-opc-loop-logex",
+      "title": "用 OPC Loop 造 Logex：十四小时自动迭代的真实记录",
+      "summary": "Logex 的 UI 从零到可用，经历了三十个 chunk 的 OPC 自动循环迭代。E2E 测试的反复失败、markdown 渲染的坑、以及一个跑了整夜的 loop，暴露了 AI 驱动开发的真实效率曲线。",
+      "date": "2026-04-14",
+      "tags": [
+        "logex",
+        "opc",
+        "e2e-testing",
+        "next.js",
+        "vercel",
+        "ai-development",
+        "automation"
+      ],
+      "project": "logex",
+      "heroImage": "",
+      "path": "2026/04/14/2026-04-14-opc-loop-logex.json"
+    },
+    {
+      "slug": "2026-04-14-opc-extension",
+      "title": "OPC Extension 架构：当你的框架开始长出骨骼",
+      "summary": "logex 的 UI 做完之后，design lint 的缺失暴露了 OPC 的一个结构性问题：如何让第三方（包括自己）扩展 OPC 的 pipeline，而不破坏核心的简洁性。一场关于 hook、skill、prompt injection 的深夜架构讨论。",
+      "date": "2026-04-14",
+      "tags": [
+        "opc",
+        "extension-architecture",
+        "plugin-system",
+        "design-lint",
+        "hook",
+        "framework-design"
+      ],
+      "project": "opc",
+      "heroImage": "",
+      "path": "2026/04/14/2026-04-14-opc-extension.json"
     },
     {
       "slug": "2026-04-13-opc-skill-evolution",
@@ -149,27 +325,6 @@
       "path": "2026/04/12/2026-04-12-agentmail-idea-factory.json"
     },
     {
-      "slug": "2026-04-12-hermes-agent-marathon",
-      "title": "235M Tokens、$220、128 个 Subagent——一个 Session 里写完一本书",
-      "summary": "一个 hermes-agent session 跑了四天四夜，从 build-advisor V3 review 开始，中途修了一个 memex sync bug，即兴决定用 187 张 Zettelkasten 卡片写一本 7 章的中英双语书，又给 blog 做了全站 SEO/a11y 审计，还跑了一个产品方向评估 pipeline。128 个 subagent、1305 次 tool call、$220 的 API 成本——这可能是单个 Claude Code session 能做的事情的极限测试。",
-      "date": "2026-04-12",
-      "tags": [
-        "hermes",
-        "opc",
-        "multi-agent",
-        "book-writing",
-        "build-advisor",
-        "memex",
-        "zettelkasten",
-        "a11y",
-        "code-review",
-        "idea-factory"
-      ],
-      "project": "hermes",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-hermes-agent-marathon.png",
-      "path": "2026/04/12/2026-04-12-hermes-agent-marathon.json"
-    },
-    {
       "slug": "2026-04-12-memex-zettelkasten-system",
       "title": "575 条 flomo 碎片，31 张 Zettelkasten 卡片，96% 该扔掉",
       "summary": "把 575 条 flomo 随手记消化成 memex Zettelkasten 卡片，不是机械导入——是让 AI agent 在 22 个 OPC tick、17 个 subagent 的协同下做真正的 digest。最后发现商业洞察类卡片比 AI 类有价值得多，而「该扔的比该留的重要」这件事本身就是最大的 insight。",
@@ -188,23 +343,107 @@
       "path": "2026/04/12/2026-04-12-memex-zettelkasten-system.json"
     },
     {
-      "slug": "2026-04-09-societas-agent-platform",
-      "title": "199M tokens 和 $220 之后，我得到了什么：给一个 agent 平台做知识蒸馏的全过程",
-      "summary": "一个 session 跨越 4 天，烧掉 199M tokens，花了 $220，生成了 21 篇带 file:line 证据的架构参考文档、一个可复用的 advisor builder skill、还顺手 review 了自己的 34 个 skills 目录。这不是一篇关于效率的文章——这是一篇关于 AI 怎么在 YOLO 模式下自己跑飞、又怎么被拉回来的故事。",
+      "slug": "2026-04-12-repo-advisor-builder",
+      "title": "Repo Advisor Builder：让每个代码库都有自己的知识顾问",
+      "summary": "记录 repo-advisor-builder skill 从纯文本输出迭代到自带 HTML 交互站点的过程，包括批量同步已有 advisor、OPC 多角色 review、以及 doc count 不足时的 subagent 分治策略。",
+      "date": "2026-04-12",
+      "tags": [
+        "repo-advisor-builder",
+        "knowledge-distillation",
+        "skill-system",
+        "OPC",
+        "HTML-site"
+      ],
+      "project": "hermes-agent",
+      "heroImage": "",
+      "path": "2026/04/12/2026-04-12-repo-advisor-builder.json"
+    },
+    {
+      "slug": "2026-04-12-memex-ai",
+      "title": "从 Memex 卡片到《硅基团队》：一本 AI 协作方法论书的诞生",
+      "summary": "一个突发奇想：能不能从几百张 Zettelkasten 卡片自动生成一本书？记录了从 idea 到成书、OPC 逐章 review、安全审计、flomo 卡片补充、到 dream-works 出版可行性评估的全过程。",
+      "date": "2026-04-12",
+      "tags": [
+        "memex",
+        "Zettelkasten",
+        "book-writing",
+        "OPC",
+        "silicon-team",
+        "knowledge-synthesis",
+        "dream-works"
+      ],
+      "project": "memex / silicon-team-book",
+      "heroImage": "",
+      "path": "2026/04/12/2026-04-12-memex-ai.json"
+    },
+    {
+      "slug": "2026-04-12-memra-remix",
+      "title": "Memra：当知识卡片想要被 Remix",
+      "summary": "从 /dw 评估到 OPC loop 实现，记录 Memra 知识二创平台的 0-to-1。包括 cluster radar 功能的构建、UX 的 \"满屏卡片没有行动点\" 问题、GitHub App 集成的架构抉择、以及多角色用户验收测试。",
+      "date": "2026-04-12",
+      "tags": [
+        "memra",
+        "knowledge-remix",
+        "OPC-loop",
+        "cluster-radar",
+        "UX",
+        "GitHub-App",
+        "Vercel"
+      ],
+      "project": "memra",
+      "heroImage": "",
+      "path": "2026/04/12/2026-04-12-memra-remix.json"
+    },
+    {
+      "slug": "2026-04-12-opc-skill-flow",
+      "title": "OPC 的中年危机：从单体 Skill 到可扩展 Flow 系统",
+      "summary": "OPC 在被大量 /opc loop 使用之后暴露了架构瓶颈：flow 定义散落各处、测试体系缺失、loop 的 plan hash 锁定导致 defer 泛滥。记录了多位架构师角色的讨论、插件化方案的取舍、以及开源策略的考量。",
+      "date": "2026-04-12",
+      "tags": [
+        "OPC",
+        "architecture",
+        "flow-system",
+        "plugin",
+        "testing",
+        "open-source",
+        "refactoring"
+      ],
+      "project": "OPC / hermes-agent",
+      "heroImage": "",
+      "path": "2026/04/12/2026-04-12-opc-skill-flow.json"
+    },
+    {
+      "slug": "2026-04-09-ai",
+      "title": "知识蒸馏的手工时代：如何把一个代码库变成 AI 能查询的知识库",
+      "summary": "以 Societas 项目为例，记录从零构建 repo advisor 知识库的完整过程——从分析参照项目 claude-code-advisor 的结构，到用并行 sub-agent 批量生成几十份架构文档，再到发现这个过程本身可以被自动化的关键时刻。",
       "date": "2026-04-09",
       "tags": [
-        "mitsein",
-        "societas",
         "knowledge-distillation",
         "advisor",
-        "opc",
-        "claude-code-skill",
-        "yolo-mode",
-        "state-machine"
+        "societas",
+        "sub-agent",
+        "claude-code"
       ],
-      "project": "mitsein",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-societas-agent-platform.png",
-      "path": "2026/04/09/2026-04-09-societas-agent-platform.json"
+      "project": "societas",
+      "heroImage": "",
+      "path": "2026/04/09/2026-04-09-ai.json"
+    },
+    {
+      "slug": "2026-04-09-repo-advisor-builder-agent",
+      "title": "造工厂的工厂：repo-advisor-builder 和自主构建 agent 的诞生",
+      "summary": "手工为 Societas 构建 advisor 之后，意识到这个过程可以自动化。于是构建了 repo-advisor-builder skill，并发明了 STATE.md + /loop 的自主构建 agent 模式——一个能跨 session 接力工作的 autonomous agent 原型。",
+      "date": "2026-04-09",
+      "tags": [
+        "meta-tooling",
+        "autonomous-agent",
+        "skill-builder",
+        "loop-agent",
+        "STATE.md",
+        "repo-advisor-builder"
+      ],
+      "project": "societas",
+      "heroImage": "",
+      "path": "2026/04/09/2026-04-09-repo-advisor-builder-agent.json"
     },
     {
       "slug": "2026-03-24-supercrew-plugin-system",

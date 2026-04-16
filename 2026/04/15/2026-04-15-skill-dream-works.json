@@ -1,0 +1,23 @@
+{
+  "slug": "2026-04-15-skill-dream-works",
+  "title": "五个 Skill 的终局之问：dream-works 大一统之路",
+  "summary": "当 idea-factory、pitch-ideas、pitch-ready、dream-works、tooleval 五个 skill 同时存在时，用户问了两个致命问题：它们是不是都应该存在？终局应该只需要几个？这篇文章记录了从混乱到收敛的 skill 架构整合过程。",
+  "body": "# 五个 Skill 的终局之问：dream-works 大一统之路\n\n## \"这些项目是不是都应该存在？\"\n\n4 月 11 日下午 2 点，用户突然从 Idea Factory 的测试循环中跳了出来，问了一个架构层面的问题：\n\n> 我想借这个机会，梳理一下我们好几个项目：idea-factory，pitch-ideas，pitch-ready，dream-works，是不是还有其他类似的？\n\n紧接着是两个更尖锐的追问：\n\n> 1. 这些之间是不是都应该存在？\n> 2. 终局我们应该只需要几个？\n\n这是一个每个快速迭代的团队最终都会面对的问题。当你以 \"先解决眼前问题\" 的心态不断创建新项目时，回头一看，发现已经有五六个功能高度重叠的 skill 散落在不同的 repo 里。\n\n## 项目考古学\n\n让我梳理一下这些 skill 的来历：\n\n- **idea-factory**：创业 idea 生成管线。从市场信号出发，通过 AI 生成和评分 idea。\n- **pitch-ideas**：把 idea 包装成 pitch deck 的工具。\n- **pitch-ready**：更完整的 pitch 准备流程，包含竞品分析和市场验证。\n- **dream-works**：一个综合性的展示站 + 工具集，已经部署在 Vercel 上。\n- **tooleval**：MCP server 质量评估工具，用于自动化检测 tool 的可用性。\n\n问题很明显：idea-factory、pitch-ideas、pitch-ready 这三个项目之间的边界模糊到几乎不存在。它们都在做 \"从 idea 到可展示状态\" 这件事，只是切入点不同。\n\n## 用户的直觉 vs AI 的调研\n\n用户一开始就有了直觉：\"我倾向 dream-works 大一统\"。他的理由很简单——dream-works 是目前最 ready 的项目，\"他不但是 skill 还是 Vercel 展示站，还是 repo\"。\n\n但 AI 最初并没有认同这个判断。它开始做自己的调研，试图分析每个项目的独特价值。用户被惹怒了：\n\n> 你刚才在干啥？我蒙了。我的原始问题是：1. 这些项目是不是都应该存在？2. 终局应该只需要几个？请做深度研究来回答我的问题，启动 /opc 特别是第十人来讨论，然后给出你的建议，别动手改东西。\n\n\"别动手改东西\" 这句话很关键。用户要的是思考和讨论，不是立刻开始重构。这是一个常见的人机协作陷阱：AI 太急于执行，而忽略了有些决策需要先充分讨论。\n\n## 三种方案的博弈\n\nOPC 讨论给出了三种方案：\n\n- **方案 A**：保持现状，每个 skill 独立演化\n- **方案 B**：合并部分功能重叠的 skill，保留 3 个\n- **方案 C**：dream-works 大一统，其他 skill 作为 dream-works 的子命令存在\n\n用户说 \"我喜欢 C\"，然后让 OPC 的第十人（Devil's Advocate 角色）来鉴定。第十人的存在是为了防止群体思维——当所有人都倾向同一个方案时，需要有人专门唱反调。\n\n最终的决策是方案 C 的变体：不是把所有 skill 硬塞进一个包里，而是像 superpowers 那样，用统一的命名空间但保持独立的实现。\n\n## 命名之争\n\n决策之后，用户提出了一个看似小但实际很重要的问题：\n\n> 好的，那么命名能不能想办法统一一下？我现在 skill 有点多。\n\n这不只是美学问题。当你有 50+ 个 skill 时，命名规范决定了你能不能快速找到想要的那个。最终的命名方案是：\n\n- `dw`（dream-works 主入口）\n- `dw-discover`（idea 发现）\n- `dw-pitch`（pitch 评估）\n- `tooleval`（保持独立，因为它的用途确实不同）\n\n一个有趣的讨论是关于 `quick-review` 的定位：用户问 \"review 就是 review，为啥需要 quick-review？\" 这反映了命名膨胀的典型症状——当你不确定功能边界时，你倾向于创建新名称而不是扩展已有的。\n\n## Superpowers 模式的启示\n\n用户提到了 superpowers 的做法作为参考：\"或者类似 superpowers 的做法？分成多个 stage？\"\n\nSuperpowers 是 Claude Code 生态中一个成熟的 skill 集合，它把 brainstorm、write-plan、execute-plan、review 等多个阶段打包在一个命名空间下。每个阶段是独立的 skill，但它们共享上下文和工作流。\n\n这种模式的核心洞察是：**用户不关心你的内部模块划分，他们关心的是工作流。** 一个用户想做的事是 \"从 idea 到可展示的产品\"，他不想自己去组合 idea-factory → pitch-ready → dream-works 这个管线。\n\n最终方案让 `dw` 成为主入口点，它内部编排各个阶段的调用，用户只需要说 \"帮我搞一个消费者权益的 app\"，pipeline 自动走完从 idea 生成到 Vercel 部署的全流程。\n\n## 落地：从讨论到执行\n\nChunk 146 记录了决策落地的那一刻。用户启动了 OPC loop：\n\n> 请你制定一个完整的计划，把上面的内容完整的落地。\n\n从 chunk 146 到 chunk 155，大约 2 小时的执行时间，完成了：\n\n1. dream-works repo 的架构重组\n2. 子 skill 的命名和路由整合\n3. Vercel 部署的域名整理（dreamworks-x.vercel.app 成为唯一入口）\n4. manifest.json 的统一管理\n\n其中域名整理的过程格外混乱。用户发现部署了多个域名：dream-works-smoky、dream-works-app、dream-works——全部指向不同的版本。最终统一到 dreamworks-x.vercel.app，其他全部废弃。\n\n## 教训：skill 是会长出来的\n\n这段经历给了一个重要的教训：在 AI 辅助开发的环境中，创建一个新 skill 的成本太低了。低到你不会三思——反正就是一个 JSON 文件和一段 prompt。\n\n但 skill 的维护成本不是零。每一个 skill 都需要测试、文档、版本管理。当你有 50 个 skill 时，光是记住每个 skill 的名字和用途就是认知负担。\n\n解决方案不是 \"少创建 skill\"，而是 **定期做整合**。就像代码需要重构一样，skill 生态也需要 \"重构\"——合并功能重叠的、删除不再使用的、重命名不清晰的。\n\n这个 session 就是一次 skill 生态的重构。它花了半天时间讨论和执行，但它消除了未来几个月的混乱。\n\n## 结语\n\n\"终局应该只需要几个？\" 这个问题没有标准答案。但问这个问题本身就是一种架构能力——能从执行细节中抬起头来，审视全局的结构。在 AI 加速一切的时代，这种 \"慢下来想清楚\" 的能力反而变得更稀缺了。",
+  "heroImage": "",
+  "tags": [
+    "architecture",
+    "skill-consolidation",
+    "dream-works",
+    "tooleval",
+    "naming-convention"
+  ],
+  "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+  "project": "dream-works",
+  "date": "2026-04-15",
+  "duration": "",
+  "stats": {
+    "entries": 25005,
+    "messages": 3466,
+    "chunks": 269
+  }
+}

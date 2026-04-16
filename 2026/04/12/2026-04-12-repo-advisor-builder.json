@@ -1,0 +1,23 @@
+{
+  "slug": "2026-04-12-repo-advisor-builder",
+  "title": "Repo Advisor Builder：让每个代码库都有自己的知识顾问",
+  "summary": "记录 repo-advisor-builder skill 从纯文本输出迭代到自带 HTML 交互站点的过程，包括批量同步已有 advisor、OPC 多角色 review、以及 doc count 不足时的 subagent 分治策略。",
+  "body": "# Repo Advisor Builder：让每个代码库都有自己的知识顾问\n\n那天下午我对着终端敲下 `/build-advisor ~/Code/hermes-agent`，等了大概七分钟，一个完整的 advisor skill 就生成了。但真正让我停下来的不是 skill 本身——而是它自动附带的那个 HTML 页面。打开浏览器一看，所有 hermes-agent 的架构知识被渲染成了一个可交互的单页站点，带搜索、带分类、带代码高亮。\n\n我问了一个问题：这是所有 builder 生成的都会自带 HTML 吗？答案是 yes——repo-advisor-builder 在某个版本之后把 HTML site generation 内置成了 skill 的标准输出。这意味着每个 advisor 不再只是一堆 markdown 指令，而是一个人类可以直接浏览的知识库。\n\n## 批量同步的连锁反应\n\n有了 hermes-agent 的 advisor，自然想到其他项目也应该对齐。openclaw、societas、claude-code——每一个已有的 advisor 都需要补上 HTML 输出。这看起来是个简单的批量操作，但实际跑起来发现每个 repo 的知识密度差异很大。\n\nhermes-agent 本身是个中型 monorepo，文档和代码量相对均衡，advisor builder 的 subagent 分工刚好够用——一个 agent 读源码结构，一个读文档，一个做 cross-reference。但 openclaw 的情况不同，它的 doc count 明显不足，大量知识藏在代码注释和 commit message 里。这时候 builder 的 subagent 策略就需要调整：与其让文档 agent 空转，不如让源码 agent 多承担一些知识提取的任务。\n\n这个问题暴露了 advisor builder 的一个设计假设：它假设每个 repo 的文档/代码比例是相对均衡的。现实显然不是这样。有些项目的知识 90% 在代码里，有些项目有完善的 wiki 但代码混乱。理想的做法是让 builder 在开始前做一个 knowledge distribution scan，然后动态调整 subagent 的分工比例。\n\n我把这个想法记了下来，但没有立即实现。70% 原则——当前的 builder 已经能覆盖 80% 的场景，剩下那 20% 可以等到真的碰到严重问题再解决。\n\n## OPC Review：多角色审查 Advisor 质量\n\n生成完所有 advisor 之后，下一步是验证质量。我用 `/opc` 启动了多角色 review——至少有三个虚拟角色分别从准确性、完整性、可用性三个维度来审查每个 advisor 的输出。\n\n这个环节发现了几个实际问题。首先是术语一致性：hermes-agent 的 advisor 里有时候用 \"pipeline\"，有时候用 \"flow\"，有时候用 \"chain\"，指的其实是同一个东西。在一个人类写的文档里这种不一致可能不要紧，但 advisor 是给 LLM 读的——LLM 会把这三个词当成三个不同概念来处理，导致回答出现偏差。\n\n其次是 cross-reference 的深度不够。advisor 提到了 hermes-agent 的 skill system，但没有把 skill 的 lifecycle（create → register → invoke → retire）完整串起来。一个新来的开发者如果问 \"how do I retire a skill\"，advisor 给不出准确答案。\n\n这些问题的修复相对 mechanical——改术语、补上下文、增加 cross-reference。但它们说明了一个更深层的问题：自动化生成的知识库质量 ceiling 取决于源材料的质量。garbage in, garbage out 这句话在 advisor builder 的场景下格外真实。\n\n## 从 HTML 到 Site：一个词的区别\n\n修完所有问题之后，我让 Claude 更新 memex 卡片，把描述从 \"HTML output\" 改成 \"site generation\"。这不只是语义精确——它反映了一个认知变化：advisor 的 HTML 输出不是一个附属品，它就是 advisor 的主要交付物。Skill 文件是给 LLM 读的，site 是给人读的。两者的受众不同，但知识来源是同一套。\n\n这个 session 的最后，我做了一个 retrospective：advisor builder 这个 skill 是不是足够 robust 了？答案是 \"还不行\"。doc count 的问题、知识分布不均衡的问题、术语一致性的自动检测——这些都是 known gaps。但作为一个能在 10 分钟内给任意 repo 生成可用知识站点的工具，它已经跨过了 \"好用\" 的门槛。\n\n这大概就是 0-to-1 和 1-to-N 的分界线。builder 本身已经 work，剩下的是在不同 repo 上打磨边界 case 的过程。而那些边界 case，往往只有在真正用起来的时候才会暴露。",
+  "heroImage": "",
+  "tags": [
+    "repo-advisor-builder",
+    "knowledge-distillation",
+    "skill-system",
+    "OPC",
+    "HTML-site"
+  ],
+  "sessionId": "unknown",
+  "project": "hermes-agent",
+  "date": "2026-04-12",
+  "duration": "",
+  "stats": {
+    "entries": 12359,
+    "messages": 1832,
+    "chunks": 130
+  }
+}
