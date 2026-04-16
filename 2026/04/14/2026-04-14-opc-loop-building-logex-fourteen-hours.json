@@ -1,9 +1,9 @@
 {
-  "slug": "2026-04-14-opc-loop-logex",
+  "slug": "2026-04-14-opc-loop-building-logex-fourteen-hours",
   "title": "用 OPC Loop 造 Logex：十四小时自动迭代的真实记录",
   "summary": "Logex 的 UI 从零到可用，经历了三十个 chunk 的 OPC 自动循环迭代。E2E 测试的反复失败、markdown 渲染的坑、以及一个跑了整夜的 loop，暴露了 AI 驱动开发的真实效率曲线。",
   "body": "# 用 OPC Loop 造 Logex：十四小时自动迭代的真实记录\n\n四月十五号上午九点半，logex 还只是一个概念设计和一堆 flat file 里的 markdown 文章。到第二天凌晨零点，它是一个部署在 Vercel 上的 Next.js 应用，有文章列表、文章详情、markdown 渲染、分享功能、左侧导航栏。中间这十四个小时发生了什么？\n\n大部分时间，我不在电脑前。\n\n## OPC Loop：让 AI 自己迭代自己\n\nOPC（One Person Company）是我的 AI 驱动开发框架。它的核心是一个 digraph-based 的任务系统，PM、designer、developer、tester 都是 subagent，按照 DAG 顺序协作。而 OPC Loop 是它的自动模式：设定目标和 acceptance criteria，然后让 loop 每隔一段时间自动读取状态、规划下一步、执行、验证。\n\n对 logex 的 UI 构建，我启动了一个 OPC loop，大致的 acceptance criteria 是：\n\n- 文章列表页，按时间倒序\n- 文章详情页，正确渲染 markdown（包括代码块、图片、链接）\n- 左侧导航栏\n- 分享功能（带密码保护）\n- E2E 测试覆盖核心路径\n\n然后我去睡觉了。\n\n## 半夜的 Loop 日志\n\n从 chunk 43 到 chunk 56，跨越八个小时（下午四点到次日凌晨零点），loop 的行为模式高度一致：每个 chunk 都是读取 `loop-state.json` 和 `plan.md`，检查 `acceptance-criteria.md`，然后执行一轮迭代。每轮 6 条消息左右，score 稳定在 0.58。\n\n这个 0.58 的 score 很说明问题。它不高——没有突破性的设计决策或 insight。但它也不低——每轮都在做实际的增量工作。这就是 OPC Loop 的价值：不是天才式的灵感爆发，而是稳定的、可预测的增量推进。像一台洗碗机，你不在的时候它在干活。\n\n## E2E 测试：最大的痛点\n\n但 loop 并不是一帆风顺的。我早上回来检查的时候（chunk 30），第一反应是愤怒：\n\n> 「你自己打开看了么？没有做 end-to-end testing 么？」\n> 「我很失望为啥你没测试」\n\n这是一个反复出现的问题。AI 写了代码、通过了 TypeScript 类型检查、甚至通过了 unit test，但没有真正打开浏览器看过。结果线上的页面有明显的渲染问题——markdown 语法没有正确解析，代码块的高亮不工作，图片路径指向了本地而不是 CDN。\n\n这不是 AI 的能力问题，是 verification loop 的设计问题。OPC 的 acceptance criteria 里写了「E2E 测试」，但 loop 的实现把它理解成了「Playwright DOM assertion 通过」。DOM assertion 通过不等于视觉正确——一个 `<pre>` 标签可以存在于 DOM 里但渲染出来是一坨乱码。\n\n后来我在 OPC 的规范里加了一条硬性要求：UI 变更必须有 screenshot verification，不是 DOM assertion。这条规则后来变成了我所有项目的标准。\n\n## Markdown 渲染的坑\n\nMarkdown 渲染看起来简单，做起来全是细节。logex 用的是 `react-markdown` + `rehype-highlight`，标准方案。但实际遇到的问题包括：\n\n1. **文章里的 markdown 本身包含代码块，而代码块里又有 markdown 语法**。二次转义的问题。\n2. **图片路径**。文章是从 session 里提取的，图片引用可能是绝对路径（`/var/folders/...`）、相对路径、或者 base64 data URL。需要统一处理。\n3. **GFM 表格在移动端的溢出**。表格比屏幕宽的时候，需要水平滚动而不是撑破布局。\n\n每一个都不是大问题，但它们加起来消耗了 loop 的好几轮迭代。这就是前端开发的现实：80% 的时间花在 20% 的边界情况上。\n\n## 命名再迭代：session-brain → logex\n\n在 UI 构建的过程中，项目名从 session-brain 正式改成了 logex（chunk 27）。改名不只是 `package.json` 里换个字符串——Vercel 项目名、GitHub repo 名、所有 import 路径、环境变量前缀，全要跟着改。\n\n我要求 AI 来做这件事，结果发现 Vercel 的项目名不能通过 CLI 改，必须手动去 dashboard 操作。又一个「自动化不了」的地方。我开始理解，现代开发的效率瓶颈不在写代码，而在各种 SaaS dashboard 的手动操作。\n\n## 数据层的最终形态\n\nlogex 的数据层最终定型为双模式：\n\n- **Git repo 模式**（logex-data）：文章以 markdown 文件存储在 GitHub repo 里，按 `YYYY/MM/DD/` 目录结构组织。适合个人使用、版本追踪。\n- **Database 模式**：Supabase，适合多用户、全文搜索场景。\n\nv1 只实现了 git repo 模式。每篇文章是一个目录，包含 `article.md`（正文）、`meta.json`（标题、tags、时间戳）、和可能的图片文件。这个结构的好处是：你可以直接在 GitHub 上阅读，也可以克隆到本地用 Obsidian 打开。数据永远是你的。\n\n## 效率曲线的真相\n\n十四小时的 OPC Loop，产出了一个可用但粗糙的 UI。如果让一个中级前端工程师来做，大概需要两到三天。看起来 AI 赢了？\n\n不完全是。AI 的十四小时里，有大量的重复迭代——同一个 markdown 渲染问题修了三次，每次用不同的方式引入新 bug。人类工程师第一次就会打开浏览器看效果，不会犯这种错误。AI 的优势不在于质量更高，而在于它可以在你睡觉的时候干活。\n\n真正的效率公式不是「AI 比人快」，而是「AI 利用了人不在的时间」。白天我做设计决策，晚上 loop 做实现，第二天早上我 review。24 小时的利用率从 8 小时变成了 22 小时。这才是 OPC Loop 的真正价值。",
-  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-loop-logex.png",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-loop-building-logex-fourteen-hours.png",
   "tags": [
     "logex",
     "opc",
@@ -21,5 +21,37 @@
     "entries": 8675,
     "messages": 884,
     "chunks": 68
-  }
+  },
+  "chunkIndices": [
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56
+  ]
 }

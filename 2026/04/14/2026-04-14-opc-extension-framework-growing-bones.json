@@ -1,9 +1,9 @@
 {
-  "slug": "2026-04-14-opc-extension",
+  "slug": "2026-04-14-opc-extension-framework-growing-bones",
   "title": "OPC Extension 架构：当你的框架开始长出骨骼",
   "summary": "logex 的 UI 做完之后，design lint 的缺失暴露了 OPC 的一个结构性问题：如何让第三方（包括自己）扩展 OPC 的 pipeline，而不破坏核心的简洁性。一场关于 hook、skill、prompt injection 的深夜架构讨论。",
   "body": "# OPC Extension 架构：当你的框架开始长出骨骼\n\n凌晨零点二十五分，我盯着 logex 刚部署的页面，问了一个很直接的问题：\n\n> 「你真觉得这个设计做的很好看么？」\n\n不好看。颜色不一致，间距随意，字体大小没有规律。这不是某个组件的问题，是整体设计语言的缺失。logex 的 UI 是在 OPC Loop 里自动生成的，每一轮 subagent 按自己的理解做决定，没有一个统一的设计约束在上面。\n\n这就引出了一个更深的问题：OPC 需要 design lint。而 design lint 不应该写死在 OPC 核心里——它是一种「增强」，有的项目需要，有的不需要。这就是 extension。\n\n## 问题的本质\n\nOPC 的 pipeline 是 PM → Designer → Developer → Tester → Gate，每一步由一个 subagent 执行。现在我想在这个 pipeline 里插入一个「设计一致性检查」：\n\n1. **在 subagent 执行前**：把设计规范注入到 prompt 里（「你必须使用这些颜色、这些间距」）\n2. **在 gate 验收时**：除了功能验收，还要做视觉一致性验收\n\n听起来像 middleware 或 hook 对吧？问题在于：这个 hook 的代码放在哪里？怎么注册？怎么确保它一定会被执行而不是被跳过？\n\n## 三个失败的设计方案\n\n**方案一：直接改 OPC 核心。** 把 design lint 的逻辑写进 OPC 的 subagent prompt template 里。问题：OPC 是通用框架，不是所有项目都需要 design lint。硬编码特定领域的逻辑进核心，违反 SRP。\n\n**方案二：独立 skill。** 做一个 `opc-extend-design-lint` skill，用户需要的时候手动调用。问题：「手动调用」意味着可以忘记调用。没有刚性保证。而且这个 skill 的执行时机——在 subagent prompt 生成之前——需要 OPC 核心的配合才能实现。独立 skill 做不到 prompt injection。\n\n**方案三：独立 skill + hook 注册。** OPC 核心暴露 hook 点（`pre-subagent-prompt`、`post-gate`），extension 注册到这些 hook 上。执行时 OPC 自动调用。这是标准的插件架构。\n\n方案三看起来最合理，但实现细节里全是坑。\n\n## Hook 机制的设计争论\n\n我和 AI 在这个问题上来回讨论了五六轮。核心争论点：\n\n**hook 的注册方式。** 是在 OPC 的 `flow-context.json` 里声明，还是让 extension 自己去注册？前者意味着用户必须手动编辑配置文件（容易忘），后者意味着 extension 需要有「修改 OPC 运行时状态」的能力（权限过大）。\n\n最后的设计是折中的：extension 在安装时声明自己需要哪些 hook，OPC 在启动时扫描已安装的 extension 并自动注册。用户不需要手动配置，但 OPC 核心也不需要知道具体有哪些 extension——它只知道「在这个 hook 点，我需要调用这些 callback」。\n\n**extension 的存储位置。** 最终定为 `~/.opc/extensions/`，每个 extension 是一个目录，包含：\n\n```\n~/.opc/extensions/\n  design-contract/\n    manifest.json    ← 声明 hook 点、依赖\n    prompt.md        ← 注入到 subagent 的 prompt 片段\n    gate-check.js    ← gate 阶段的验证逻辑\n```\n\n这个结构的关键决策是：**prompt 和代码分离**。`prompt.md` 是给 LLM 看的设计规范（「使用 4px 的间距基数」），`gate-check.js` 是给机器执行的验证逻辑（截图对比、颜色提取）。两者由同一个 extension 提供，但作用于 pipeline 的不同阶段。\n\n## 核心原则的 push back\n\n讨论到后半段，我发现自己在往过度设计的方向走。我要的 extension 越来越多——design lint、accessibility check、performance budget、i18n validation——每一个都想做成独立 extension，每一个都需要 hook。\n\nAI 在这里做了一次有价值的 push back：\n\n> 「是不是不设计 extension 才是最好的？」\n\n这个问题很尖锐。如果每个增强都很小（一段 prompt + 一个 check 函数），把它们直接写进 OPC 的配置文件里，用 convention over configuration 的方式管理，可能比一套完整的 extension registry + manifest + lifecycle 更简单。\n\n但我最后还是坚持了 extension 架构。原因是我已经有了三年的使用预期：OPC 的用户不只是我一个人了，extension 的作者也不只是我。如果没有一个标准化的接口，每个人都往 OPC 核心里塞自己的 hook，三个月之后核心代码会变成垃圾场。\n\n## 没做完的事\n\n坦白说，这次讨论没有产出可运行的代码。它产出的是一份架构设计：extension 的存储结构、manifest schema、hook 注册机制、与 OPC 核心的协作模式。chunk 68 里我说「先休整，然后继续 section 5」，意思是实现留到下个 session。\n\n这可能是正确的节奏。架构讨论不应该直接进入编码——你需要让设计沉淀一下，第二天带着新鲜的眼睛审视昨晚的决定。「sleep on it」不是拖延，是 review process 的一部分。\n\n凌晨三点半，logex 部署在线上，OPC extension 的架构图画在脑子里。一个产品的 v1 和一个框架的 v2 设计，在同一个 session 里完成。不完美，但方向是对的。",
-  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-extension.png",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-extension-framework-growing-bones.png",
   "tags": [
     "opc",
     "extension-architecture",
@@ -20,5 +20,19 @@
     "entries": 8675,
     "messages": 884,
     "chunks": 68
-  }
+  },
+  "chunkIndices": [
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68
+  ]
 }
