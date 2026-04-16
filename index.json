@@ -1,6 +1,51 @@
 {
   "articles": [
     {
+      "slug": "2026-04-16-opc-hardening-journey",
+      "title": "从 Hermes Review 到 21 个 Test Suite：三周硬化一个 Agent 框架",
+      "summary": "Week 1 被自己的 advisor 打了 47 分。Week 3 变成 21 个 test suite + 0 failures。一个 agent 框架从「能跑」到「能信」的全记录。",
+      "date": "2026-04-16",
+      "tags": [
+        "opc",
+        "testing",
+        "agent-framework",
+        "security-hardening"
+      ],
+      "project": "opc",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-opc-hardening-journey.png",
+      "path": "2026/04/16/2026-04-16-opc-hardening-journey.json"
+    },
+    {
+      "slug": "2026-04-16-acceptance-is-contract",
+      "title": "验收标准不是 Checklist，是甲方合同",
+      "summary": "从「定义做完」到「机械执行验收」——OPC 怎么把模糊的 acceptance criteria 变成 14 条 lint 规则和一个 gate command。",
+      "date": "2026-04-16",
+      "tags": [
+        "opc",
+        "acceptance-criteria",
+        "mechanical-enforcement",
+        "quality-gates"
+      ],
+      "project": "opc",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-acceptance-is-contract.png",
+      "path": "2026/04/16/2026-04-16-acceptance-is-contract.json"
+    },
+    {
+      "slug": "2026-04-16-opc-loop-bootstrap",
+      "title": "用 Loop 修 Loop：一场注定被 remote 覆盖的 meta 实验",
+      "summary": "把 OPC loop engine 的 4 个 gap 写成 plan.md，用 loop 跑自己。8 ticks 全绿，结果 git push 发现 remote 已经做了更完整的版本。",
+      "date": "2026-04-16",
+      "tags": [
+        "opc",
+        "loop-engine",
+        "self-bootstrap",
+        "meta-testing"
+      ],
+      "project": "opc",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-opc-loop-bootstrap.png",
+      "path": "2026/04/16/2026-04-16-opc-loop-bootstrap.json"
+    },
+    {
       "slug": "2026-04-16-e2e-testing-ai-code-three-traps",
       "title": "给 AI 写的代码补 E2E 测试：Playwright + axe-core 踩了三个真实的坑",
       "summary": "page.route() 拦截不了 Next.js Server Components 的 fetch。axe-core 算不对 rgba 颜色的对比度。Playwright 的 data: 选项强制 JSON 序列化，raw malformed JSON 根本发不出去。三个坑，三个根因，三个解法。",
