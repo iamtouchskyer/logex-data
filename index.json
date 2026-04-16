@@ -1,6 +1,16 @@
 {
   "articles": [
     {
+      "slug": "2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop",
+      "title": "23 小时、$92、44 个 subagent：用 OPC loop 从零到家庭 AI 日历",
+      "summary": "一个 session 里，从 Google Calendar clone 重设计到 AI Agent Feed，再到 LLM Pool 三路 fallback——全程 OPC loop 驱动。不是演示，是真实的产品迭代，包括改方向、踩坑、让 agent 互相审查的全过程。",
+      "date": "2026-04-16",
+      "tags": ["opc", "family-calendar", "llm-pool", "next.js", "ai-engineering", "subagent"],
+      "project": "family-calendar",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.png",
+      "path": "2026/04/16/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.json"
+    },
+    {
       "slug": "2026-04-15-8-days-589b-tokens-from-skill-to-factory",
       "title": "8 天 589B Token：从一个 Skill 到一座工厂",
       "summary": "一个 Claude Code session 跑了 8 天不关，从零构建 Idea Factory skill，集成到 OPC 流水线，跑完 9 节点真实 pipeline，最后变成能批量生产 consumer app 的 dream-works 工厂。89 个 subagent、3700 次 tool call、$1600 的账单——这不是 demo，是一次真正的 agent 产能极限测试。",
@@ -208,5 +218,5 @@
       "path": "2026/03/24/2026-03-24-supercrew-plugin-system.json"
     }
   ],
-  "lastUpdated": "2026-04-15"
+  "lastUpdated": "2026-04-16"
 }
