@@ -3,7 +3,7 @@
   "title": "假设我有无限的 token，能拿来干啥？",
   "summary": "一个随口的假设性问题，引发了一场关于 AI token 用途的发散式探索。从 token foundry 到 eval 测试，从漫无目的的头脑风暴到锁定一个真正让人兴奋的方向。",
   "body": "# 假设我有无限的 token，能拿来干啥？\n\n\"假设我有无限的 token，你觉得我能拿来干啥？能不能帮我去找找灵感。\"\n\n这句话是整个八天 session 的第一句。没有需求文档，没有 PRD，没有任何明确的目标。就是一个人坐在电脑前，对着 Claude 问了一个完全开放的问题。\n\n## 发散的起点\n\n如果你真的有无限 token，选项其实多得让人焦虑。Claude 给出了一堆方向——content generation pipeline、automated research、code generation factory、token foundry。每一个听起来都有道理，每一个也都足够模糊到让你无法行动。\n\n这就是 brainstorm 阶段最典型的状态：什么都可以做，所以什么都没做。\n\n用户问了一个关键问题：\"token foundry 具体啥意思？\" 这不是在追问细节，这是在试探哪个方向能激起自己的本能反应。答案来了——eval 测试。\n\n\"eval 测试这个方向反而我很感兴趣，请你基于这个帮我多做思考。\"\n\n这是一个非常典型的 idea discovery 模式：你不知道自己想要什么，直到你看到它。发散不是目的，发散是为了碰到那个让你说 \"就是这个\" 的东西。\n\n## 从兴趣到具象\n\n一旦方向锁定在 eval 测试，Claude 被要求深入思考。几个 subagent 被派出去并行探索不同子方向。这是 Claude Code 的一个有意思的使用模式——你不需要自己想清楚所有分支，你可以让 AI 同时探索五条路，然后你只需要做 selection。\n\n生成了一个 HTML 的 exploration report，整理了各种可能性。但到这一步其实还没有任何代码产出，也没有任何产品形态。这纯粹是思维的展开和收束。\n\n## 值得注意的事\n\n很多人用 AI 是带着明确任务来的：\"帮我写个函数\"、\"帮我 debug 这段代码\"。但这个 session 展示了另一种用法——把 AI 当作思考的放大器。你抛出一个模糊的直觉，AI 帮你展开成五个具体方向，你凭直觉挑一个，AI 再帮你深入。\n\n这种用法的前提是你得信任自己的直觉。用户在看到 eval 测试这个方向时的反应不是 \"让我分析一下 ROI\"，而是 \"我很感兴趣\"。在 idea discovery 阶段，兴趣比分析更有价值，因为你还没有足够的信息来做分析。\n\n第一天的头几个小时就这样过去了。没有一行代码，但锁定了方向。如果你觉得这是浪费 token，那你大概率会在错误的方向上写出很多代码。\n\n方向比速度重要。这是这七个 chunk 里最值钱的一句话。",
-  "heroImage": "",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-token.png",
   "tags": [
     "idea-discovery",
     "brainstorming",

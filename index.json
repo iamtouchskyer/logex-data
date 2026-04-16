@@ -96,7 +96,7 @@
         "claude-code"
       ],
       "project": "idea-factory",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-token.png",
       "path": "2026/04/15/2026-04-15-token.json"
     },
     {
@@ -113,7 +113,7 @@
         "ai-simulation"
       ],
       "project": "idea-factory",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-gate-ai.png",
       "path": "2026/04/15/2026-04-15-gate-ai.json"
     },
     {
@@ -131,7 +131,7 @@
         "dogfooding"
       ],
       "project": "idea-factory",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-skill.png",
       "path": "2026/04/15/2026-04-15-skill.json"
     },
     {
@@ -148,7 +148,7 @@
         "state-management"
       ],
       "project": "idea-factory",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-claude-tick-based.png",
       "path": "2026/04/15/2026-04-15-claude-tick-based.json"
     },
     {
@@ -164,7 +164,7 @@
         "skill-development"
       ],
       "project": "idea-factory",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-100.png",
       "path": "2026/04/15/2026-04-15-100.json"
     },
     {
@@ -180,7 +180,7 @@
         "naming-convention"
       ],
       "project": "dream-works",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-skill-dream-works.png",
       "path": "2026/04/15/2026-04-15-skill-dream-works.json"
     },
     {
@@ -197,7 +197,7 @@
         "cron"
       ],
       "project": "dream-works",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-tick-based-loop-agent-ai.png",
       "path": "2026/04/15/2026-04-15-tick-based-loop-agent-ai.json"
     },
     {
@@ -213,7 +213,7 @@
         "template"
       ],
       "project": "logex",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-session-logex.png",
       "path": "2026/04/15/2026-04-15-session-logex.json"
     },
     {
@@ -230,7 +230,7 @@
         "architecture"
       ],
       "project": "logex",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-memex-logex-session.png",
       "path": "2026/04/14/2026-04-14-memex-logex-session.json"
     },
     {
@@ -247,7 +247,7 @@
         "anti-pattern"
       ],
       "project": "logex",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-credential.png",
       "path": "2026/04/14/2026-04-14-credential.json"
     },
     {
@@ -265,7 +265,7 @@
         "automation"
       ],
       "project": "logex",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-loop-logex.png",
       "path": "2026/04/14/2026-04-14-opc-loop-logex.json"
     },
     {
@@ -282,7 +282,7 @@
         "framework-design"
       ],
       "project": "opc",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-extension.png",
       "path": "2026/04/14/2026-04-14-opc-extension.json"
     },
     {
@@ -355,7 +355,7 @@
         "HTML-site"
       ],
       "project": "hermes-agent",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-repo-advisor-builder.png",
       "path": "2026/04/12/2026-04-12-repo-advisor-builder.json"
     },
     {
@@ -373,7 +373,7 @@
         "dream-works"
       ],
       "project": "memex / silicon-team-book",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memex-ai.png",
       "path": "2026/04/12/2026-04-12-memex-ai.json"
     },
     {
@@ -391,7 +391,7 @@
         "Vercel"
       ],
       "project": "memra",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memra-remix.png",
       "path": "2026/04/12/2026-04-12-memra-remix.json"
     },
     {
@@ -409,7 +409,7 @@
         "refactoring"
       ],
       "project": "OPC / hermes-agent",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-opc-skill-flow.png",
       "path": "2026/04/12/2026-04-12-opc-skill-flow.json"
     },
     {
@@ -425,7 +425,7 @@
         "claude-code"
       ],
       "project": "societas",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-ai.png",
       "path": "2026/04/09/2026-04-09-ai.json"
     },
     {
@@ -442,7 +442,7 @@
         "repo-advisor-builder"
       ],
       "project": "societas",
-      "heroImage": "",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-repo-advisor-builder-agent.png",
       "path": "2026/04/09/2026-04-09-repo-advisor-builder-agent.json"
     },
     {
