@@ -1,0 +1,23 @@
+{
+  "slug": "2026-04-16-45a1a7f3-article-1",
+  "title": "三个 Vercel Alias 指向同一个 Deployment：一场虚惊的排查",
+  "summary": "用户坚信三个 Vercel alias 显示不同版本，但深度排查后发现它们指向同一个 deployment。真正的问题是一个空壳 project 在捣乱。",
+  "body": "## 「三个域名，三个版本」\n\ndreamworks-x.vercel.app、dreamworks-y.vercel.app、dreamworks-z.vercel.app —— 三个 alias 都指向同一个 Vercel project `dreamworks-z`。但用户打开后觉得看到了不同的内容。\n\n「你帮我去 Vercel 看看，我感觉是两个 deploy 打架了。」\n\n这种时候最忌讳的是直接相信直觉。先拿证据。\n\n## 排查步骤：从 alias 到 deployment ID\n\n```bash\nvercel inspect dreamworks-x.vercel.app --scope dreamworks\nvercel inspect dreamworks-y.vercel.app --scope dreamworks\nvercel inspect dreamworks-z.vercel.app --scope dreamworks\n```\n\n三条命令，三个结果。Deployment ID 完全一致：`dpl_Cm8GGBKs11xGVyF7L7L1GedoFtSG`。\n\n这说明 alias 层面没有「打架」—— 它们指向同一份产物。\n\n## 那为什么看起来不一样？\n\n继续查 Vercel project list：\n\n```bash\nvercel project ls --scope dreamworks\n```\n\n发现一个诡异的存在：一个叫 `site` 的 project，0 个 deployment。这是之前某次误操作创建的空壳。\n\n空壳 project 本身不直接影响现有 alias，但它的存在让 `vercel deploy` 的 scope 解析变得混乱。如果不带 `--scope dreamworks`，CLI 可能会 link 到错误的 project。这就是 CLAUDE.md 里那条硬规则的由来：\n\n> **NEVER run `vercel deploy` without `--scope dreamworks`.** Omitting scope creates orphan projects.\n\n## 删掉空壳\n\n```bash\necho \"y\" | vercel project rm site --scope dreamworks\n```\n\n注意 Vercel CLI 的 `project rm` 不支持 `--yes` flag，需要管道输入 `y`。这是个小坑。\n\n## 真正的「不同版本」从哪来？\n\n用户看到的差异其实是**浏览器缓存 + 不同时间点访问**的结果。CDN 边缘节点可能在不同时间 purge，加上浏览器本地缓存，同一个 deployment 在不同设备上确实可能短暂展示不同版本的 HTML/CSS。\n\n验证方法：\n```bash\ncurl -sI https://dreamworks-x.vercel.app | grep x-vercel-id\ncurl -sI https://dreamworks-y.vercel.app | grep x-vercel-id\n```\n\n`x-vercel-id` header 包含 request ID，不是 deployment ID。要看 deployment，用 `vercel inspect`。\n\n## Takeaway\n\n1. **先拿 deployment ID 再下结论**。`vercel inspect <url>` 是确定「谁在服务」的唯一权威来源。\n2. **空壳 project 是定时炸弹**。它不直接 break 东西，但让 scope 解析不确定。清理掉。\n3. **CDN + 浏览器缓存让人产生幻觉**。同一个 deployment 在不同设备看起来不同，不代表 alias 有问题。\n4. **deploy 命令必须带 scope**。这不是建议，是硬规则。Vercel CLI 在多 project 环境下的默认行为不可预测。",
+  "heroImage": "",
+  "tags": [
+    "vercel",
+    "deployment",
+    "debugging",
+    "CDN",
+    "alias"
+  ],
+  "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
+  "chunkIndices": [
+    1,
+    2
+  ],
+  "project": "dream-works",
+  "date": "2026-04-16",
+  "duration": "",
+  "stats": {}
+}

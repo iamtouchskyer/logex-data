@@ -152,6 +152,48 @@
       "path": "2026/04/16/2026-04-16-88effbab-article-1.json"
     },
     {
+      "slug": "2026-04-16-45a1a7f3-article-2",
+      "title": "CSS Grid 回退术：保留新功能但恢复旧版 feel",
+      "summary": "dream-works showcase site 加了 category filter 和 card preview images 后变丑了。怎么保留功能增量、回退视觉质感？答案在三行 CSS 和一个 Playwright 截图。",
+      "date": "2026-04-16",
+      "tags": [
+        "CSS Grid",
+        "Astro",
+        "frontend",
+        "animation",
+        "Playwright"
+      ],
+      "project": "dream-works",
+      "chunkIndices": [
+        3,
+        4
+      ],
+      "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
+      "heroImage": "",
+      "path": "2026/04/16/2026-04-16-45a1a7f3-article-2.json"
+    },
+    {
+      "slug": "2026-04-16-45a1a7f3-article-1",
+      "title": "三个 Vercel Alias 指向同一个 Deployment：一场虚惊的排查",
+      "summary": "用户坚信三个 Vercel alias 显示不同版本，但深度排查后发现它们指向同一个 deployment。真正的问题是一个空壳 project 在捣乱。",
+      "date": "2026-04-16",
+      "tags": [
+        "vercel",
+        "deployment",
+        "debugging",
+        "CDN",
+        "alias"
+      ],
+      "project": "dream-works",
+      "chunkIndices": [
+        1,
+        2
+      ],
+      "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
+      "heroImage": "",
+      "path": "2026/04/16/2026-04-16-45a1a7f3-article-1.json"
+    },
+    {
       "slug": "2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop",
       "title": "23 小时、$92、44 个 subagent：用 OPC loop 从零到家庭 AI 日历",
       "summary": "一个 session 里，从 Google Calendar clone 重设计到 AI Agent Feed，再到 LLM Pool 三路 fallback——全程 OPC loop 驱动。不是演示，是真实的产品迭代，包括改方向、踩坑、让 agent 互相审查的全过程。",
