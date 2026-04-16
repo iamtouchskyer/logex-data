@@ -1,6 +1,16 @@
 {
   "articles": [
     {
+      "slug": "2026-04-16-ppt-agent-quality-loop-ceiling",
+      "title": "PPT Agent 质量循环：从 67% 到 72%，然后撞墙",
+      "summary": "用 OPC loop 跑了 12 个 tick，把 PPT agent 的评分从 67% 推到 72%。然后发现 prompt 优化已经到了理论上限的 94%——剩下的 6% 要改 rubric、改 template、改 infra。",
+      "date": "2026-04-16",
+      "tags": ["mitsein", "ppt-agent", "quality-engineering", "prompt-optimization", "llm-evaluation", "opc-loop"],
+      "project": "mitsein",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-ppt-agent-quality-loop-ceiling.png",
+      "path": "2026/04/16/2026-04-16-ppt-agent-quality-loop-ceiling.json"
+    },
+    {
       "slug": "2026-04-16-opc-hardening-journey",
       "title": "从 Hermes Review 到 21 个 Test Suite：三周硬化一个 Agent 框架",
       "summary": "Week 1 被自己的 advisor 打了 47 分。Week 3 变成 21 个 test suite + 0 failures。一个 agent 框架从「能跑」到「能信」的全记录。",
