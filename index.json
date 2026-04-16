@@ -1,6 +1,16 @@
 {
   "articles": [
     {
+      "slug": "2026-04-16-design-lint-from-scratch",
+      "title": "从字体不一致到 400 行零依赖 Linter：用 OPC Loop 从零构建 Design Lint",
+      "summary": "博客上的字体和颜色问题肉眼能看到但测试抓不住。一个 OPC 3-tick loop 跑完之后，产出了一个零依赖的 visual consistency linter——8 个 bug 被两个独立 reviewer 揪出来，全部修完，regression green。",
+      "date": "2026-04-16",
+      "tags": ["design-lint", "opc-loop", "visual-consistency", "claude-code-skill", "zero-deps"],
+      "project": "blog",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-design-lint-from-scratch.png",
+      "path": "2026/04/16/2026-04-16-design-lint-from-scratch.json"
+    },
+    {
       "slug": "2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop",
       "title": "23 小时、$92、44 个 subagent：用 OPC loop 从零到家庭 AI 日历",
       "summary": "一个 session 里，从 Google Calendar clone 重设计到 AI Agent Feed，再到 LLM Pool 三路 fallback——全程 OPC loop 驱动。不是演示，是真实的产品迭代，包括改方向、踩坑、让 agent 互相审查的全过程。",
