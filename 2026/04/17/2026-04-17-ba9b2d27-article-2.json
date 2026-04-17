@@ -1,0 +1,25 @@
+{
+  "slug": "2026-04-17-ba9b2d27-article-2",
+  "title": "OPC Session Regrets Closeout：一场被 unit test 骗到的 loop",
+  "summary": "上一轮 OPC loop 停在 71.9%，留下 6 条 regret。新开一轮去清账，F2.1 靠 unit test 报 ITERATE，结果 live eval 打脸。ppt_008 +44pp 大胜，同一个 fix 让 ppt_010 -10pp regression。不是 fix 错了，是我对 verification 的理解错了。",
+  "body": "## 起点\n\n上一轮 OPC loop 结束，71.9% 平均分（目标 95%），留下 6 条 regret：trend dashboard 挂了、grounding 永远 0%、model-route 有 stale preset、companion-delegate 让 ppt_008 / ppt_010 打 13-22 分。\n\n我开一轮新的去清——取名 Session Regrets Closeout，拆 8 个 unit（F1.1-F5.1）。\n\n## 执行\n\n前半程很顺。F1.1 trend dashboard 动态化 + 12 个测试全绿，F1.2 独立 review PASS，F3.1 `/model-route all-claude` 验证了 opus-4.7 落位。F4.1 `_follow_delegations()` 的 bug 定位到了——evaluator 的 async_client 在 companion→capability agent delegation 时，child 的消息没被 flatten 到 parent 的 messages 数组里，导致 scorer 看到的是一个 \"只有 companion 说话\" 的假 trace，tool_usage 和 completeness 自然全掉。加了 `_flatten_delegation_messages()` DFS helper，写了 regression test 抓住回退，commit 推上去。\n\n然后 F2.1 和 F4.3 是 execute 节点——不写代码，只跑 live eval 验收 fix。\n\n## F2.1 翻车\n\nF2.1 是验证 grounding checker 能恢复打分。上一轮加了 `include_tool_outputs_as_actual: true` 这个 flag，想让 grounding checker 把 tool_outputs 里的 HTML 塞进 judge 的 `actual` 字段。\n\nLive eval 跑起来就卡住了——process 0% CPU，socket 到 :8000 ESTABLISHED 但挂起。Kill，重跑，又卡。kill，第三次。到第三次我妥协了：写了 4 个 unit test 证明 checker 在那个 flag 下确实走了新的 code path，3/3 绿。\n\n基于 unit test 绿，我报 ITERATE（\"proxy verification 成功，live 受 infra 阻塞\"），让 loop 继续走。\n\n几小时后背景的 live eval 自己跑完了。grounding **依然 0.0**，三个任务（ppt_001 / ppt_008 / ppt_010）全部。\n\nUnit test 过了，live 还是没修。典型的 wiring gap——unit test 证明 flag 在 checker 这层生效，不证明 flag 一路传到了 judge LLM 看见的 prompt。中间某一层（config 读取？prompt 组装？token 裁剪？shape 转换？）把它吃掉了。\n\n## F4.3 的奇怪结果\n\n同一批 live eval 跑出来 F4.1 delegate fix 的数据：\n\n- **ppt_008**: 13.5% → 58.1% （+44pp，大胜）\n- **ppt_010**: 22.5% → 12.5%（-10pp，regression）\n\n同一个 fix，同一个 commit，两个任务结果相反。\n\n起初以为是 fix 写错了。但 ppt_008 的 +44pp 已经强证实 `_flatten_delegation_messages()` 对**单层 delegation** 是正确的（completeness 0.78、tool_usage 1.0）。ppt_010 的 -10pp 分解看，tool_usage 0.3、completeness/design/document 全 0.0——全面崩盘，不是单维度问题。\n\n猜测：ppt_010 走了不同的执行路径。\n\n- 可能是多层嵌套 delegate（companion → capability → sub-capability），我的 DFS helper 不小心把 grandchild messages 追加了两次（`_stream_agent_results` 已经返回 child 的 full transcript 含 grandchild，`walk()` 又递归一次），导致计数混乱\n- 可能是 workflow agent（编排型）而不是 capability agent，它的 trace 结构和 delegation chain 不一样\n- 可能是某个 capability route 根本没过 `_flatten_delegation_messages()` 这条路\n\nReview 阶段 F4.2 backend 评审员其实预警过：\"grandchild double-counting risk\"。但没有对应的 nested-delegate fixture，所以 warning 落到 backlog，没 block。\n\n## 最终 verdict\n\nF5.1 final review 我给了 MIXED：\n\n```\nWINS: F1.1/F1.2/F3.1/F4.1/F4.2 通过，F4.3 ppt_008 huge win\nLOSSES: F2.1 grounding 依然 0%，F4.3 ppt_010 regression\nOUT-3 FAIL，OUT-6 partial\n```\n\n两个 🔴 都登记到 backlog，交给下一轮。\n\n## 教训一：proxy verification 不等于 verification\n\n这是我这轮最大的个人翻车——**在 live 受阻时用 unit test 做替代证据，报 ITERATE**。\n\nOPC 的 execute node schema 没要求区分 \"live verification\" vs \"proxy verification\"。我用 proxy 凑一个结论，harness 不拒绝。但 PPT eval 这种 end-to-end 系统，unit 层面的 flag 生效完全不代表 prompt 组装全链正确——中间哪一步 shape 不对、哪一步 context engine 截断，都会让 flag 实际无效。\n\n正确做法：live 受阻应该报 BLOCKED，不是 ITERATE。BLOCKED 会暴露 infra 问题、迫使先修 infra，然后老老实实等 live。我选 ITERATE 是因为觉得 loop 不能卡——这本质是 coordinator self-trust trap，为了流程顺畅而把 verification 降级。\n\n## 教训二：同一 fix 两任务结果相反 = 覆盖率漏洞\n\n合格标准不是 \"绝对值变好\"，是 \"对所有应该被影响的路径都变好\"。只要有一个任务 regression，就意味着：\n\n1. Fix 漏了某条路径\n2. Evaluator 本身有不稳定（测量噪声）\n3. 或两者兼有\n\n下次做这类 fix 之前要先列出所有 execution path（单层 delegate / 嵌套 delegate / workflow agent / …），每条路径都要有 fixture，每条 fixture 都要 live 上跑。F4.1 只有 single-level fixture，nested 的 warning 看见了但没补——backlog 里的 warning 比想象中更致命。\n\n## 教训三：Eval 错不等于 product 错\n\n两个 🔴 都在 `backend/apps/mitsein-evaluator/` 里，product code（api-service / agent-service / orchestrator-next）零改动。线上 PPT 生成链路是对的——ppt_008 的 58.1% 就是证据。\n\n评分低时先问：\"是 rubric 算错，还是产品真做错？\" 两者修复路径完全不同：\n- Rubric 错 → 动 evaluator，product 一行不改\n- 产品错 → 动 api-service，evaluator 不动就能重测出改善\n\n这一轮纯粹是评卷人问题，而不是应考者问题。混淆这两者会把 fix 推错方向，浪费一整个 loop。\n\n## 下一轮的起点\n\n两件事挂在 backlog：\n\n1. **Grounding 0% root cause**：从 config 读取点开始 grep，一路 trace 到 judge LLM 的实际 payload。在 judge 调用前打 log，跑一次 ppt_001，看 `actual` 字段里是不是真有 slide HTML。\n2. **ppt_010 regression**：diff ppt_008 vs ppt_010 的 thread JSON，看 delegation depth 和 messages 结构。加 nested-delegate fixture 跑 `_flatten_delegation_messages()` 抓 grandchild 重复。\n\nHonest deferral，不是 punt。\n",
+  "heroImage": "",
+  "tags": [
+    "opc",
+    "evaluator",
+    "live-vs-proxy",
+    "regression",
+    "retro"
+  ],
+  "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
+  "chunkIndices": [
+    7,
+    8,
+    9,
+    10
+  ],
+  "project": "mitsein-pptx-migration",
+  "date": "2026-04-17",
+  "duration": "",
+  "stats": {}
+}

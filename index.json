@@ -1,6 +1,102 @@
 {
   "articles": [
     {
+      "slug": "2026-04-17-design-lint-surgery-discovery-vs-gate",
+      "title": "给 design-lint 动手术：从 240 个发现砍到 151 个，外加一个 pattern 名字",
+      "summary": "写完一个 design lint engine，自信它能当 OPC 的 code-review gate。跑了 10 个真实站之后发现：我写的是设计教程里的 folk wisdom，不是规则。",
+      "date": "2026-04-17",
+      "tags": [
+        "design-system",
+        "opc",
+        "lint",
+        "benchmark",
+        "claude-code"
+      ],
+      "project": "opc-extend-design-lint",
+      "chunkIndices": [
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "sessionId": "88effbab-f964-4a0a-afee-4d52be07a834",
+      "heroImage": "",
+      "path": "2026/04/17/2026-04-17-design-lint-surgery-discovery-vs-gate.json"
+    },
+    {
+      "slug": "2026-04-17-ba9b2d27-article-3",
+      "title": "OPC 改自己：在 loop 翻车之后修 harness",
+      "summary": "loop 跑完觉得 OPC harness 自己有 8 个可以改的点。挑了 4 个低风险的当场 fix——空 severity header 误报、backlog 吃空行、deprecation 刷屏、loop 之间没有 handoff。剩下两个 schema 级别的留给单独 PR。",
+      "date": "2026-04-17",
+      "tags": [
+        "opc",
+        "skill",
+        "harness",
+        "meta",
+        "fix"
+      ],
+      "project": "opc-skill",
+      "chunkIndices": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
+      "heroImage": "",
+      "path": "2026/04/17/2026-04-17-ba9b2d27-article-3.json"
+    },
+    {
+      "slug": "2026-04-17-ba9b2d27-article-2",
+      "title": "OPC Session Regrets Closeout：一场被 unit test 骗到的 loop",
+      "summary": "上一轮 OPC loop 停在 71.9%，留下 6 条 regret。新开一轮去清账，F2.1 靠 unit test 报 ITERATE，结果 live eval 打脸。ppt_008 +44pp 大胜，同一个 fix 让 ppt_010 -10pp regression。不是 fix 错了，是我对 verification 的理解错了。",
+      "date": "2026-04-17",
+      "tags": [
+        "opc",
+        "evaluator",
+        "live-vs-proxy",
+        "regression",
+        "retro"
+      ],
+      "project": "mitsein-pptx-migration",
+      "chunkIndices": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
+      "heroImage": "",
+      "path": "2026/04/17/2026-04-17-ba9b2d27-article-2.json"
+    },
+    {
+      "slug": "2026-04-17-ba9b2d27-article-1",
+      "title": "前端 tool view 突然全瞎了：一次协议 break 引发的 CI 信任危机",
+      "summary": "打开 agent 页面，所有 toolcall view 和 ask card 都只剩一个光秃秃的数字列表。修复不难，真正可怕的是——一个从 snake_case 到 camelCase 的字段重命名，20 多个测试全绿 push 进主干，没有一个测试抓住它。",
+      "date": "2026-04-17",
+      "tags": [
+        "frontend",
+        "contract-test",
+        "ci",
+        "regression",
+        "mitsein"
+      ],
+      "project": "mitsein-pptx-migration",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
+      "heroImage": "",
+      "path": "2026/04/17/2026-04-17-ba9b2d27-article-1.json"
+    },
+    {
       "slug": "2026-04-16-ppt-agent-quality-loop-ceiling",
       "title": "PPT Agent 质量循环：从 67% 到 72%，然后撞墙",
       "summary": "用 OPC loop 跑了 12 个 tick，把 PPT agent 的评分从 67% 推到 72%。然后发现 prompt 优化已经到了理论上限的 94%——剩下的 6% 要改 rubric、改 template、改 infra。",
@@ -1200,5 +1296,5 @@
       "path": "2026/03/24/2026-03-24-supercrew-plugin-system.json"
     }
   ],
-  "lastUpdated": "2026-04-16"
+  "lastUpdated": "2026-04-17"
 }
