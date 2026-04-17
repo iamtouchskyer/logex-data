@@ -1,6 +1,43 @@
 {
   "articles": [
     {
+      "slug": "2026-04-17-e123eeaf-article-1",
+      "title": "让 AI Agent 帮你取消订阅：一场跨四个平台的 SaaS 审计实战",
+      "summary": "一个 $200/yr 的 Substack bundle 续费提醒，引发了跨 Gmail、Outlook、Substack、Gamma 四个平台的订阅审计。AI Agent 在这个过程中撞上了 Google Passkey 的硬墙，发现了 Gmail MCP 比 Outlook Playwright 快 10 倍的事实，最终把实战经验沉淀回 cli-x skill。",
+      "date": "2026-04-17",
+      "tags": [
+        "ai-agent",
+        "saas-audit",
+        "playwright",
+        "gmail-mcp",
+        "cli-x",
+        "subscription-management",
+        "google-passkey"
+      ],
+      "project": "cli-x",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "sessionId": "e123eeaf-682b-4ff6-9b6b-e1cf51a1cd40",
+      "heroImage": "",
+      "path": "2026/04/17/2026-04-17-e123eeaf-article-1.json"
+    },
+    {
       "slug": "2026-04-17-design-lint-surgery-discovery-vs-gate",
       "title": "给 design-lint 动手术：从 240 个发现砍到 151 个，外加一个 pattern 名字",
       "summary": "写完一个 design lint engine，自信它能当 OPC 的 code-review gate。跑了 10 个真实站之后发现：我写的是设计教程里的 folk wisdom，不是规则。",
@@ -1296,5 +1333,6 @@
       "path": "2026/03/24/2026-03-24-supercrew-plugin-system.json"
     }
   ],
-  "lastUpdated": "2026-04-17"
+  "lastUpdated": "2026-04-17",
+  "totalArticles": 42
 }

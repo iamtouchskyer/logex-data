@@ -1,0 +1,40 @@
+{
+  "slug": "2026-04-17-e123eeaf-article-1",
+  "lang": "zh",
+  "title": "让 AI Agent 帮你取消订阅：一场跨四个平台的 SaaS 审计实战",
+  "summary": "一个 $200/yr 的 Substack bundle 续费提醒，引发了跨 Gmail、Outlook、Substack、Gamma 四个平台的订阅审计。AI Agent 在这个过程中撞上了 Google Passkey 的硬墙，发现了 Gmail MCP 比 Outlook Playwright 快 10 倍的事实，最终把实战经验沉淀回 cli-x skill。",
+  "body": "# 让 AI Agent 帮你取消订阅：一场跨四个平台的 SaaS 审计实战\n\n\"去年我在 Lenny's Newsletter 上订阅了一个 bundle，现在发现每一个都需要单独 unsubscribe，不然要付钱。坑死我了。\"\n\n这句话开启了一场持续 26 小时、跨越 4 次 context compaction、横跨 Gmail / Outlook / Substack / Gamma 四个平台的 SaaS 订阅审计。我让 Claude Code 当我的 agent，用 Playwright MCP 和 Gmail MCP 帮我把所有付费订阅找出来并逐个取消。\n\n结果？有些地方出奇顺利，有些地方撞了硬墙。\n\n## 起点：$200 的 Lenny's Newsletter\n\n事情很简单。xingjingx@gmail.com 和 surixing@outlook.com 两个邮箱，分散着各种 SaaS 订阅。Lenny's Newsletter 是最大的一笔 —— $200/yr，绑在 surixing@outlook.com 上，即将自动续费。\n\n我给 agent 的指令也很直接：\"你可以用我的账号一个一个去 unsubscribe 么？每个之前跟我确认一下。\"\n\n## 第一个发现：Gmail MCP >> Playwright\n\n审计订阅的第一步是找到所有付费记录。两个邮箱，两种方式：\n\n**Gmail（xingjingx@gmail.com）**：用 Gmail MCP 的 `search_threads` 工具，一句 `from:stripe.com receipt` 直接返回所有 Stripe 收据。3 秒钟，结果清清楚楚：\n\n- Gamma — $96/yr Plus plan\n- Manus AI — $19/mo（2025年10月后停了）\n- Lenny's Newsletter — $200/yr\n- Black Forest Labs、flux-ai.io 等小额订阅\n\n**Outlook（surixing@outlook.com）**：没有 Graph API token，只能用 Playwright 操作 Outlook Web。先试了 `invoice OR receipt OR subscription renewal OR payment confirmed` —— 返回空。Outlook Web 的搜索引擎根本不支持 OR 语法。最后用最朴素的 `receipt from`，才搜出结果 —— 只有 Lenny's Newsletter 一笔。\n\n这个对比太明显了：**Gmail MCP 是结构化 API 查询，Outlook Web 是 DOM 操作 + 不靠谱的搜索框。** 同样的任务，前者 3 秒，后者折腾了 10 分钟还差点漏查。\n\n> **Stripe receipt 的通用 pattern**：所有走 Stripe 支付的 SaaS 产品，收据邮件的发件人都是 `invoice+statements+acct_xxx@stripe.com`。这意味着 `from:stripe.com receipt` 是一个万能审计查询 —— 不管你订了什么产品，只要它用 Stripe 收款，都能被这一条搜出来。\n\n## 取消 Substack：Magic Link 的意外捷径\n\n找到 Lenny's Newsletter 的 Stripe 收据后，下一步是取消。\n\n按照 Substack 的标准流程，应该去 `substack.com/settings/payments` 操作。但这需要先登录 —— Substack 用 magic link 认证，也就是说 agent 得先输入邮箱，等 magic link 邮件到达，再去邮箱点链接。\n\n但实际操作中发现了一条捷径：**Stripe 收据邮件底部自带 \"Manage your subscription\" 链接，这个链接包含 magic token，点击后直接进入订阅管理页面，不需要额外登录。**\n\nAgent 用 Gmail MCP 找到收据 → 提取管理链接 → Playwright 打开链接 → 直接进入 Substack 的 subscription management 页面 → 点取消 → 确认。整个流程一气呵成。\n\n## Google Passkey：自动化的硬墙\n\nGamma 的 $96/yr Plus plan 就没这么幸运了。\n\nGamma 用 Google OAuth 登录。Agent 打开 gamma.app/settings，被重定向到 Google 登录页面，输入 xingjingx@gmail.com……然后 Google 要求 passkey 验证 —— 指纹或面容识别。\n\n这是 Playwright 无法绕过的硬限制。没有 \"Try another way\" 能跳到密码输入（取决于用户的安全设置）。Passkey 是一个 hardware-bound challenge，浏览器自动化工具在这里完全无能为力。\n\nAgent 老老实实地报告了：\"Google Passkey 验证无法自动化，你需要手动去 gamma.app/settings → Billing 取消。\"\n\n这个发现的影响范围不只是 Gamma —— **任何使用 Google OAuth 的平台，只要用户开了 passkey，都会碰到这个墙。** 这是 agent 自动化的一个根本性限制。\n\n## 人类纠偏：Agent 不是万能的\n\n整个过程中，我至少纠正了 agent 三次。\n\n第一次：agent 搜 Gmail 找 Lenny's Newsletter 的订阅记录，搜不到。我说 \"我肯定购买了 Lenny 的，你再仔细查\"。后来发现这笔订阅绑在 surixing@outlook.com 上，不在 Gmail 里。\n\n第二次：我让 agent 去 surixing@outlook.com 查其他订阅，agent 搞混了邮箱，在 Gmail 上执行了操作。我直接说：\"我是说第二件事，你说错邮箱了，既然你有了新的，你自己去搜，不行你就一封一封的看。\"\n\n第三次：agent 建议我手动去各个产品官网检查 Product Pass 工具（Lovable、Cursor 等）的订阅状态。我回了一句：\"你自己做啊？？？为啥要我？？？？？？？？？\"\n\n这些纠偏很真实。**Agent 在跨平台、跨账号的场景下，很容易搞混上下文。** 尤其是 session compaction 之后（这个 session 经历了 4 次 compaction），agent 对 \"哪个邮箱对应哪个任务\" 的记忆会降级。人类的 oversight 在这里不是可有可无的 —— 是必需的。\n\n## 沉淀：从一次性操作到可复用的 Skill\n\n这次审计结束后，我让 agent 检查是不是在 build 一个叫 cli-x 的 skill。\n\ncli-x 是一个 \"universal external platform interface\" —— 一个把所有外部平台操作统一成 `/cli-x <platform> <operation>` 的 skill。它已经有 18 个 platform runbook，覆盖从 GitHub（CLI 方式）到微信公众号（Playwright 方式）。\n\n这次 session 的实战经验直接 patch 回了两个 runbook：\n\n**substack.md**：unsubscribe operation 从原来的 \"去 settings/payments 操作\" 改成了 \"优先用 Gmail MCP 找 Stripe receipt → 点 manage subscription magic link\" 的路径。Known Issues 加了 Gmail MCP 审计 pattern 和 Google Passkey blocking。\n\n**outlook.md**：加了 \"Playwright Fallback Notes\" 子节 —— Outlook Web 不支持 OR 查询、搜索结果有 tab 分类、Focused vs Other inbox 的坑。\n\n## 成本和效率\n\n整个 session 的数据：\n- 持续时间：~26 小时（跨两天，中间有大量空闲）\n- Token 消耗：73M total（含 69.5M cache read）\n- LLM 调用：681 次\n- 工具调用：440 次（Playwright 操作占大头：snapshot 90次、navigate 60次、click 34次）\n- 估算成本：~$56\n\n$56 审计了两个邮箱的所有 SaaS 订阅，取消了 Lenny's Newsletter（$200/yr），发现了 Gamma（$96/yr 需手动取消），确认了 Outlook 邮箱没有其他付费订阅。纯经济角度看，省下的第一年续费就回本了。\n\n但更大的价值是沉淀下来的东西：**cli-x skill 的两个 runbook 拿到了实战验证的操作路径**，下次再做类似的事情，不需要重新踩坑。\n\n## Takeaways\n\n1. **`from:stripe.com receipt` 是 SaaS 订阅审计的万能查询。** 只要产品用 Stripe 收款（绝大多数 SaaS 都是），这一条就能全部捞出来。\n\n2. **MCP > CLI > Playwright，这个优先级是真的。** Gmail MCP 3 秒搞定的事情，Outlook Playwright 折腾 10 分钟。能用 API 就别碰 DOM。\n\n3. **Google Passkey 是浏览器自动化的硬墙。** 不是 \"难绕过\"，是 \"不可能绕过\"。设计 agent 工作流时，必须把 passkey 列为已知限制，并为用户提供手动 fallback。\n\n4. **Agent 在跨平台、跨账号场景下需要人类 oversight。** Context compaction 会降级 agent 对 \"哪个账号做哪件事\" 的记忆。信任但要验证。\n\n5. **一次性操作 + 经验沉淀 = 复利。** 做完了就写进 runbook。下次你（或任何 agent）再做同样的事，不需要重新发现 Stripe receipt pattern 或 magic link 捷径。",
+  "heroImage": "",
+  "tags": [
+    "ai-agent",
+    "saas-audit",
+    "playwright",
+    "gmail-mcp",
+    "cli-x",
+    "subscription-management",
+    "google-passkey"
+  ],
+  "sessionId": "e123eeaf-682b-4ff6-9b6b-e1cf51a1cd40",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "project": "cli-x",
+  "date": "2026-04-17",
+  "duration": "",
+  "stats": {}
+}
