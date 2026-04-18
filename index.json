@@ -126,6 +126,33 @@
       }
     },
     {
+      "slug": "2026-04-18-2026-04-17-dw-to-dreamworks-plugin-namespace",
+      "title": "把 dw 变成 dreamworks：一次 skill plugin 的 namespace 重构",
+      "summary": "一句漫不经心的 \"symbolic link 可以干掉了？\"，拐了几个弯，最后拆掉三个 symlink、建一个 plugin，学到 Claude Code skill 分发的两个隐藏机制：directory source 是 snapshot 不是实时读，~/.claude 必须自包含。",
+      "date": "2026-04-18",
+      "tags": [
+        "claude-code",
+        "plugin",
+        "skill",
+        "namespace",
+        "refactor",
+        "dreamworks"
+      ],
+      "project": "dreamworks",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "sessionId": "916a122a-283d-4d55-8ee4-a9052fda900a",
+      "heroImage": "",
+      "path": "2026/04/18/2026-04-18-2026-04-17-dw-to-dreamworks-plugin-namespace.json"
+    },
+    {
       "slug": "2026-04-17-e123eeaf-article-1",
       "title": "让 AI Agent 帮你取消订阅：一场跨四个平台的 SaaS 审计实战",
       "summary": "一个 $200/yr 的 Substack bundle 续费提醒，引发了跨 Gmail、Outlook、Substack、Gamma 四个平台的订阅审计。AI Agent 在这个过程中撞上了 Google Passkey 的硬墙，发现了 Gmail MCP 比 Outlook Playwright 快 10 倍的事实，最终把实战经验沉淀回 cli-x skill。",
