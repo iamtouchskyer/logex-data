@@ -1,6 +1,36 @@
 {
   "articles": [
     {
+      "slug": "2026-04-18-27ddc26f-article-1",
+      "date": "2026-04-18",
+      "project": "opencli",
+      "tags": [
+        "opc",
+        "repo-advisor-builder",
+        "mechanical-gate",
+        "review-flow",
+        "validate-evidence",
+        "handshake-schema"
+      ],
+      "sessionId": "27ddc26f-3a50-4dd3-b4d3-3468a60a5a53",
+      "heroImage": "",
+      "chunkIndices": [
+        1,
+        2,
+        4
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "给 OpenCLI 建 advisor，然后用 OPC 扒自己一层皮",
+          "summary": "从 /repo-advisor-builder 生成 24 篇架构文档，到 /opc 派三个 reviewer 对自己的产出开枪，再到 validate-evidence.py 97 个假阳性——一个 session 里完成了一次完整的 build → review → polish 闭环。顺便证明了 mechanical gate 的盲区。",
+          "path": "2026/04/18/2026-04-18-27ddc26f-article-1.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-18-2026-04-17-opc-extension-capability-contract",
       "date": "2026-04-18",
       "project": "opc",
