@@ -128,7 +128,7 @@
     {
       "slug": "2026-04-18-2026-04-17-dw-to-dreamworks-plugin-namespace",
       "title": "把 dw 变成 dreamworks：一次 skill plugin 的 namespace 重构",
-      "summary": "一句漫不经心的 \"symbolic link 可以干掉了？\"，拐了几个弯，最后拆掉三个 symlink、建一个 plugin，学到 Claude Code skill 分发的两个隐藏机制：directory source 是 snapshot 不是实时读，~/.claude 必须自包含。",
+      "summary": "一句漫不经心的 \"symbolic link 可以干掉了？\"，拐了几个弯，最后拆掉三个 symlink、建一个 plugin、吃掉 dw-templates，学到 Claude Code skill 分发的两个隐藏机制 + repo 剪枝的三变量判断框架（audience/cadence/blast radius）。",
       "date": "2026-04-18",
       "tags": [
         "claude-code",
