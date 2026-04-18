@@ -1,6 +1,35 @@
 {
   "articles": [
     {
+      "slug": "2026-04-18-27ddc26f-article-2-advisor-monorepo",
+      "date": "2026-04-18",
+      "project": "repo-advisors",
+      "tags": [
+        "claude-code",
+        "skill-monorepo",
+        "github-cli",
+        "gh-auth-scope",
+        "repo-cleanup",
+        "monorepo-pattern"
+      ],
+      "sessionId": "27ddc26f-3a50-4dd3-b4d3-3468a60a5a53",
+      "heroImage": "",
+      "chunkIndices": [
+        5,
+        6
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "11 个 advisor，一个 repo：把散落的 Claude Code skill 收成单仓库",
+          "summary": "我有 11 个 advisor skill 散落在 ~/.claude/skills/，其中两个还有独立的 GitHub repo。一次性收成 monorepo + 一键安装脚本，顺便差点删错 agent.md。",
+          "path": "2026/04/18/2026-04-18-27ddc26f-article-2-advisor-monorepo.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-18-27ddc26f-article-1",
       "date": "2026-04-18",
       "project": "opencli",
