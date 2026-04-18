@@ -1,0 +1,35 @@
+{
+  "slug": "2026-04-18-2026-04-17-logex-genesis",
+  "lang": "zh",
+  "title": "Logex 的诞生：从「session 该留存」到一个双链博客",
+  "summary": "Memex 和 session-recap 跑得挺顺，突然意识到每一个 session 本身就值得留存——不是 memo card，是 blog。于是我把双链逻辑搬过来、起了个叫 Engram 的名字、又嫌不好听改成 Logex、打包塞进 GitHub repo 当 storage，最后还被自己狠狠地批评了一顿 UI。",
+  "body": "## 起因：一个「突然意识到」\n\n那天晚上我已经在跑 Memex 和 session-recap。Memex 把我每天的 insight 当 Zettelkasten 存起来——atomic、带 `[[link]]`、English kebab-case slug；session-recap 做的是把每个 Claude Code session 整理成一段 summary 卡进去。两个都工作得挺好。\n\n然后我盯着 `~/.claude/projects/` 下面那一堆 `*.jsonl`，突然意识到一件事：\n\n> 每一个 session 都值得把自己的记录好好留存下来，变成我将来的 memory，或者叫 brain。\n\nMemex 卡太短——是 insight 不是过程。Session-recap summary 也太短——是索引不是故事。真正有价值的是那个中间层：一个 session 做了哪些事、遇到了哪些坑、拐了哪些弯、最后为什么这么决定的。\n\n这不是 memo，这是 **blog**。\n\n## 第一个决策：一对一还是多对多\n\n一开始我想的是 `session → article` 一对一。结果自己想了两秒就推翻了：\n\n> 每个 session 都不一定是一篇，可能是多篇。因为一个 session 我们可能做了很多事情。最好的是你发现我切换 topic 的时候，自动就生成一篇。\n\n于是第一个设计决策定下来：**LLM-driven segmentation**。不是按时间切、不是按 token 切、不是按 tool-use 切。是把整个 session 喂给 LLM，让它自己认「这段在讲什么」、「这里是不是换话题了」。一个 session 可以产出 0 篇、1 篇、或者 5 篇。\n\n这个决定后来验证是对的。我一个横跨一天的 session 经常是：早上 debug 一个 auth bug、中午搞 frontend redesign、下午 PM+designer 过一轮 UX、晚上又回头修 backend。硬切就会把一个完整的 debug 故事拆得七零八落。\n\n## Pipeline 的形状\n\n几轮迭代下来 pipeline 长这样：\n\n```\nJSONL → parse.ts → chunk.ts (score) → prepare.ts\n         ↓\n     chunkSummaries[] + segmentationPrompt\n         ↓\n     LLM (Claude in session) → groups[]\n         ↓\n     article writing (LLM 自己写)\n         ↓\n     publish.ts (idempotent upsert)\n         ↓\n     logex-data repo → Vercel → logex.vercel.app\n```\n\n两个关键点：\n\n1. **Claude 自己在 session 里写文章**——不 call API，不花 API key 的钱，就用当前这个 Claude 自己的 context 和 token budget。这跟 Memex 的设计哲学一致：你已经是一个 LLM 了，不要再起一个 LLM 来指挥自己。\n2. **prepare.ts 只做纯计算**——parse、chunk、score，大概 2 秒。所有判断性工作（这是不是一个 topic？值不值得写？）都甩给 LLM。\n\n## 双链：从 Memex 复用\n\n用户原话：「本质上还是要 memex 的本质，双链。」\n\n于是 Logex 的 article 里天然带 `[[slug]]` 语法，frontend render 的时候一边扫一边连。两个 article 提到同一个 concept，就互相 backlink。这不是我 invent 的——Obsidian、Logseq、Andy Matuschak 的 note 都这么做。但能从 Memex 直接 port 过来让我省了两天。\n\n够用。不需要 graph DB，不需要 embedding search。要 reading ergonomics 的时候再加。\n\n## 存储：github repo or database？\n\n这是当时纠结最久的一步。两个选项：\n\n- **GitHub repo**（flat files + git）：版本历史免费、免 hosting、跟 Memex 的 logic 一样、用户可以 fork\n- **Database**（Supabase / Postgres）：查询快、搜索强、支持 auth 和 multi-user\n\n我问自己：logex 的用户是谁？\n\n**现在只有一个用户，就是我。** 未来可能 open source 给别人用。DB 方案的所有优势——auth、multi-user、concurrent write——现在都没用。GitHub repo 方案的所有劣势——查询慢、搜索弱——在 100 篇文章以内都不是问题。\n\n于是拍板：**GitHub repo 主力，同时留 DB adapter 给未来。** Runtime 读 `VITE_STORAGE` env 选 adapter。Production 用 `VITE_STORAGE=github`，指向 `iamtouchskyer/logex-data`。这个 repo 就是 data 层，app 是 view 层，干干净净。\n\n## 取名：Engram → Logex\n\n中间有一阵我叫它 **Engram**（神经科学里「记忆痕迹」的意思）。挺装的。用户一句「不好听，能找一个类似 memex、memra 这样的么」直接打回。\n\n`mem-ex` = memory + index。`log-ex` = log + index。对仗工整、读起来顺、跟 Memex 成一个家族。成了。\n\n这种命名决策其实很典型：**不要爱上第一个想到的名字。** Engram 有意义但难念；Logex 没那么「深」但好记。好记 > 有深度——尤其你自己都要在 terminal 里打 100 遍。\n\n## Publish 的坑：idempotent 要在 pipeline 的哪一层\n\n第一版 publish 就是 `append to index.json`。结果我重跑一遍 `/logex` 就 double-insert 了——同一个 session 的同一篇文章被写了两次。\n\n修法有三种：\n\n1. **Article 里带 sessionId + chunkIndices** → `publish.ts` 读现有 index，按 (sessionId, chunkIndices) 认同一篇，update 不 append\n2. **让 LLM 决定是 update 还是 insert**——但 LLM 的决定会飘\n3. **Slug 唯一 = hash(sessionId + chunkIndices)**——机械 dedup\n\n最后选了 1 + 2 的组合：`publish.ts prepare-match` 先用 code 对 sessionId 做 fast path，如果没歧义直接 insert；有歧义（同一 session 跑第二次，chunk 分组不一样）才抛给 LLM 决定 update 哪一篇。两层幂等，重跑 `/logex` 安全。\n\n## UI：被自己骂醒\n\nMVP 上线第一天我自己打开看：三列侧栏、白背景、一个 article list、完。功能都对，看着像 2005 年的 wiki。\n\n然后我跑去跟自己的 OPC（One-Person Company）系统说：\n\n> /opc 请启动 PM 和 designer 来好好设计一下啊\n\nPM agent 给我写了 PRD：首页该有时间线、tag cloud、search、dark mode、reading progress。Designer agent 给我画了 layout。我照着改了一晚上，首页变成：\n\n- 左侧 sidebar：tag cloud + project 分组\n- 中间：article timeline（按日期分组）\n- 右侧：current article reader + backlinks panel\n\n同一个信息密度，视觉上的「呼吸感」完全不一样。\n\n**Takeaway**: E2E 做完不是结束。打开它、用 5 分钟、骂它一顿、然后改。前端比后端更需要这一步，因为 UI 的「对」不是 test 能测出来的。\n\n## 三个后来才意识到是对的决定\n\n1. **LLM 写文章本身，不是 call API**——省钱、快、context 完整\n2. **GitHub repo 当 storage，同时留 DB adapter**——现在轻，未来不重构\n3. **双链从 Memex port 过来**——不 invent，复用已经跑顺的东西\n\n一个想法从「我突然意识到」到跑起来大概两天。中间最长的一段不是 coding，是取名——好的 naming 值得花这个时间。\n\n现在每个 session 跑完 `/logex`，就在 `logex.vercel.app` 多几篇文章，自动成为我自己的 brain 的一部分。就像这一篇。",
+  "heroImage": "",
+  "tags": [
+    "logex",
+    "memex",
+    "zettelkasten",
+    "0-to-1",
+    "storage-decision",
+    "naming",
+    "bidirectional-links"
+  ],
+  "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    27,
+    28,
+    30,
+    37
+  ],
+  "project": "logex",
+  "date": "2026-04-18",
+  "duration": "",
+  "stats": {}
+}

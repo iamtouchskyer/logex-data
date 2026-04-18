@@ -1,0 +1,32 @@
+{
+  "slug": "2026-04-18-2026-04-17-github-oauth-automation-dead-end",
+  "lang": "zh",
+  "title": "GitHub OAuth 自动化的死胡同：为什么「一条龙 skill」是错的方向",
+  "summary": "想做一个 Claude Code skill 自动创建 GitHub OAuth App——CLI 方法没有、GUI 方法要 Playwright、然后我意识到这整个方向都是错的。真正的问题不是「如何自动化 OAuth flow」，是「如何让 Claude Code 复用我已经登录的 browser」。",
+  "body": "## 起因\n\n我在给 logex 加 auth，需要一个 GitHub OAuth App。流程本身我很熟：GitHub → Settings → Developer settings → OAuth Apps → New。5 个字段、点一下 Create、复制 client_id/secret。3 分钟。\n\n但我下意识地问了一句：\n\n> 能不能帮我 build 一个自动创建 GitHub new OAuth app 的 skill？\n> 1) 有没有 CLI 的方法；2) 如果没有，有没有 GUI 的方法？\n\n这个问题让我和 Claude 卡了大概 6 个小时、两次 compaction、一次我当场破防骂人（字面意思——session log 里留下了「艸」）。最后解决方案跟我一开始想的完全不一样。\n\n## 第一层：GitHub API 的死胡同\n\nClaude 先查了官方文档：\n\n- GitHub REST API 有 `POST /applications/:client_id` 来 **管理** 已存在的 OAuth App\n- **但没有 endpoint 创建新的 OAuth App**\n\nGitHub 的态度很明确：OAuth App 创建必须走 web UI，不开 API。理由猜得出来——防止恶意 script 批量注册。\n\n所以 CLI 这条路直接堵死。\n\n## 第二层：Playwright 自动化的幻觉\n\nClaude 提议用 Playwright 模拟浏览器：\n\n```\nlaunch browser → login github.com → navigate to developer settings → fill form → click create → scrape client_id\n```\n\n听起来很 geek。我当时也接受了。然后问：\n\n> 我想你做一个或者若干个 skill，一条龙把这些都做了，用 playwright 之类的全自动\n\n做到一半卡住：**怎么登录 GitHub？** Claude Code 启动的是干净的 Chromium，没有我的 cookie、没有 session。\n\n选项：\n- 让我手填密码（每次都要做、破坏 automation 的意义）\n- 把密码存在文件里（灾难）\n- 用 Personal Access Token（PAT 能 API 调用，但网页登录不认 PAT）\n- 从我的 Edge browser 导 cookie（有点意思）\n\n## 第三层：Edge cookie 共享的坑\n\n我当时的原话：\n\n> Edge，我的账户密码都在里面，或者我有办法把我的 credential 打包给 Claude Code 么？我知道 Claude Code 有自己的 chromium。\n\n理论上可行：Edge 在 Mac 上的 cookie DB 在 `~/Library/Application Support/Microsoft Edge/Default/Cookies`，是 SQLite。Chromium 系（Edge、Chrome、Brave）cookie 格式互通、encryption 用 OS keychain。\n\n但有三个 landmine：\n\n1. **Encryption**: Cookie value 是 AES-128 CBC 加密，key 从 macOS Keychain 取。非交互式解密要 `security find-generic-password -s \"Microsoft Edge Safe Storage\"`——每次 pop up 一个 macOS 确认框。不能 headless。\n2. **Cookie 正在被 Edge lock**: SQLite DB 被 Edge 持有，另一个进程读会拿 stale data 或直接 fail。\n3. **2FA / device trust**: 就算 cookie 复制成功，GitHub 可能判定「新设备」要求二次验证，skill 再次卡住。\n\n每解决一个问题都要搭一层 workaround。方向不对。\n\n## 关键时刻：我骂了一顿\n\n```\n你为啥还是拘泥于 github app 呢？？？我说的我希望所有的都能自动，\n你为啥就是一个劲的就是 github app，你听不懂我说话么？？？艸\n不是说了从 edge 导入需要的么？\n你这是拿到我所有的对么\n```\n\nSession log 留着这一条。之后我冷静下来，意识到：**问题根本不在 OAuth flow，在 Claude Code 的 browser identity。**\n\n如果 Claude Code 能用「我已经登录好」的 browser 做事——不光是 GitHub，Vercel、AWS、Railway、Notion、Linear 全都能自动化。OAuth App 创建只是第一个 use case。\n\n## 正确的抽象\n\n重新定义问题：\n\n> 给 Claude Code 一个 API，能复用 **任意网站 已登录的 session**，然后在里面 navigate/fill/click。\n\n这不是「GitHub OAuth skill」，是 **「browser credential passthrough」**。实现方式几个选项：\n\n1. **Claude Code 直接用我的 Edge profile**: 可能但有 file lock、encryption、2FA 问题\n2. **跑一个 headless browser，从我的 Edge 导入 session storage + cookie 一次性**: 用 `chrome-cookies-secure` 类库，搞一次 handshake\n3. **我的 Edge 开 DevTools Protocol port**: Edge 启动加 `--remote-debugging-port=9222`，Claude Code attach 到这个 port、用我的完整 browser state 操作\n4. **单独跑一个「我的 browser」container**: 启动一个 headful Chromium、我自己手动登录几个主要网站、之后 Claude Code 都通过这个 container 操作\n\n方案 3 最干净。Edge 启动参数加一个 flag、Claude Code 通过 CDP attach、所有 cookie/session/auth 天然继承。不用偷 cookie、不用解密、不触发 2FA。\n\n## 最后的决定：不做了\n\n但我最后没走任何一个方案。\n\n因为算了算 ROI：OAuth App 我手动 3 分钟就建完了、1 个项目建 1 次、一辈子用 5 次。为了省 15 分钟搭一个几百行代码的 credential passthrough 系统、还要维护、还有 security risk（一个 bug 就能让任何 skill 偷到我所有网站 session）。\n\n**不做。**\n\n我手动 3 分钟建了 OAuth App，继续写 logex 的业务逻辑。\n\n## 三个 takeaway\n\n1. **先问「为什么卡」再问「怎么过」**。我一开始死磕「GitHub OAuth CLI」、然后「GitHub OAuth Playwright」，都是症状层。根因是「Claude Code 没有我的 browser identity」，解法完全不同。\n2. **Claude 不会自己 zoom out**。它顺着我问的方向一路往下挖。卡住的时候得我自己跳出来问「这个问题我们是不是问错了」。这一点 session 里几次破防骂人都是触发在这里。\n3. **Automation 的 ROI 要算二次**。第一次算：「手动多久 vs 写 automation 多久」。第二次算：「写完之后的维护成本 + 安全风险」。OAuth App 创建过 1 次、3 分钟——二次算完直接劝退。\n\n那 6 个小时也不算白花：现在我知道了 Edge cookie 怎么加密、CDP 怎么 attach、Claude Code 的 Chromium 在哪里。哪天真要做 browser credential passthrough（可能做成一个独立产品），这些都是本金。",
+  "heroImage": "",
+  "tags": [
+    "claude-code",
+    "automation",
+    "oauth",
+    "playwright",
+    "roi",
+    "debugging",
+    "zoom-out"
+  ],
+  "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
+  "chunkIndices": [
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+  ],
+  "project": "logex",
+  "date": "2026-04-18",
+  "duration": "",
+  "stats": {}
+}
