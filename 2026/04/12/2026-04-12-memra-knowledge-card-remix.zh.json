@@ -1,0 +1,47 @@
+{
+  "slug": "2026-04-12-memra-knowledge-card-remix",
+  "title": "Memra：当知识卡片想要被 Remix",
+  "summary": "从 /dw 评估到 OPC loop 实现，记录 Memra 知识二创平台的 0-to-1。包括 cluster radar 功能的构建、UX 的 \"满屏卡片没有行动点\" 问题、GitHub App 集成的架构抉择、以及多角色用户验收测试。",
+  "body": "# Memra：当知识卡片想要被 Remix\n\n事情是这样开始的：在把 memex 卡片写成一本书之后，我意识到 \"书\" 只是知识二创的一种形式。卡片还可以被组合成 blog post、newsletter、slide deck、甚至交互式的知识图谱。这些不同的输出形式需要一个统一的入口——不是一个 CLI 命令，而是一个真正的产品界面。\n\n于是 Memra 这个项目诞生了。\n\n## DW 评估：三个方向都想做\n\n在正式动手之前，我用 `/dw new` 做了方向评估。我脑子里有三个方向：1) 知识聚类可视化（把相关卡片自动分组并展示关系）；2) 二创工作流（从卡片到成品的 pipeline）；3) 发布和分享。dream-works 的评估结论是三个方向都 viable，但建议先做 1——因为聚类可视化是后两者的基础设施，没有它，二创和分享都缺乏 \"从哪里开始\" 的入口。\n\n这个建议和我的直觉一致。Cluster radar 成了 Tier 1 目标。\n\n## OPC Loop 构建：第一次用 loop 做完整产品\n\n我用 `/opc loop` 来驱动 Memra 的开发。这是我第一次用 OPC 的 loop 模式来做一个从零开始的产品。具体做法是给 OPC 一个 Tier 1 的任务描述（cluster radar 的 spec），然后让它自己启动角色、分解任务、执行实现。\n\n第一轮 loop 完成了基础的 data pipeline：从 memex 读取卡片 → 提取关键词和 embedding → 基于相似度做聚类 → 输出 cluster 结构。这部分相对 straightforward，因为 memex 的卡片格式是标准化的。\n\n问题出在前端。\n\n## \"满屏都是卡片，没有行动点！\"\n\n第一版 UI 出来之后，我打开页面的第一反应是：这是什么？满屏幕都是卡片缩略图，密密麻麻地排列着，用颜色区分不同的 cluster。技术上没问题——每个 cluster 确实被正确识别和标注了。但从用户角度看，这个界面完全没有行动点。\n\n我看不到 \"从哪里开始\"。看不到 \"下一步做什么\"。没有 call-to-action，没有 progressive disclosure，只有一面信息墙。\n\n这个问题的根源在于：开发过程中所有角色（包括 OPC 里的 UX 角色）都太了解系统的内部结构了。他们知道每个 cluster 的含义，知道点击卡片会发生什么，知道这个界面的 mental model。但一个第一次打开 Memra 的用户，什么都不知道。\n\n我当时的反馈很直接：\"你没有启动真实用户的视角，你还需要去寻找其他可以做 remix 的 app 来看。\" 这不是一个代码层面的问题，而是一个视角层面的问题。解决方案不是调整 CSS，而是重新思考 first-time user experience。\n\n后续的修改方向是：1) 增加一个 onboarding overlay，告诉用户 \"你的卡片被分成了 N 个知识族群\"；2) 默认展示最有趣的（活跃度最高的）cluster，而不是全部平铺；3) 每个 cluster 有一个明确的 \"开始 remix\" 按钮。这些改动把 \"信息展示\" 变成了 \"行动引导\"。\n\n## GitHub App 集成：一个还是两个？\n\n部署的时候遇到了一个架构问题：Memra 需要 GitHub App 来 authenticate 用户和读取 memex repo。问题是 local development 和 Vercel production 环境需要不同的 OAuth callback URL。这意味着要么用一个 GitHub App 同时处理两个环境（通过动态 redirect），要么创建两个独立的 GitHub App。\n\n我一开始觉得应该用两个——隔离性好，不会因为改 production 配置把 local dev 搞挂。但 Claude 查了一下发现一个 GitHub App 就可以 work for Vercel，因为 Vercel 的部署 URL 是可预测的。最终选了一个 App 的方案，减少维护成本。\n\n这个决策过程本身不复杂，但它体现了一个 pattern：在部署相关的问题上，\"更简单\" 几乎总是更好的选择。多一个需要维护的 GitHub App 意味着多一个可能过期的 secret、多一个可能不一致的配置、多一个需要在文档里解释的东西。\n\n## 多角色用户验收\n\n功能基本完成后，我用 OPC 启动了三个虚拟用户角色来做验收。这些角色有不同的背景：一个是重度 Zettelkasten 用户，一个是完全不了解知识管理的普通开发者，一个是内容创作者。\n\n重度用户的反馈最有价值：他指出了 cluster 的命名问题。自动生成的 cluster name 往往是 \"AI-Tools-Workflow\" 这样的关键词拼接，缺乏人类语言的自然感。一个好的 cluster name 应该是 \"为什么我放弃了 Notion 转投 plain text\" 这种叙事性的标题，而不是 \"Note-Taking-Tools-Comparison\" 这种分类标签。\n\n这又回到了之前在书写过程中遇到的同一个问题：LLM 擅长分类和归纳，但在 \"给碎片起一个有灵魂的名字\" 这件事上，仍然需要人类的品味介入。\n\n## 未完成的部分\n\nSession 结束时，Memra 的 Tier 1 基本完成但还没有正式部署到 Vercel。剩下的工作包括 ink-flow 集成（让二创成品可以直接发布到 blog）和正式的 production deployment。这些被记录为 TODO，等待下一个 session 继续推进。\n\n回头看，Memra 这个 session 最大的收获不是代码本身，而是对 \"知识产品\" 的理解深化了一层：知识的价值不在于它被存储在哪里，而在于它能被以多少种形式重新表达。卡片是一种形式，书是一种形式，可视化 cluster 是一种形式，remix 出来的 blog post 又是一种形式。Memra 要做的不是 \"又一个笔记工具\"，而是知识的形态转换器。",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memra-knowledge-card-remix.png",
+  "tags": [
+    "memra",
+    "knowledge-remix",
+    "OPC-loop",
+    "cluster-radar",
+    "UX",
+    "GitHub-App",
+    "Vercel"
+  ],
+  "sessionId": "unknown",
+  "project": "memra",
+  "date": "2026-04-12",
+  "duration": "",
+  "stats": {
+    "entries": 12359,
+    "messages": 1832,
+    "chunks": 130
+  },
+  "chunkIndices": [
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92
+  ],
+  "lang": "zh"
+}

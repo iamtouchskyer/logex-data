@@ -1,0 +1,53 @@
+{
+  "slug": "2026-04-15-three-skills-merged-into-pipeline",
+  "title": "When Three Tools Become One: Building a Unified Pipeline",
+  "summary": "The journey from three separate tools—tooleval, OPC, and idea validation—into a single, unified Idea Factory skill. Covers architectural choices between skill vs MCP, relationship definitions with OPC, and self-dogfood testing.",
+  "body": "# When Three Tools Become One: Building a Unified Pipeline\n\n\"Are you actually building a skill called go-build-a-startup?\"\n\nThat's what the user said in chunk 30. By then, they'd realized there were actually three separate threads running: OPC handling project management and multi-role debates, tooleval doing MCP server quality assessment, and gate-based validation filtering ideas. Each made sense in isolation, but the experience was fragmented.\n\n## Why Merge?\n\nThe user's core vision was actually simple: search Product Hunt for products, analyze which ones could be quickly rebuilt in the agent era and bring value to the Claude Code ecosystem, then run the full pipeline from idea → assessment → design → validation.\n\n\"Can you summarize what projects you're actually working on... this is interesting, should we merge these?\"\n\nThose \"wait, are these all the same thing?\" moments are the most valuable insights in 0-to-1 development. They show that your earlier divergent exploration wasn't wasted—you need to build the components first before you can see how they fit together.\n\n## Architecture Debate: Skill vs MCP\n\nThe first question for merging was choosing the form factor. The Claude Code ecosystem has two main extension approaches:\n\n- **Skill**: A prompt + behavior definition loaded directly by Claude Code. Lightweight, deploy by copying files, tightly coupled with user workflows.\n- **MCP server**: Standardized tool service that exposes capabilities through protocol, callable by any MCP-compatible client. More \"proper\" but heavier.\n\nThe user was clear: \"I think this should become a skill, not MCP, because my entire workflow chain is skills right now. What do you think?\"\n\nThe logic here: at this stage, the goal is making it smooth for personal use, not providing services to others. Skills iterate much faster than MCP—change one line of prompt and it works, no server restarts, no protocol compatibility issues, no multi-tenant concerns.\n\nOf course, this means refactoring later when you want to share with others. But that's future work. YAGNI.\n\n## The Three-Way Relationship\n\nBy chunks 44-45, the user demanded a clear relationship mapping:\n\n\"Pretend I'm an investor—what's the relationship between idea factory and OPC, tooleval?\"\n\nThe final architecture that emerged:\n\n- **Idea Factory** is the main pipeline. It defines the complete flow from idea discovery to validation to execution.\n- **OPC** is Idea Factory's execution engine. OPC's digraph-based task management, multi-role review, and checkpoint mechanisms get reused by Idea Factory.\n- **tooleval** is an optional component in Idea Factory. When an idea involves MCP server quality assessment, tooleval gets called. It's not required.\n\nIn one sentence: Idea Factory is the CEO, OPC is the project manager, tooleval is the outsourced QA.\n\n\"Why isn't tooleval a skill? Can't it be used independently?\" the user asked. Answer: yes, it can. tooleval stays independent but can be invoked by Idea Factory. This is proper modularity—each component works standalone and can also be orchestrated.\n\n## Self-Dogfood: Using Idea Factory to Evaluate Idea Factory\n\nThe requirements included one particularly interesting stipulation: \"Use this skill to evaluate our skill itself.\"\n\nThis is extreme dogfooding. A tool that evaluates ideas should first be able to evaluate itself. If Idea Factory scores itself poorly, either the tool has bugs or the idea genuinely isn't good enough—both cases worth investigating.\n\nActually running this (chunk 42) exposed several issues: missing fallbacks in pipeline steps, insufficient error handling, overly long prompts causing context waste. These are problems you'll never discover by \"thinking about architecture\" in isolation.\n\n## The Final Skill Form\n\nBy chunk 50, Idea Factory skill v1 had taken shape:\n\n1. **Discover**: Get idea candidates from Product Hunt / GitHub trending / user input\n2. **Screen**: Multi-role AI review with kappa consistency checking\n3. **Deep-dive**: Technical feasibility spikes for ideas that pass initial screening\n4. **Validate**: If MCP-related, call tooleval for automated testing\n5. **Report**: Generate structured reports with go/no-go recommendations\n\nEach step can run independently or chain together seamlessly. OPC tracks the status and outputs of every step.\n\nThis design isn't perfect. The biggest issue is Discover stage sourcing being too dependent on Product Hunt—limiting idea source diversity. But perfect is the enemy of shipping. The user's attitude was clear: get it running first, iterate later.\n\nFrom three scattered tools to one pipeline took about 20 chunks. Sounds like a lot, but considering the multiple session breaks, direction realignments, and architectural debates, the actual \"effective work time\" was probably just a few hours.\n\nThe expensive part isn't writing code—it's figuring out \"are these three things actually one thing or three things?\"",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-three-skills-merged-into-pipeline.png",
+  "tags": [
+    "skill-design",
+    "architecture",
+    "pipeline",
+    "opc",
+    "tooleval",
+    "idea-factory",
+    "dogfooding"
+  ],
+  "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+  "project": "idea-factory",
+  "date": "2026-04-15",
+  "duration": "",
+  "stats": {
+    "entries": 25005,
+    "messages": 3466,
+    "chunks": 269
+  },
+  "chunkIndices": [
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75
+  ],
+  "lang": "en"
+}

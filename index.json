@@ -47,6 +47,11 @@
           "title": "OPC Extension 丝滑化改造：从 meta.nodes 硬编码到 capability contract",
           "summary": "OPC extension system 第一版能跑，但 activation 是 `meta.nodes = [\"code-review\"]` 这种硬编码——加一个 flow 就得改 extension code，双向耦合。重写成 capability contract（provides × requires）之后，extension 不再认识 OPC node 名字。顺手修了 4 个会让用户破防的坑。",
           "path": "2026/04/18/2026-04-18-2026-04-17-opc-extension-capability-contract.zh.json"
+        },
+        "en": {
+          "title": "Smoothing Out OPC Extensions: From Hardcoded meta.nodes to Capability Contracts",
+          "summary": "The first version of OPC's extension system worked, but activation was hardcoded as `meta.nodes = [\"code-review\"]`—adding a new flow meant changing extension code, creating tight coupling. After rewriting it with capability contracts (provides × requires), extensions no longer know OPC node names. Also fixed 4 gotchas that would frustrate users.",
+          "path": "2026/04/18/2026-04-18-2026-04-17-opc-extension-capability-contract.en.json"
         }
       }
     },
@@ -86,6 +91,11 @@
           "title": "Logex 的诞生：从「session 该留存」到一个双链博客",
           "summary": "Memex 和 session-recap 跑得挺顺，突然意识到每一个 session 本身就值得留存——不是 memo card，是 blog。于是我把双链逻辑搬过来、起了个叫 Engram 的名字、又嫌不好听改成 Logex、打包塞进 GitHub repo 当 storage，最后还被自己狠狠地批评了一顿 UI。",
           "path": "2026/04/18/2026-04-18-2026-04-17-logex-genesis.zh.json"
+        },
+        "en": {
+          "title": "Building Logex: When Every Session Deserves to Become a Blog Post",
+          "summary": "Memex and session-recap were humming along nicely when I suddenly realized each session was worth preserving—not as memo cards, but as proper blog posts. So I ported the bidirectional linking logic over, named it Engram (then changed it to Logex because it sounded better), packaged it into a GitHub repo for storage, and ended up giving myself a brutal UI critique.",
+          "path": "2026/04/18/2026-04-18-2026-04-17-logex-genesis.en.json"
         }
       }
     },
@@ -122,6 +132,11 @@
           "title": "GitHub OAuth 自动化的死胡同：为什么「一条龙 skill」是错的方向",
           "summary": "想做一个 Claude Code skill 自动创建 GitHub OAuth App——CLI 方法没有、GUI 方法要 Playwright、然后我意识到这整个方向都是错的。真正的问题不是「如何自动化 OAuth flow」，是「如何让 Claude Code 复用我已经登录的 browser」。",
           "path": "2026/04/18/2026-04-18-2026-04-17-github-oauth-automation-dead-end.zh.json"
+        },
+        "en": {
+          "title": "The Dead End of GitHub OAuth Automation: Why 'Full-Stack Skills' Are the Wrong Direction",
+          "summary": "I wanted to build a Claude Code skill to automatically create GitHub OAuth Apps—no CLI method exists, GUI requires Playwright, then I realized this whole direction was wrong. The real problem isn't 'how to automate OAuth flow,' it's 'how to let Claude Code reuse my already-logged-in browser.'",
+          "path": "2026/04/18/2026-04-18-2026-04-17-github-oauth-automation-dead-end.en.json"
         }
       }
     },
@@ -154,9 +169,8 @@
     },
     {
       "slug": "2026-04-17-e123eeaf-article-1",
-      "title": "让 AI Agent 帮你取消订阅：一场跨四个平台的 SaaS 审计实战",
-      "summary": "一个 $200/yr 的 Substack bundle 续费提醒，引发了跨 Gmail、Outlook、Substack、Gamma 四个平台的订阅审计。AI Agent 在这个过程中撞上了 Google Passkey 的硬墙，发现了 Gmail MCP 比 Outlook Playwright 快 10 倍的事实，最终把实战经验沉淀回 cli-x skill。",
       "date": "2026-04-17",
+      "project": "cli-x",
       "tags": [
         "ai-agent",
         "saas-audit",
@@ -166,7 +180,7 @@
         "subscription-management",
         "google-passkey"
       ],
-      "project": "cli-x",
+      "sessionId": "e123eeaf-682b-4ff6-9b6b-e1cf51a1cd40",
       "chunkIndices": [
         1,
         2,
@@ -185,15 +199,25 @@
         15,
         16
       ],
-      "sessionId": "e123eeaf-682b-4ff6-9b6b-e1cf51a1cd40",
       "heroImage": "",
-      "path": "2026/04/17/2026-04-17-e123eeaf-article-1.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "让 AI Agent 帮你取消订阅：一场跨四个平台的 SaaS 审计实战",
+          "summary": "一个 $200/yr 的 Substack bundle 续费提醒，引发了跨 Gmail、Outlook、Substack、Gamma 四个平台的订阅审计。AI Agent 在这个过程中撞上了 Google Passkey 的硬墙，发现了 Gmail MCP 比 Outlook Playwright 快 10 倍的事实，最终把实战经验沉淀回 cli-x skill。",
+          "path": "2026/04/17/2026-04-17-e123eeaf-article-1.zh.json"
+        },
+        "en": {
+          "title": "AI Agent vs. Subscription Hell: A Cross-Platform SaaS Audit Battle Report",
+          "summary": "A $200/yr Substack bundle renewal triggered a subscription audit across Gmail, Outlook, Substack, and Gamma. The AI agent hit a brick wall with Google Passkey, discovered Gmail MCP is 10x faster than Outlook Playwright, and ultimately distilled hard-won lessons back into reusable cli-x skills.",
+          "path": "2026/04/17/2026-04-17-e123eeaf-article-1.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-17-design-lint-surgery-discovery-vs-gate",
-      "title": "给 design-lint 动手术：从 240 个发现砍到 151 个，外加一个 pattern 名字",
-      "summary": "写完一个 design lint engine，自信它能当 OPC 的 code-review gate。跑了 10 个真实站之后发现：我写的是设计教程里的 folk wisdom，不是规则。",
       "date": "2026-04-17",
+      "project": "opc-extend-design-lint",
       "tags": [
         "design-system",
         "opc",
@@ -201,7 +225,7 @@
         "benchmark",
         "claude-code"
       ],
-      "project": "opc-extend-design-lint",
+      "sessionId": "88effbab-f964-4a0a-afee-4d52be07a834",
       "chunkIndices": [
         9,
         10,
@@ -209,15 +233,25 @@
         12,
         13
       ],
-      "sessionId": "88effbab-f964-4a0a-afee-4d52be07a834",
       "heroImage": "",
-      "path": "2026/04/17/2026-04-17-design-lint-surgery-discovery-vs-gate.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "给 design-lint 动手术：从 240 个发现砍到 151 个，外加一个 pattern 名字",
+          "summary": "写完一个 design lint engine，自信它能当 OPC 的 code-review gate。跑了 10 个真实站之后发现：我写的是设计教程里的 folk wisdom，不是规则。",
+          "path": "2026/04/17/2026-04-17-design-lint-surgery-discovery-vs-gate.zh.json"
+        },
+        "en": {
+          "title": "Surgery on design-lint: From 240 findings to 151, plus a pattern name",
+          "summary": "Built a design lint engine, confident it could gate OPC code reviews. After running it on 10 real sites: turns out I'd encoded design tutorial folk wisdom, not rules.",
+          "path": "2026/04/17/2026-04-17-design-lint-surgery-discovery-vs-gate.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-17-ba9b2d27-article-3",
-      "title": "OPC 改自己：在 loop 翻车之后修 harness",
-      "summary": "loop 跑完觉得 OPC harness 自己有 8 个可以改的点。挑了 4 个低风险的当场 fix——空 severity header 误报、backlog 吃空行、deprecation 刷屏、loop 之间没有 handoff。剩下两个 schema 级别的留给单独 PR。",
       "date": "2026-04-17",
+      "project": "opc-skill",
       "tags": [
         "opc",
         "skill",
@@ -225,7 +259,7 @@
         "meta",
         "fix"
       ],
-      "project": "opc-skill",
+      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
       "chunkIndices": [
         11,
         12,
@@ -233,15 +267,25 @@
         14,
         15
       ],
-      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
       "heroImage": "",
-      "path": "2026/04/17/2026-04-17-ba9b2d27-article-3.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "OPC 改自己：在 loop 翻车之后修 harness",
+          "summary": "loop 跑完觉得 OPC harness 自己有 8 个可以改的点。挑了 4 个低风险的当场 fix——空 severity header 误报、backlog 吃空行、deprecation 刷屏、loop 之间没有 handoff。剩下两个 schema 级别的留给单独 PR。",
+          "path": "2026/04/17/2026-04-17-ba9b2d27-article-3.zh.json"
+        },
+        "en": {
+          "title": "OPC Fixes Itself: Patching the Harness After a Loop Crash",
+          "summary": "After running a loop, OPC identified 8 areas needing improvement in its own harness. Fixed 4 low-risk issues on the spot—empty severity header false positives, backlog consuming empty lines, deprecation spam, and missing handoff between loops. Left two schema-level changes for separate PRs.",
+          "path": "2026/04/17/2026-04-17-ba9b2d27-article-3.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-17-ba9b2d27-article-2",
-      "title": "OPC Session Regrets Closeout：一场被 unit test 骗到的 loop",
-      "summary": "上一轮 OPC loop 停在 71.9%，留下 6 条 regret。新开一轮去清账，F2.1 靠 unit test 报 ITERATE，结果 live eval 打脸。ppt_008 +44pp 大胜，同一个 fix 让 ppt_010 -10pp regression。不是 fix 错了，是我对 verification 的理解错了。",
       "date": "2026-04-17",
+      "project": "mitsein-pptx-migration",
       "tags": [
         "opc",
         "evaluator",
@@ -249,22 +293,32 @@
         "regression",
         "retro"
       ],
-      "project": "mitsein-pptx-migration",
+      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
       "chunkIndices": [
         7,
         8,
         9,
         10
       ],
-      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
       "heroImage": "",
-      "path": "2026/04/17/2026-04-17-ba9b2d27-article-2.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "OPC Session Regrets Closeout：一场被 unit test 骗到的 loop",
+          "summary": "上一轮 OPC loop 停在 71.9%，留下 6 条 regret。新开一轮去清账，F2.1 靠 unit test 报 ITERATE，结果 live eval 打脸。ppt_008 +44pp 大胜，同一个 fix 让 ppt_010 -10pp regression。不是 fix 错了，是我对 verification 的理解错了。",
+          "path": "2026/04/17/2026-04-17-ba9b2d27-article-2.zh.json"
+        },
+        "en": {
+          "title": "When Unit Tests Lie: An OPC Session That Taught Me Hard Lessons About Verification",
+          "summary": "Previous OPC loop stalled at 71.9% with 6 regrets. Started a new session to clear them. F2.1 reported ITERATE based on passing unit tests, but live eval exposed the lie. ppt_008 gained +44pp, while ppt_010 regressed -10pp from the same fix. The problem wasn't the fix—it was my flawed understanding of what verification actually means.",
+          "path": "2026/04/17/2026-04-17-ba9b2d27-article-2.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-17-ba9b2d27-article-1",
-      "title": "前端 tool view 突然全瞎了：一次协议 break 引发的 CI 信任危机",
-      "summary": "打开 agent 页面，所有 toolcall view 和 ask card 都只剩一个光秃秃的数字列表。修复不难，真正可怕的是——一个从 snake_case 到 camelCase 的字段重命名，20 多个测试全绿 push 进主干，没有一个测试抓住它。",
       "date": "2026-04-17",
+      "project": "mitsein-pptx-migration",
       "tags": [
         "frontend",
         "contract-test",
@@ -272,7 +326,7 @@
         "regression",
         "mitsein"
       ],
-      "project": "mitsein-pptx-migration",
+      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
       "chunkIndices": [
         1,
         2,
@@ -281,15 +335,25 @@
         5,
         6
       ],
-      "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
       "heroImage": "",
-      "path": "2026/04/17/2026-04-17-ba9b2d27-article-1.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "前端 tool view 突然全瞎了：一次协议 break 引发的 CI 信任危机",
+          "summary": "打开 agent 页面，所有 toolcall view 和 ask card 都只剩一个光秃秃的数字列表。修复不难，真正可怕的是——一个从 snake_case 到 camelCase 的字段重命名，20 多个测试全绿 push 进主干，没有一个测试抓住它。",
+          "path": "2026/04/17/2026-04-17-ba9b2d27-article-1.zh.json"
+        },
+        "en": {
+          "title": "When Your Frontend Goes Blind: How a Snake-to-Camel Rename Broke Production and Exposed Our CI",
+          "summary": "Opened the agent page to find all toolcall views and ask cards reduced to bare numbered lists. The fix was easy—the scary part was realizing that a simple field rename from snake_case to camelCase sailed through 20+ green tests straight into main without a single failure.",
+          "path": "2026/04/17/2026-04-17-ba9b2d27-article-1.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-ppt-agent-quality-loop-ceiling",
-      "title": "PPT Agent 质量循环：从 67% 到 72%，然后撞墙",
-      "summary": "用 OPC loop 跑了 12 个 tick，把 PPT agent 的评分从 67% 推到 72%。然后发现 prompt 优化已经到了理论上限的 94%——剩下的 6% 要改 rubric、改 template、改 infra。",
       "date": "2026-04-16",
+      "project": "mitsein",
       "tags": [
         "mitsein",
         "ppt-agent",
@@ -298,45 +362,75 @@
         "llm-evaluation",
         "opc-loop"
       ],
-      "project": "mitsein",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-ppt-agent-quality-loop-ceiling.png",
-      "path": "2026/04/16/2026-04-16-ppt-agent-quality-loop-ceiling.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "PPT Agent 质量循环：从 67% 到 72%，然后撞墙",
+          "summary": "用 OPC loop 跑了 12 个 tick，把 PPT agent 的评分从 67% 推到 72%。然后发现 prompt 优化已经到了理论上限的 94%——剩下的 6% 要改 rubric、改 template、改 infra。",
+          "path": "2026/04/16/2026-04-16-ppt-agent-quality-loop-ceiling.zh.json"
+        },
+        "en": {
+          "title": "PPT Agent Quality Loop: From 67% to 72%, Then Hitting the Wall",
+          "summary": "Ran 12 ticks of OPC loop to push PPT agent scores from 67% to 72%. Then discovered prompt optimization had reached 94% of theoretical maximum—the remaining 6% requires fixing rubric, template, and infra. A real accounting of agent quality engineering.",
+          "path": "2026/04/16/2026-04-16-ppt-agent-quality-loop-ceiling.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-opc-loop-bootstrap",
-      "title": "用 Loop 修 Loop：一场注定被 remote 覆盖的 meta 实验",
-      "summary": "把 OPC loop engine 的 4 个 gap 写成 plan.md，用 loop 跑自己。8 ticks 全绿，结果 git push 发现 remote 已经做了更完整的版本。",
       "date": "2026-04-16",
+      "project": "opc",
       "tags": [
         "opc",
         "loop-engine",
         "self-bootstrap",
         "meta-testing"
       ],
-      "project": "opc",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-opc-loop-bootstrap.png",
-      "path": "2026/04/16/2026-04-16-opc-loop-bootstrap.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 Loop 修 Loop：一场注定被 remote 覆盖的 meta 实验",
+          "summary": "把 OPC loop engine 的 4 个 gap 写成 plan.md，用 loop 跑自己。8 ticks 全绿，结果 git push 发现 remote 已经做了更完整的版本。",
+          "path": "2026/04/16/2026-04-16-opc-loop-bootstrap.zh.json"
+        },
+        "en": {
+          "title": "Eating My Own Tail: A Meta Loop Experiment Destined for Git Conflicts",
+          "summary": "Turned OPC loop engine's 4 gaps into a plan.md and ran the loop on itself. 8 ticks, all green, then git push revealed remote had shipped a more complete version. Sometimes failure teaches more than success.",
+          "path": "2026/04/16/2026-04-16-opc-loop-bootstrap.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-opc-hardening-journey",
-      "title": "从 Hermes Review 到 21 个 Test Suite：三周硬化一个 Agent 框架",
-      "summary": "Week 1 被自己的 advisor 打了 47 分。Week 3 变成 21 个 test suite + 0 failures。一个 agent 框架从「能跑」到「能信」的全记录。",
       "date": "2026-04-16",
+      "project": "opc",
       "tags": [
         "opc",
         "testing",
         "agent-framework",
         "security-hardening"
       ],
-      "project": "opc",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-opc-hardening-journey.png",
-      "path": "2026/04/16/2026-04-16-opc-hardening-journey.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从 Hermes Review 到 21 个 Test Suite：三周硬化一个 Agent 框架",
+          "summary": "Week 1 被自己的 advisor 打了 47 分。Week 3 变成 21 个 test suite + 0 failures。一个 agent 框架从「能跑」到「能信」的全记录。",
+          "path": "2026/04/16/2026-04-16-opc-hardening-journey.zh.json"
+        },
+        "en": {
+          "title": "From 47/100 to Zero Failures: Three Weeks of Hardening an Agent Framework",
+          "summary": "Week 1: My own advisor scored my work 47/100. Week 2: I wrote 6 protocol specs. Week 3: 1686 lines of code + 21 test suites + 0 failures. The complete story of taking an agent framework from 'it works' to 'you can trust it.'",
+          "path": "2026/04/16/2026-04-16-opc-hardening-journey.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-e2e-testing-ai-code-three-traps",
-      "title": "给 AI 写的代码补 E2E 测试：Playwright + axe-core 踩了三个真实的坑",
-      "summary": "page.route() 拦截不了 Next.js Server Components 的 fetch。axe-core 算不对 rgba 颜色的对比度。Playwright 的 data: 选项强制 JSON 序列化，raw malformed JSON 根本发不出去。三个坑，三个根因，三个解法。",
       "date": "2026-04-16",
+      "project": "family-calendar",
       "tags": [
         "E2E测试",
         "Playwright",
@@ -345,15 +439,25 @@
         "Next.js",
         "Testing"
       ],
-      "project": "family-calendar",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-e2e-testing-ai-code-three-traps.png",
-      "path": "2026/04/16/2026-04-16-e2e-testing-ai-code-three-traps.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "给 AI 写的代码补 E2E 测试：Playwright + axe-core 踩了三个真实的坑",
+          "summary": "page.route() 拦截不了 Next.js Server Components 的 fetch。axe-core 算不对 rgba 颜色的对比度。Playwright 的 data: 选项强制 JSON 序列化，raw malformed JSON 根本发不出去。三个坑，三个根因，三个解法。",
+          "path": "2026/04/16/2026-04-16-e2e-testing-ai-code-three-traps.zh.json"
+        },
+        "en": {
+          "title": "Three Real-World E2E Testing Gotchas: When AI-Generated Tests Don't Test What You Think",
+          "summary": "page.route() can't intercept Next.js Server Components fetch calls. axe-core miscalculates rgba color contrast ratios. Playwright's data option force-serializes JSON, making it impossible to send raw malformed payloads. These three gotchas sent me down multiple rabbit holes while adding E2E tests to AI-generated code—here's the root cause and fix for each.",
+          "path": "2026/04/16/2026-04-16-e2e-testing-ai-code-three-traps.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-design-lint-from-scratch",
-      "title": "从字体不一致到 400 行零依赖 Linter：用 OPC Loop 从零构建 Design Lint",
-      "summary": "博客上的字体和颜色问题肉眼能看到但测试抓不住。一个 OPC 3-tick loop 跑完之后，产出了一个零依赖的 visual consistency linter——8 个 bug 被两个独立 reviewer 揪出来，全部修完，regression green。",
       "date": "2026-04-16",
+      "project": "blog",
       "tags": [
         "design-lint",
         "opc-loop",
@@ -361,15 +465,25 @@
         "claude-code-skill",
         "zero-deps"
       ],
-      "project": "blog",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-design-lint-from-scratch.png",
-      "path": "2026/04/16/2026-04-16-design-lint-from-scratch.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从字体不一致到 400 行零依赖 Linter：用 OPC Loop 从零构建 Design Lint",
+          "summary": "博客上的字体和颜色问题肉眼能看到但测试抓不住。一个 OPC 3-tick loop 跑完之后，产出了一个零依赖的 visual consistency linter——8 个 bug 被两个独立 reviewer 揪出来，全部修完，regression green。",
+          "path": "2026/04/16/2026-04-16-design-lint-from-scratch.zh.json"
+        },
+        "en": {
+          "title": "When AI Says Your Fonts Are Inconsistent, Here's What It Really Means — Building a Design Lint Tool from Scratch",
+          "summary": "E2E tests tell you if buttons work, but they won't tell you that your site uses 5 different fonts and 27 text colors. Spent an entire session going from manual auditing to automated design lint tooling — including a Node.js URL encoding bug that tripped me up on iCloud paths.",
+          "path": "2026/04/16/2026-04-16-design-lint-from-scratch.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-apple-design-tokens-ai-implementation",
-      "title": "把家庭 App 做得像 Apple 产品：设计 Token 系统 + AI 执行的完整流程",
-      "summary": "功能跑起来之后，界面看起来像一个工具。加入 Apple 设计 token 系统、dark mode、glassmorphism 之后，它开始有产品的感觉。这篇记录如何用 /apple-style-ui skill 驱动 AI 完成这次视觉升级，以及中间遇到的 WCAG 对比度陷阱。",
       "date": "2026-04-16",
+      "project": "family-calendar",
       "tags": [
         "Apple Design",
         "UI设计",
@@ -377,15 +491,25 @@
         "WCAG",
         "Glassmorphism"
       ],
-      "project": "family-calendar",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-apple-design-tokens-ai-implementation.png",
-      "path": "2026/04/16/2026-04-16-apple-design-tokens-ai-implementation.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "把家庭 App 做得像 Apple 产品：设计 Token 系统 + AI 执行的完整流程",
+          "summary": "功能跑起来之后，界面看起来像一个工具。加入 Apple 设计 token 系统、dark mode、glassmorphism 之后，它开始有产品的感觉。这篇记录如何用 /apple-style-ui skill 驱动 AI 完成这次视觉升级，以及中间遇到的 WCAG 对比度陷阱。",
+          "path": "2026/04/16/2026-04-16-apple-design-tokens-ai-implementation.zh.json"
+        },
+        "en": {
+          "title": "Making a Family App Feel Like an Apple Product: Design Tokens + AI Implementation",
+          "summary": "Once the functionality works, interfaces often feel like tools rather than products. After implementing Apple's design token system, dark mode, and glassmorphism, it started feeling like a real product. This post covers how I used the /apple-style-ui skill to drive AI through this visual upgrade, including the WCAG contrast traps we hit along the way.",
+          "path": "2026/04/16/2026-04-16-apple-design-tokens-ai-implementation.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-ai-agent-family-calendar-mvp",
-      "title": "用 AI Agent 两天从零构建家庭日历 MVP：一句话需求到全栈上线",
-      "summary": "一句「做个家庭日历」扔给 OPC loop，两天后一个支持图片/语音/文字输入、大模型解析、家庭成员访问控制的 Next.js 应用出现在屏幕上。这篇文章记录这个过程的真实节奏——包括 AI 跑偏的地方，和我怎么把它拽回来的。",
       "date": "2026-04-16",
+      "project": "family-calendar",
       "tags": [
         "AI开发",
         "OPC",
@@ -393,30 +517,50 @@
         "家庭产品",
         "MVP"
       ],
-      "project": "family-calendar",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-ai-agent-family-calendar-mvp.png",
-      "path": "2026/04/16/2026-04-16-ai-agent-family-calendar-mvp.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 AI Agent 两天从零构建家庭日历 MVP：一句话需求到全栈上线",
+          "summary": "一句「做个家庭日历」扔给 OPC loop，两天后一个支持图片/语音/文字输入、大模型解析、家庭成员访问控制的 Next.js 应用出现在屏幕上。这篇文章记录这个过程的真实节奏——包括 AI 跑偏的地方，和我怎么把它拽回来的。",
+          "path": "2026/04/16/2026-04-16-ai-agent-family-calendar-mvp.zh.json"
+        },
+        "en": {
+          "title": "From Zero to MVP in Two Days: Building a Family Calendar with AI Agents",
+          "summary": "I threw \"build a family calendar\" at my OPC loop, and two days later had a full Next.js app supporting image/voice/text input, LLM parsing, and family access controls running on my screen. This is the real-time record of that process—including where the AI went off track, and how I yanked it back on course.",
+          "path": "2026/04/16/2026-04-16-ai-agent-family-calendar-mvp.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-acceptance-is-contract",
-      "title": "验收标准不是 Checklist，是甲方合同",
-      "summary": "从「定义做完」到「机械执行验收」——OPC 怎么把模糊的 acceptance criteria 变成 14 条 lint 规则和一个 gate command。",
       "date": "2026-04-16",
+      "project": "opc",
       "tags": [
         "opc",
         "acceptance-criteria",
         "mechanical-enforcement",
         "quality-gates"
       ],
-      "project": "opc",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-acceptance-is-contract.png",
-      "path": "2026/04/16/2026-04-16-acceptance-is-contract.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "验收标准不是 Checklist，是甲方合同",
+          "summary": "从「定义做完」到「机械执行验收」——OPC 怎么把模糊的 acceptance criteria 变成 14 条 lint 规则和一个 gate command。",
+          "path": "2026/04/16/2026-04-16-acceptance-is-contract.zh.json"
+        },
+        "en": {
+          "title": "Acceptance Criteria Aren't Checklists — They're Client Contracts",
+          "summary": "From \"defining done\" to \"mechanically enforcing acceptance\" — how OPC transforms fuzzy acceptance criteria into 14 lint rules and a gate command. The pickier the client, the cleaner the contractor's work.",
+          "path": "2026/04/16/2026-04-16-acceptance-is-contract.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-88effbab-article-1",
-      "title": "1444 个孤儿进程、91GB 内存：Playwright 进程泄漏的根因与自动化收割",
-      "summary": "81 个并行 Playwright visual test runner 跑了 12 小时后，留下 1444 个 Chromium 孤儿进程吃掉 91GB 内存。这篇文章讲的不是怎么 kill 进程——而是为什么 Playwright 必然泄漏、为什么 SIGTERM 杀不死 Chrome、以及一个 AI agent 如何用 cron watchdog 持续收割了 72 小时。",
       "date": "2026-04-16",
+      "project": "mitsein",
       "tags": [
         "playwright",
         "chromium",
@@ -425,22 +569,32 @@
         "devops",
         "macos"
       ],
-      "project": "mitsein",
+      "sessionId": "88effbab-f964-4a0a-afee-4d52be07a834",
       "chunkIndices": [
         1,
         4,
         5,
         6
       ],
-      "sessionId": "88effbab-f964-4a0a-afee-4d52be07a834",
       "heroImage": "",
-      "path": "2026/04/16/2026-04-16-88effbab-article-1.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "1444 个孤儿进程、91GB 内存：Playwright 进程泄漏的根因与自动化收割",
+          "summary": "81 个并行 Playwright visual test runner 跑了 12 小时后，留下 1444 个 Chromium 孤儿进程吃掉 91GB 内存。这篇文章讲的不是怎么 kill 进程——而是为什么 Playwright 必然泄漏、为什么 SIGTERM 杀不死 Chrome、以及一个 AI agent 如何用 cron watchdog 持续收割了 72 小时。",
+          "path": "2026/04/16/2026-04-16-88effbab-article-1.zh.json"
+        },
+        "en": {
+          "title": "1,444 Zombie Processes, 91GB RAM: Why Playwright Always Leaks and How to Build an Automated Reaper",
+          "summary": "After 12 hours of running 81 parallel Playwright visual test runners, we found 1,444 orphaned Chromium processes consuming 91GB of memory. This isn't about how to kill processes—it's about why Playwright inevitably leaks, why SIGTERM can't kill Chrome, and how an AI agent became our cron watchdog for 72 hours straight.",
+          "path": "2026/04/16/2026-04-16-88effbab-article-1.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-45a1a7f3-article-2",
-      "title": "CSS Grid 回退术：保留新功能但恢复旧版 feel",
-      "summary": "dream-works showcase site 加了 category filter 和 card preview images 后变丑了。怎么保留功能增量、回退视觉质感？答案在三行 CSS 和一个 Playwright 截图。",
       "date": "2026-04-16",
+      "project": "dream-works",
       "tags": [
         "CSS Grid",
         "Astro",
@@ -448,20 +602,30 @@
         "animation",
         "Playwright"
       ],
-      "project": "dream-works",
+      "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
       "chunkIndices": [
         3,
         4
       ],
-      "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
       "heroImage": "",
-      "path": "2026/04/16/2026-04-16-45a1a7f3-article-2.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "CSS Grid 回退术：保留新功能但恢复旧版 feel",
+          "summary": "dream-works showcase site 加了 category filter 和 card preview images 后变丑了。怎么保留功能增量、回退视觉质感？答案在三行 CSS 和一个 Playwright 截图。",
+          "path": "2026/04/16/2026-04-16-45a1a7f3-article-2.zh.json"
+        },
+        "en": {
+          "title": "The Art of CSS Grid Rollbacks: Keeping New Features While Restoring the Old Vibe",
+          "summary": "The dream-works showcase site got ugly after adding category filters and card preview images. How do you keep the functional improvements while rolling back the visual feel? The answer lies in three lines of CSS and a Playwright screenshot.",
+          "path": "2026/04/16/2026-04-16-45a1a7f3-article-2.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-45a1a7f3-article-1",
-      "title": "三个 Vercel Alias 指向同一个 Deployment：一场虚惊的排查",
-      "summary": "用户坚信三个 Vercel alias 显示不同版本，但深度排查后发现它们指向同一个 deployment。真正的问题是一个空壳 project 在捣乱。",
       "date": "2026-04-16",
+      "project": "dream-works",
       "tags": [
         "vercel",
         "deployment",
@@ -469,20 +633,30 @@
         "CDN",
         "alias"
       ],
-      "project": "dream-works",
+      "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
       "chunkIndices": [
         1,
         2
       ],
-      "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
       "heroImage": "",
-      "path": "2026/04/16/2026-04-16-45a1a7f3-article-1.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "三个 Vercel Alias 指向同一个 Deployment：一场虚惊的排查",
+          "summary": "用户坚信三个 Vercel alias 显示不同版本，但深度排查后发现它们指向同一个 deployment。真正的问题是一个空壳 project 在捣乱。",
+          "path": "2026/04/16/2026-04-16-45a1a7f3-article-1.zh.json"
+        },
+        "en": {
+          "title": "When Three Vercel Aliases Point to the Same Deployment: A False Alarm Investigation",
+          "summary": "A user was convinced three Vercel aliases were showing different versions, but deep investigation revealed they all pointed to the same deployment. The real culprit was a phantom project causing confusion.",
+          "path": "2026/04/16/2026-04-16-45a1a7f3-article-1.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop",
-      "title": "23 小时、$92、44 个 subagent：用 OPC loop 从零到家庭 AI 日历",
-      "summary": "一个 session 里，从 Google Calendar clone 重设计到 AI Agent Feed，再到 LLM Pool 三路 fallback——全程 OPC loop 驱动。不是演示，是真实的产品迭代，包括改方向、踩坑、让 agent 互相审查的全过程。",
       "date": "2026-04-16",
+      "project": "family-calendar",
       "tags": [
         "opc",
         "family-calendar",
@@ -491,15 +665,25 @@
         "ai-engineering",
         "subagent"
       ],
-      "project": "family-calendar",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.png",
-      "path": "2026/04/16/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "23 小时、$92、44 个 subagent：用 OPC loop 从零到家庭 AI 日历",
+          "summary": "一个 session 里，从 Google Calendar clone 重设计到 AI Agent Feed，再到 LLM Pool 三路 fallback——全程 OPC loop 驱动。不是演示，是真实的产品迭代，包括改方向、踩坑、让 agent 互相审查的全过程。",
+          "path": "2026/04/16/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.zh.json"
+        },
+        "en": {
+          "title": "23 Hours, $92, 44 Subagents: Building an AI Family Calendar with OPC Loop",
+          "summary": "One session from Google Calendar clone redesign to AI Agent Feed to LLM Pool three-way fallback—all driven by OPC loop. Not a demo, but real product iteration including pivots, gotchas, and agents reviewing each other's work.",
+          "path": "2026/04/16/2026-04-16-23h-92usd-44-subagents-family-calendar-opc-loop.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-visual-regression-marathon",
-      "title": "从 88 到 3,432：一个人用 5 天建了整套 Visual Regression",
-      "summary": "一个前端 600+ 组件的项目，visual regression 覆盖率只有 8%。5 天、805M tokens、153 个 subagents 之后，覆盖率到了 55%，踩过的坑比写的代码更有价值。",
       "date": "2026-04-15",
+      "project": "mitsein-merge",
       "tags": [
         "visual-regression",
         "playwright",
@@ -508,15 +692,25 @@
         "frontend",
         "automation"
       ],
-      "project": "mitsein-merge",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-visual-regression-marathon.png",
-      "path": "2026/04/15/2026-04-15-visual-regression-marathon.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从 88 到 3,432：一个人用 5 天建了整套 Visual Regression",
+          "summary": "一个前端 600+ 组件的项目，visual regression 覆盖率只有 8%。5 天、805M tokens、153 个 subagents 之后，覆盖率到了 55%，踩过的坑比写的代码更有价值。",
+          "path": "2026/04/15/2026-04-15-visual-regression-marathon.zh.json"
+        },
+        "en": {
+          "title": "From 88 to 3,432: Building Complete Visual Regression Testing in 5 Days",
+          "summary": "A frontend project with 600+ components had only 8% visual regression coverage. After 5 days, 805M tokens, and 153 subagents later, coverage hit 55%. The lessons from failures turned out more valuable than the code itself.",
+          "path": "2026/04/15/2026-04-15-visual-regression-marathon.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-unlimited-tokens-what-to-do",
-      "title": "假设我有无限的 token，能拿来干啥？",
-      "summary": "一个晚上 11:30 随口抛出的问题，引爆了一场 8 天、6.43 亿 token 的马拉松 session。前 25 个 chunk 记录了从漫无目的的灵感搜索，到锁定 eval 测试方向，再到用 OPC pipeline 跑 Gate 验证的全过程。",
       "date": "2026-04-15",
+      "project": "idea-factory",
       "tags": [
         "marathon-session",
         "eval",
@@ -525,9 +719,6 @@
         "gate-verification",
         "token-economics"
       ],
-      "project": "idea-factory",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-token.png",
-      "path": "2026/04/15/2026-04-15-unlimited-tokens-what-to-do.json",
       "chunkIndices": [
         1,
         2,
@@ -554,13 +745,26 @@
         23,
         24,
         25
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-token.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "假设我有无限的 token，能拿来干啥？",
+          "summary": "一个晚上 11:30 随口抛出的问题，引爆了一场 8 天、6.43 亿 token 的马拉松 session。前 25 个 chunk 记录了从漫无目的的灵感搜索，到锁定 eval 测试方向，再到用 OPC pipeline 跑 Gate 验证的全过程。",
+          "path": "2026/04/15/2026-04-15-unlimited-tokens-what-to-do.zh.json"
+        },
+        "en": {
+          "title": "What would you build with infinite tokens?",
+          "summary": "A casual 11:30 PM question sparked an 8-day, 643-million-token marathon session. The first 25 chunks captured the complete journey from aimless brainstorming to locking onto eval testing, then building an OPC pipeline for systematic Gate validation.",
+          "path": "2026/04/15/2026-04-15-unlimited-tokens-what-to-do.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-tick-based-loop-agent-overnight-polishing",
-      "title": "Tick-based Loop Agent：让 AI 通宵替你打磨展示站",
-      "summary": "Dream-works 展示站需要从 landing page 到每个 app 做全面的 UI/UX 升级。用户设计了一个 tick-based loop agent 模式，让 AI 在无人监管的状态下通过 cron 定时器持续迭代。这篇文章解剖了这种'放养式开发'的工程实践和它暴露的问题。",
       "date": "2026-04-15",
+      "project": "dream-works",
       "tags": [
         "agentic-workflow",
         "tick-based-loop",
@@ -569,9 +773,6 @@
         "autonomous-agent",
         "cron"
       ],
-      "project": "dream-works",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-tick-based-loop-agent-ai.png",
-      "path": "2026/04/15/2026-04-15-tick-based-loop-agent-overnight-polishing.json",
       "chunkIndices": [
         185,
         186,
@@ -615,13 +816,26 @@
         224,
         225,
         226
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-tick-based-loop-agent-ai.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Tick-based Loop Agent：让 AI 通宵替你打磨展示站",
+          "summary": "Dream-works 展示站需要从 landing page 到每个 app 做全面的 UI/UX 升级。用户设计了一个 tick-based loop agent 模式，让 AI 在无人监管的状态下通过 cron 定时器持续迭代。这篇文章解剖了这种'放养式开发'的工程实践和它暴露的问题。",
+          "path": "2026/04/15/2026-04-15-tick-based-loop-agent-overnight-polishing.zh.json"
+        },
+        "en": {
+          "title": "Tick-based Loop Agent: How AI Worked Overnight to Polish Our Demo Site",
+          "summary": "The Dream-works demo site needed a complete UI/UX overhaul from landing page to individual apps. Instead of manual fixes, we designed a tick-based loop agent that runs autonomously via cron, iterating continuously without supervision. This post dissects the engineering practices behind this 'hands-off development' approach and the problems it exposed.",
+          "path": "2026/04/15/2026-04-15-tick-based-loop-agent-overnight-polishing.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-tick-based-autonomous-loop-failures-and-retries",
-      "title": "让 Claude 跑完再来找我：tick-based 自主循环的挫败与重试",
-      "summary": "用户最大的痛点：Claude 总是跑几步就停下来等人类确认。从 /loop 命令到 tick-based agent 设计，从反复的中断沮丧到最终的 progress.md 状态机方案，一场关于 AI 自主性边界的实战。",
       "date": "2026-04-15",
+      "project": "idea-factory",
       "tags": [
         "autonomous-agent",
         "tick-based-loop",
@@ -630,9 +844,6 @@
         "agent-autonomy",
         "state-management"
       ],
-      "project": "idea-factory",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-claude-tick-based.png",
-      "path": "2026/04/15/2026-04-15-tick-based-autonomous-loop-failures-and-retries.json",
       "chunkIndices": [
         76,
         77,
@@ -659,13 +870,26 @@
         98,
         99,
         100
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-claude-tick-based.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "让 Claude 跑完再来找我：tick-based 自主循环的挫败与重试",
+          "summary": "用户最大的痛点：Claude 总是跑几步就停下来等人类确认。从 /loop 命令到 tick-based agent 设计，从反复的中断沮丧到最终的 progress.md 状态机方案，一场关于 AI 自主性边界的实战。",
+          "path": "2026/04/15/2026-04-15-tick-based-autonomous-loop-failures-and-retries.zh.json"
+        },
+        "en": {
+          "title": "Just Run Until Done: The Frustration and Retry Cycles of tick-based Autonomous Loops",
+          "summary": "The user's biggest pain point: Claude keeps stopping after a few steps to ask for human confirmation. From /loop commands to tick-based agent design, from repeated interruption frustration to a final progress.md state machine solution—a real-world battle over the boundaries of AI autonomy.",
+          "path": "2026/04/15/2026-04-15-tick-based-autonomous-loop-failures-and-retries.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-three-skills-merged-into-pipeline",
-      "title": "三个 Skill 合并成一条流水线",
-      "summary": "从 tooleval、OPC、idea validation 三个独立工具合并成一个统一的 Idea Factory skill 的过程。涉及 skill vs MCP 的架构选择、与 OPC 的关系定义、以及 self-dogfood 测试。",
       "date": "2026-04-15",
+      "project": "idea-factory",
       "tags": [
         "skill-design",
         "architecture",
@@ -675,9 +899,6 @@
         "idea-factory",
         "dogfooding"
       ],
-      "project": "idea-factory",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-skill.png",
-      "path": "2026/04/15/2026-04-15-three-skills-merged-into-pipeline.json",
       "chunkIndices": [
         51,
         52,
@@ -704,13 +925,26 @@
         73,
         74,
         75
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-skill.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "三个 Skill 合并成一条流水线",
+          "summary": "从 tooleval、OPC、idea validation 三个独立工具合并成一个统一的 Idea Factory skill 的过程。涉及 skill vs MCP 的架构选择、与 OPC 的关系定义、以及 self-dogfood 测试。",
+          "path": "2026/04/15/2026-04-15-three-skills-merged-into-pipeline.zh.json"
+        },
+        "en": {
+          "title": "When Three Tools Become One: Building a Unified Pipeline",
+          "summary": "The journey from three separate tools—tooleval, OPC, and idea validation—into a single, unified Idea Factory skill. Covers architectural choices between skill vs MCP, relationship definitions with OPC, and self-dogfood testing.",
+          "path": "2026/04/15/2026-04-15-three-skills-merged-into-pipeline.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-session-to-knowledge-logex-self-reference",
-      "title": "810 行代码把 Session 变成文章：Logex Pipeline 的技术解剖",
-      "summary": "Logex 是一个把 Claude Code session JSONL 日志转化为可发布博客文章的 pipeline。本文拆解它的五阶段架构——parse、chunk、score、segment、publish——以及每个阶段的关键设计决策。",
       "date": "2026-04-15",
+      "project": "logex",
       "tags": [
         "logex",
         "pipeline",
@@ -719,9 +953,6 @@
         "content-generation",
         "typescript"
       ],
-      "project": "logex",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-session-logex.png",
-      "path": "2026/04/15/2026-04-15-session-to-knowledge-logex-self-reference.json",
       "chunkIndices": [
         227,
         228,
@@ -766,13 +997,26 @@
         267,
         268,
         269
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-session-logex.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "810 行代码把 Session 变成文章：Logex Pipeline 的技术解剖",
+          "summary": "Logex 是一个把 Claude Code session JSONL 日志转化为可发布博客文章的 pipeline。本文拆解它的五阶段架构——parse、chunk、score、segment、publish——以及每个阶段的关键设计决策。",
+          "path": "2026/04/15/2026-04-15-session-to-knowledge-logex-self-reference.zh.json"
+        },
+        "en": {
+          "title": "810 Lines of Code That Turn Sessions Into Stories: Dissecting the Logex Pipeline",
+          "summary": "Logex transforms Claude Code session JSONL logs into publishable blog articles through a five-stage pipeline. This deep dive explores the parse-chunk-score-segment-publish architecture and the key design decisions behind each stage.",
+          "path": "2026/04/15/2026-04-15-session-to-knowledge-logex-self-reference.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-opc-spec-to-code",
-      "title": "从「LLM 不会定价」到 1686 行机械执行层",
-      "summary": "OPC v0.10b 的核心洞察：LLM 做不了 cardinal 估价，但能做 ordinal 模式识别。一个 session 里把 spec 变成了代码——10 个 red flag、gate logic、delta comparison、criteria lint，全部机械化。",
       "date": "2026-04-15",
+      "project": "opc",
       "tags": [
         "opc",
         "ux-simulation",
@@ -780,15 +1024,25 @@
         "red-flags",
         "testing"
       ],
-      "project": "opc",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-opc-spec-to-code.png",
-      "path": "2026/04/15/2026-04-15-opc-spec-to-code.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从「LLM 不会定价」到 1686 行机械执行层",
+          "summary": "OPC v0.10b 的核心洞察：LLM 做不了 cardinal 估价，但能做 ordinal 模式识别。一个 session 里把 spec 变成了代码——10 个 red flag、gate logic、delta comparison、criteria lint，全部机械化。",
+          "path": "2026/04/15/2026-04-15-opc-spec-to-code.zh.json"
+        },
+        "en": {
+          "title": "From \"LLMs Can't Price\" to 1,686 Lines of Mechanical Execution",
+          "summary": "OPC v0.10b's core insight: LLMs can't do cardinal pricing, but they excel at ordinal pattern recognition. One session turned spec into code—10 red flags, gate logic, delta comparison, criteria lint, all mechanized.",
+          "path": "2026/04/15/2026-04-15-opc-spec-to-code.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-one-session-639-tests-150-dollars",
-      "title": "一个 Session，639 个测试，150 美元：OPC Loop 跑完一整个 Test Coverage 冲刺",
-      "summary": "55 小时的 Claude Code session 里，6 个 AI 角色先吵了 3 轮架，然后一个 20-tick OPC harness 自动跑完了从探索到验收的全流程——最终新增 639 个测试，0 failure。代价是 $150 token 和若干次被 rate limit 打断。",
       "date": "2026-04-15",
+      "project": "mitsein",
       "tags": [
         "opc-loop",
         "test-coverage",
@@ -797,15 +1051,25 @@
         "multi-agent",
         "mitsein"
       ],
-      "project": "mitsein",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-one-session-639-tests-150-dollars.png",
-      "path": "2026/04/15/2026-04-15-one-session-639-tests-150-dollars.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "一个 Session，639 个测试，150 美元：OPC Loop 跑完一整个 Test Coverage 冲刺",
+          "summary": "55 小时的 Claude Code session 里，6 个 AI 角色先吵了 3 轮架，然后一个 20-tick OPC harness 自动跑完了从探索到验收的全流程——最终新增 639 个测试，0 failure。代价是 $150 token 和若干次被 rate limit 打断。",
+          "path": "2026/04/15/2026-04-15-one-session-639-tests-150-dollars.zh.json"
+        },
+        "en": {
+          "title": "639 Tests, One 55-Hour Session, $150: How OPC Loop Automated an Entire Test Coverage Sprint",
+          "summary": "In a 55-hour Claude Code session, 6 AI agents debated for 3 rounds before a 20-tick OPC harness automatically ran the full cycle from exploration to acceptance—delivering 639 new tests with 0 failures. The cost: $150 in tokens and several rate limit interruptions.",
+          "path": "2026/04/15/2026-04-15-one-session-639-tests-150-dollars.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-no-fake-green-100-percent-test-coverage",
-      "title": "杜绝虚假繁荣：100% 测试覆盖率背后的质量信仰",
-      "summary": "在 Idea Factory skill 的打磨过程中，用户对测试覆盖率提出了近乎偏执的要求——100% coverage，而且必须是有效测试。这篇文章记录了从并发安全修复到端到端走查的完整质量攻坚过程，以及'杜绝虚假繁荣'这条质量红线如何把原型推向产品。",
       "date": "2026-04-15",
+      "project": "idea-factory",
       "tags": [
         "testing",
         "quality-engineering",
@@ -813,9 +1077,6 @@
         "test-coverage",
         "skill-development"
       ],
-      "project": "idea-factory",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-100.png",
-      "path": "2026/04/15/2026-04-15-no-fake-green-100-percent-test-coverage.json",
       "chunkIndices": [
         101,
         102,
@@ -859,13 +1120,26 @@
         140,
         141,
         142
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-100.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "杜绝虚假繁荣：100% 测试覆盖率背后的质量信仰",
+          "summary": "在 Idea Factory skill 的打磨过程中，用户对测试覆盖率提出了近乎偏执的要求——100% coverage，而且必须是有效测试。这篇文章记录了从并发安全修复到端到端走查的完整质量攻坚过程，以及'杜绝虚假繁荣'这条质量红线如何把原型推向产品。",
+          "path": "2026/04/15/2026-04-15-no-fake-green-100-percent-test-coverage.zh.json"
+        },
+        "en": {
+          "title": "The War Against Vanity Metrics: When 100% Test Coverage Becomes a Quality Religion",
+          "summary": "During the development of Idea Factory skill, a user made an almost obsessive demand—100% test coverage, and it had to be meaningful testing. This article chronicles the complete quality engineering journey from concurrency fixes to end-to-end validation, and how the principle of 'no vanity metrics' pushed a prototype toward production-grade software.",
+          "path": "2026/04/15/2026-04-15-no-fake-green-100-percent-test-coverage.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-gate-filtering-ideas-ai-as-investor",
-      "title": "用 Gate 筛想法：当 AI 假装自己是投资人",
-      "summary": "设计了 Gate 1/2/3 的验证 pipeline，用 Cohen's kappa 衡量 LLM judge 一致性，用开发者兴趣评分做 Gate 2，用 MCP spike 验证可行性。中间用户一度搞混了方向，意识到自己不想找真人验证，而是要全 AI 模拟。",
       "date": "2026-04-15",
+      "project": "idea-factory",
       "tags": [
         "gate-validation",
         "cohens-kappa",
@@ -874,9 +1148,6 @@
         "idea-screening",
         "ai-simulation"
       ],
-      "project": "idea-factory",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-gate-ai.png",
-      "path": "2026/04/15/2026-04-15-gate-filtering-ideas-ai-as-investor.json",
       "chunkIndices": [
         26,
         27,
@@ -903,13 +1174,26 @@
         48,
         49,
         50
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-gate-ai.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 Gate 筛想法：当 AI 假装自己是投资人",
+          "summary": "设计了 Gate 1/2/3 的验证 pipeline，用 Cohen's kappa 衡量 LLM judge 一致性，用开发者兴趣评分做 Gate 2，用 MCP spike 验证可行性。中间用户一度搞混了方向，意识到自己不想找真人验证，而是要全 AI 模拟。",
+          "path": "2026/04/15/2026-04-15-gate-filtering-ideas-ai-as-investor.zh.json"
+        },
+        "en": {
+          "title": "When AI Plays Venture Capitalist: Screening Ideas with Gate-Based Validation",
+          "summary": "Built a Gate 1/2/3 validation pipeline using Cohen's kappa to measure LLM judge consistency, developer interest scores for Gate 2, and MCP spikes to verify feasibility. User initially got confused about direction, then realized they wanted full AI simulation instead of real human validation.",
+          "path": "2026/04/15/2026-04-15-gate-filtering-ideas-ai-as-investor.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-15-five-skills-endgame-dream-works-unification",
-      "title": "五个 Skill 的终局之问：dream-works 大一统之路",
-      "summary": "当 idea-factory、pitch-ideas、pitch-ready、dream-works、tooleval 五个 skill 同时存在时，用户问了两个致命问题：它们是不是都应该存在？终局应该只需要几个？这篇文章记录了从混乱到收敛的 skill 架构整合过程。",
       "date": "2026-04-15",
+      "project": "dream-works",
       "tags": [
         "architecture",
         "skill-consolidation",
@@ -917,9 +1201,6 @@
         "tooleval",
         "naming-convention"
       ],
-      "project": "dream-works",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-skill-dream-works.png",
-      "path": "2026/04/15/2026-04-15-five-skills-endgame-dream-works-unification.json",
       "chunkIndices": [
         143,
         144,
@@ -963,13 +1244,26 @@
         182,
         183,
         184
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-skill-dream-works.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "五个 Skill 的终局之问：dream-works 大一统之路",
+          "summary": "当 idea-factory、pitch-ideas、pitch-ready、dream-works、tooleval 五个 skill 同时存在时，用户问了两个致命问题：它们是不是都应该存在？终局应该只需要几个？这篇文章记录了从混乱到收敛的 skill 架构整合过程。",
+          "path": "2026/04/15/2026-04-15-five-skills-endgame-dream-works-unification.zh.json"
+        },
+        "en": {
+          "title": "When Five Skills Become One: The dream-works Unification Story",
+          "summary": "With five overlapping skills in production—idea-factory, pitch-ideas, pitch-ready, dream-works, and tooleval—a user asked two killer questions: Should all of these exist? How many do we actually need in the end? This is the story of consolidating chaos into coherence.",
+          "path": "2026/04/15/2026-04-15-five-skills-endgame-dream-works-unification.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-14-opc-loop-building-logex-fourteen-hours",
-      "title": "用 OPC Loop 造 Logex：十四小时自动迭代的真实记录",
-      "summary": "Logex 的 UI 从零到可用，经历了三十个 chunk 的 OPC 自动循环迭代。E2E 测试的反复失败、markdown 渲染的坑、以及一个跑了整夜的 loop，暴露了 AI 驱动开发的真实效率曲线。",
       "date": "2026-04-14",
+      "project": "logex",
       "tags": [
         "logex",
         "opc",
@@ -979,9 +1273,6 @@
         "ai-development",
         "automation"
       ],
-      "project": "logex",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-loop-logex.png",
-      "path": "2026/04/14/2026-04-14-opc-loop-building-logex-fourteen-hours.json",
       "chunkIndices": [
         27,
         28,
@@ -1013,13 +1304,26 @@
         54,
         55,
         56
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-loop-logex.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 OPC Loop 造 Logex：十四小时自动迭代的真实记录",
+          "summary": "Logex 的 UI 从零到可用，经历了三十个 chunk 的 OPC 自动循环迭代。E2E 测试的反复失败、markdown 渲染的坑、以及一个跑了整夜的 loop，暴露了 AI 驱动开发的真实效率曲线。",
+          "path": "2026/04/14/2026-04-14-opc-loop-building-logex-fourteen-hours.zh.json"
+        },
+        "en": {
+          "title": "Building Logex with OPC Loop: A 14-Hour Automated Development Odyssey",
+          "summary": "From zero to deployed: how Logex's UI went through 30 chunks of OPC automated iteration cycles. E2E test failures, markdown rendering gotchas, and an overnight loop revealed the real efficiency curve of AI-driven development.",
+          "path": "2026/04/14/2026-04-14-opc-loop-building-logex-fourteen-hours.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-14-opc-extension-framework-growing-bones",
-      "title": "OPC Extension 架构：当你的框架开始长出骨骼",
-      "summary": "logex 的 UI 做完之后，design lint 的缺失暴露了 OPC 的一个结构性问题：如何让第三方（包括自己）扩展 OPC 的 pipeline，而不破坏核心的简洁性。一场关于 hook、skill、prompt injection 的深夜架构讨论。",
       "date": "2026-04-14",
+      "project": "opc",
       "tags": [
         "opc",
         "extension-architecture",
@@ -1028,9 +1332,6 @@
         "hook",
         "framework-design"
       ],
-      "project": "opc",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-extension.png",
-      "path": "2026/04/14/2026-04-14-opc-extension-framework-growing-bones.json",
       "chunkIndices": [
         57,
         58,
@@ -1044,13 +1345,26 @@
         66,
         67,
         68
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-extension.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "OPC Extension 架构：当你的框架开始长出骨骼",
+          "summary": "logex 的 UI 做完之后，design lint 的缺失暴露了 OPC 的一个结构性问题：如何让第三方（包括自己）扩展 OPC 的 pipeline，而不破坏核心的简洁性。一场关于 hook、skill、prompt injection 的深夜架构讨论。",
+          "path": "2026/04/14/2026-04-14-opc-extension-framework-growing-bones.zh.json"
+        },
+        "en": {
+          "title": "When Your Framework Grows a Skeleton: The OPC Extension Architecture",
+          "summary": "After building logex's UI, the lack of design lint exposed a structural problem in OPC: how to let third parties (including ourselves) extend the pipeline without breaking core simplicity. A late-night architectural discussion about hooks, skills, and prompt injection.",
+          "path": "2026/04/14/2026-04-14-opc-extension-framework-growing-bones.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-14-memex-to-logex-every-session-deserves-a-paper",
-      "title": "从 memex 到 logex：为什么每个 session 都值得一篇论文",
-      "summary": "一个下午的 brainstorm 如何从「session 应该留下点什么」的直觉出发，经过 engram、session-brain 等命名迭代，最终收敛为 logex — 一个将 AI session 转化为可检索、可链接的技术文章的系统。",
       "date": "2026-04-14",
+      "project": "logex",
       "tags": [
         "logex",
         "memex",
@@ -1059,9 +1373,6 @@
         "naming",
         "architecture"
       ],
-      "project": "logex",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-memex-logex-session.png",
-      "path": "2026/04/14/2026-04-14-memex-to-logex-every-session-deserves-a-paper.json",
       "chunkIndices": [
         1,
         2,
@@ -1072,13 +1383,26 @@
         7,
         8,
         9
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-memex-logex-session.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从 memex 到 logex：为什么每个 session 都值得一篇论文",
+          "summary": "一个下午的 brainstorm 如何从「session 应该留下点什么」的直觉出发，经过 engram、session-brain 等命名迭代，最终收敛为 logex — 一个将 AI session 转化为可检索、可链接的技术文章的系统。",
+          "path": "2026/04/14/2026-04-14-memex-to-logex-every-session-deserves-a-paper.zh.json"
+        },
+        "en": {
+          "title": "From memex to logex: Why Every session Deserves Its Own Paper",
+          "summary": "How an afternoon brainstorm evolved from the intuition that \"sessions should leave something behind,\" through naming iterations like engram and session-brain, to converge on logex—a system that transforms AI sessions into searchable, linkable technical articles.",
+          "path": "2026/04/14/2026-04-14-memex-to-logex-every-session-deserves-a-paper.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-14-credential-automation-sixteen-hour-rabbit-hole",
-      "title": "Credential 自动化：一个看似合理的需求如何变成十六小时的兔子洞",
-      "summary": "为了让 Claude Code 能自动创建 GitHub OAuth App，我从 CLI 方案出发，经过 Playwright GUI 自动化、Edge cookie 导入、跨机器 credential 共享，最后发现这条路的 ROI 远不如手动操作十分钟。",
       "date": "2026-04-14",
+      "project": "logex",
       "tags": [
         "credential-management",
         "oauth",
@@ -1087,9 +1411,6 @@
         "yagni",
         "anti-pattern"
       ],
-      "project": "logex",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-credential.png",
-      "path": "2026/04/14/2026-04-14-credential-automation-sixteen-hour-rabbit-hole.json",
       "chunkIndices": [
         19,
         20,
@@ -1099,13 +1420,26 @@
         24,
         25,
         26
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-credential.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Credential 自动化：一个看似合理的需求如何变成十六小时的兔子洞",
+          "summary": "为了让 Claude Code 能自动创建 GitHub OAuth App，我从 CLI 方案出发，经过 Playwright GUI 自动化、Edge cookie 导入、跨机器 credential 共享，最后发现这条路的 ROI 远不如手动操作十分钟。",
+          "path": "2026/04/14/2026-04-14-credential-automation-sixteen-hour-rabbit-hole.zh.json"
+        },
+        "en": {
+          "title": "When \"Reasonable\" Automation Becomes a 16-Hour Rabbit Hole",
+          "summary": "To let Claude Code auto-create GitHub OAuth Apps, I went from CLI exploration through Playwright GUI automation and Edge cookie imports to cross-machine credential sharing, only to discover the ROI was nowhere near worth it compared to 10 minutes of manual work.",
+          "path": "2026/04/14/2026-04-14-credential-automation-sixteen-hour-rabbit-hole.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-13-opc-skill-evolution",
-      "title": "28 个 Subagent、130 美元、和一个不会付钱的 LLM——OPC 的两天进化",
-      "summary": "一次代码审计开始，4 个 reviewer agent 全部判 FAIL，7 个 Critical+High 全修完之后又被逼出了 quality tier 系统、zero trust 三层验证链、甲乙方合同框架。最后启动 4 个模拟用户讨论 willingness-to-pay gate，才发现 LLM 生成的经济信号根本不是经济信号。148M tokens，487 tool calls，两天一夜，OPC 从 personal tool 变成了一个敢让用户审判的 pipeline。",
       "date": "2026-04-13",
+      "project": "opc",
       "tags": [
         "opc",
         "code-review",
@@ -1117,15 +1451,25 @@
         "devil-advocate",
         "multi-agent"
       ],
-      "project": "opc",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-13-opc-skill-evolution.png",
-      "path": "2026/04/13/2026-04-13-opc-skill-evolution.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "28 个 Subagent、130 美元、和一个不会付钱的 LLM——OPC 的两天进化",
+          "summary": "一次代码审计开始，4 个 reviewer agent 全部判 FAIL，7 个 Critical+High 全修完之后又被逼出了 quality tier 系统、zero trust 三层验证链、甲乙方合同框架。最后启动 4 个模拟用户讨论 willingness-to-pay gate，才发现 LLM 生成的经济信号根本不是经济信号。148M tokens，487 tool calls，两天一夜，OPC 从 personal tool 变成了一个敢让用户审判的 pipeline。",
+          "path": "2026/04/13/2026-04-13-opc-skill-evolution.zh.json"
+        },
+        "en": {
+          "title": "28 Subagents, $130, and an LLM That Won't Pay: OPC's Two-Day Evolution",
+          "summary": "A code audit revealed brutal truth: 4 reviewer agents unanimously failed my testing, exposing 7 Critical+High issues. After fixing those, the system evolved to include quality tiers, zero-trust validation chains, and contract-style frameworks. But when I deployed 4 simulated users to test willingness-to-pay gates, I discovered LLM-generated economic signals aren't economic signals at all. 148M tokens, 487 tool calls, two days and nights—OPC evolved from personal tool to a pipeline that dares to face user judgment.",
+          "path": "2026/04/13/2026-04-13-opc-skill-evolution.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-12-repo-advisor-builder-knowledge-counselor",
-      "title": "用 6-Phase State Machine 量产代码库 Advisor：Builder 的编排逻辑与踩坑实录",
-      "summary": "repo-advisor-builder 不是手写知识文档的过程，而是一个自动化 pipeline：主 agent 调度 subagent 读代码、写文档、跑 audit gate。本文记录用它给 hermes-agent 构建 advisor 时遇到的真实问题——术语漂移、evidence 验证失败、subagent 分工边界。",
       "date": "2026-04-12",
+      "project": "hermes-agent",
       "tags": [
         "repo-advisor-builder",
         "subagent-orchestration",
@@ -1134,9 +1478,6 @@
         "claude-code",
         "automation-pipeline"
       ],
-      "project": "hermes-agent",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-repo-advisor-builder.png",
-      "path": "2026/04/12/2026-04-12-repo-advisor-builder-knowledge-counselor.json",
       "chunkIndices": [
         1,
         2,
@@ -1146,13 +1487,26 @@
         6,
         7,
         8
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-repo-advisor-builder.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 6-Phase State Machine 量产代码库 Advisor：Builder 的编排逻辑与踩坑实录",
+          "summary": "repo-advisor-builder 不是手写知识文档的过程，而是一个自动化 pipeline：主 agent 调度 subagent 读代码、写文档、跑 audit gate。本文记录用它给 hermes-agent 构建 advisor 时遇到的真实问题——术语漂移、evidence 验证失败、subagent 分工边界。",
+          "path": "2026/04/12/2026-04-12-repo-advisor-builder-knowledge-counselor.zh.json"
+        },
+        "en": {
+          "title": "Mass-Producing Code Repository Advisors with a 6-Phase State Machine: Orchestration Logic and Battle Scars",
+          "summary": "repo-advisor-builder isn't about manually writing knowledge docs—it's an automated pipeline where the main agent orchestrates subagents to read code, write documentation, and run audit gates. This post chronicles the real problems encountered while building an advisor for hermes-agent: terminology drift, evidence validation failures, and subagent boundary disputes.",
+          "path": "2026/04/12/2026-04-12-repo-advisor-builder-knowledge-counselor.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-12-opc-midlife-crisis-skill-to-flow",
-      "title": "OPC 的中年危机：从单体 Skill 到可扩展 Flow 系统",
-      "summary": "OPC 在被大量 /opc loop 使用之后暴露了架构瓶颈：flow 定义散落各处、测试体系缺失、loop 的 plan hash 锁定导致 defer 泛滥。记录了多位架构师角色的讨论、插件化方案的取舍、以及开源策略的考量。",
       "date": "2026-04-12",
+      "project": "OPC / hermes-agent",
       "tags": [
         "OPC",
         "architecture",
@@ -1162,9 +1516,6 @@
         "open-source",
         "refactoring"
       ],
-      "project": "OPC / hermes-agent",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-opc-skill-flow.png",
-      "path": "2026/04/12/2026-04-12-opc-midlife-crisis-skill-to-flow.json",
       "chunkIndices": [
         95,
         96,
@@ -1202,13 +1553,26 @@
         128,
         129,
         130
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-opc-skill-flow.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "OPC 的中年危机：从单体 Skill 到可扩展 Flow 系统",
+          "summary": "OPC 在被大量 /opc loop 使用之后暴露了架构瓶颈：flow 定义散落各处、测试体系缺失、loop 的 plan hash 锁定导致 defer 泛滥。记录了多位架构师角色的讨论、插件化方案的取舍、以及开源策略的考量。",
+          "path": "2026/04/12/2026-04-12-opc-midlife-crisis-skill-to-flow.zh.json"
+        },
+        "en": {
+          "title": "OPC's Growing Pains: From Monolithic Skill to Scalable Flow Architecture",
+          "summary": "Heavy usage of /opc loop exposed critical bottlenecks in OPC's architecture: scattered flow definitions, missing test infrastructure, and excessive deferrals caused by locked plan hashes. Chronicles the architectural debates, plugin system trade-offs, and open-source strategy decisions that shaped the refactor.",
+          "path": "2026/04/12/2026-04-12-opc-midlife-crisis-skill-to-flow.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-12-memra-knowledge-card-remix",
-      "title": "Memra：当知识卡片想要被 Remix",
-      "summary": "从 /dw 评估到 OPC loop 实现，记录 Memra 知识二创平台的 0-to-1。包括 cluster radar 功能的构建、UX 的 \"满屏卡片没有行动点\" 问题、GitHub App 集成的架构抉择、以及多角色用户验收测试。",
       "date": "2026-04-12",
+      "project": "memra",
       "tags": [
         "memra",
         "knowledge-remix",
@@ -1218,9 +1582,6 @@
         "GitHub-App",
         "Vercel"
       ],
-      "project": "memra",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memra-remix.png",
-      "path": "2026/04/12/2026-04-12-memra-knowledge-card-remix.json",
       "chunkIndices": [
         74,
         75,
@@ -1241,13 +1602,26 @@
         90,
         91,
         92
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memra-remix.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Memra：当知识卡片想要被 Remix",
+          "summary": "从 /dw 评估到 OPC loop 实现，记录 Memra 知识二创平台的 0-to-1。包括 cluster radar 功能的构建、UX 的 \"满屏卡片没有行动点\" 问题、GitHub App 集成的架构抉择、以及多角色用户验收测试。",
+          "path": "2026/04/12/2026-04-12-memra-knowledge-card-remix.zh.json"
+        },
+        "en": {
+          "title": "Memra: When Knowledge Cards Want to Be Remixed",
+          "summary": "From /dw evaluation to OPC loop implementation, documenting Memra's knowledge remix platform from 0-to-1. Including cluster radar feature development, the UX problem of \"cards everywhere, no action points,\" GitHub App integration architecture decisions, and multi-role user acceptance testing.",
+          "path": "2026/04/12/2026-04-12-memra-knowledge-card-remix.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-12-memex-zettelkasten-system",
-      "title": "575 条 flomo 碎片，31 张 Zettelkasten 卡片，96% 该扔掉",
-      "summary": "把 575 条 flomo 随手记消化成 memex Zettelkasten 卡片，不是机械导入——是让 AI agent 在 22 个 OPC tick、17 个 subagent 的协同下做真正的 digest。最后发现商业洞察类卡片比 AI 类有价值得多，而「该扔的比该留的重要」这件事本身就是最大的 insight。",
       "date": "2026-04-12",
+      "project": "memex",
       "tags": [
         "memex",
         "zettelkasten",
@@ -1257,15 +1631,25 @@
         "knowledge-management",
         "digest"
       ],
-      "project": "memex",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memex-zettelkasten-system.png",
-      "path": "2026/04/12/2026-04-12-memex-zettelkasten-system.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "575 条 flomo 碎片，31 张 Zettelkasten 卡片，96% 该扔掉",
+          "summary": "把 575 条 flomo 随手记消化成 memex Zettelkasten 卡片，不是机械导入——是让 AI agent 在 22 个 OPC tick、17 个 subagent 的协同下做真正的 digest。最后发现商业洞察类卡片比 AI 类有价值得多，而「该扔的比该留的重要」这件事本身就是最大的 insight。",
+          "path": "2026/04/12/2026-04-12-memex-zettelkasten-system.zh.json"
+        },
+        "en": {
+          "title": "575 Flomo Fragments, 31 Zettelkasten Cards, 96% Should Be Thrown Away",
+          "summary": "Digesting 575 flomo quick-capture notes into memex Zettelkasten cards — not mechanical import, but real AI agent digest across 22 OPC ticks and 17 subagents. Discovered that business insight cards are far more valuable than AI ones, and that 'what to discard matters more than what to keep' was itself the biggest insight.",
+          "path": "2026/04/12/2026-04-12-memex-zettelkasten-system.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-12-memex-to-silicon-team-book",
-      "title": "从 Memex 卡片到《硅基团队》：一本 AI 协作方法论书的诞生",
-      "summary": "一个突发奇想：能不能从几百张 Zettelkasten 卡片自动生成一本书？记录了从 idea 到成书、OPC 逐章 review、安全审计、flomo 卡片补充、到 dream-works 出版可行性评估的全过程。",
       "date": "2026-04-12",
+      "project": "memex / silicon-team-book",
       "tags": [
         "memex",
         "Zettelkasten",
@@ -1275,9 +1659,6 @@
         "knowledge-synthesis",
         "dream-works"
       ],
-      "project": "memex / silicon-team-book",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memex-ai.png",
-      "path": "2026/04/12/2026-04-12-memex-to-silicon-team-book.json",
       "chunkIndices": [
         16,
         17,
@@ -1315,13 +1696,26 @@
         49,
         50,
         51
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memex-ai.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从 Memex 卡片到《硅基团队》：一本 AI 协作方法论书的诞生",
+          "summary": "一个突发奇想：能不能从几百张 Zettelkasten 卡片自动生成一本书？记录了从 idea 到成书、OPC 逐章 review、安全审计、flomo 卡片补充、到 dream-works 出版可行性评估的全过程。",
+          "path": "2026/04/12/2026-04-12-memex-to-silicon-team-book.zh.json"
+        },
+        "en": {
+          "title": "From Memex Cards to \"Silicon Teams\": How an AI Collaboration Book Wrote Itself",
+          "summary": "A wild experiment: could hundreds of Zettelkasten cards automatically generate an entire book? Chronicles the full journey from initial idea to finished manuscript, including OPC chapter-by-chapter review, security audits, flomo card integration, and dream-works publishing feasibility assessment.",
+          "path": "2026/04/12/2026-04-12-memex-to-silicon-team-book.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-12-agentmail-idea-factory",
-      "title": "32 个 Subagent 替我做了整个 Ship 流程——$60 之后 AgentMail 上线了",
-      "summary": "一个 AI 邮件服务器从 CONDITIONAL_GO 到 Show HN 就绪，经历了 25 小时的 OPC full-stack pipeline：3 轮 multi-role review、32 个 subagent 并行审查、14 个 bug fix、52 个测试。最值钱的发现不是代码 bug，而是三个独立 reviewer 都在说同一句话时你就知道这是真问题。",
       "date": "2026-04-12",
+      "project": "agentmail",
       "tags": [
         "agentmail",
         "opc",
@@ -1332,15 +1726,25 @@
         "subagent",
         "ship-flow"
       ],
-      "project": "agentmail",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-agentmail-idea-factory.png",
-      "path": "2026/04/12/2026-04-12-agentmail-idea-factory.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "32 个 Subagent 替我做了整个 Ship 流程——$60 之后 AgentMail 上线了",
+          "summary": "一个 AI 邮件服务器从 CONDITIONAL_GO 到 Show HN 就绪，经历了 25 小时的 OPC full-stack pipeline：3 轮 multi-role review、32 个 subagent 并行审查、14 个 bug fix、52 个测试。最值钱的发现不是代码 bug，而是三个独立 reviewer 都在说同一句话时你就知道这是真问题。",
+          "path": "2026/04/12/2026-04-12-agentmail-idea-factory.zh.json"
+        },
+        "en": {
+          "title": "32 Subagents Shipped My Entire Product — How AgentMail Went Live for $60",
+          "summary": "From CONDITIONAL_GO to Show HN ready in 25 hours: an AI email server built through OPC's full-stack pipeline with 3 rounds of multi-role review, 32 parallel subagent audits, 14 bug fixes, and 52 tests. The most valuable discovery wasn't a code bug—it was realizing that when three independent reviewers say the same thing, you know it's a real problem.",
+          "path": "2026/04/12/2026-04-12-agentmail-idea-factory.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-09-knowledge-distillation-codebase-to-ai-queryable",
-      "title": "知识蒸馏的手工时代：如何把一个代码库变成 AI 能查询的知识库",
-      "summary": "以 Societas 项目为例，记录从零构建 repo advisor 知识库的完整过程——从分析参照项目 claude-code-advisor 的结构，到用并行 sub-agent 批量生成几十份架构文档，再到发现这个过程本身可以被自动化的关键时刻。",
       "date": "2026-04-09",
+      "project": "societas",
       "tags": [
         "knowledge-distillation",
         "advisor",
@@ -1348,9 +1752,6 @@
         "sub-agent",
         "claude-code"
       ],
-      "project": "societas",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-ai.png",
-      "path": "2026/04/09/2026-04-09-knowledge-distillation-codebase-to-ai-queryable.json",
       "chunkIndices": [
         1,
         2,
@@ -1380,13 +1781,26 @@
         26,
         27,
         28
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-ai.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "知识蒸馏的手工时代：如何把一个代码库变成 AI 能查询的知识库",
+          "summary": "以 Societas 项目为例，记录从零构建 repo advisor 知识库的完整过程——从分析参照项目 claude-code-advisor 的结构，到用并行 sub-agent 批量生成几十份架构文档，再到发现这个过程本身可以被自动化的关键时刻。",
+          "path": "2026/04/09/2026-04-09-knowledge-distillation-codebase-to-ai-queryable.zh.json"
+        },
+        "en": {
+          "title": "The Manual Era of Knowledge Distillation: Turning Codebases into AI-Queryable Knowledge Vaults",
+          "summary": "Using the Societas project as a case study, this chronicles the complete journey of building a repo advisor knowledge base from scratch—from analyzing the claude-code-advisor reference structure, to using parallel sub-agents to batch-generate dozens of architectural documents, to the pivotal moment of realizing this entire process could be automated.",
+          "path": "2026/04/09/2026-04-09-knowledge-distillation-codebase-to-ai-queryable.en.json"
+        }
+      }
     },
     {
       "slug": "2026-04-09-factory-of-factories-repo-advisor-builder",
-      "title": "造工厂的工厂：repo-advisor-builder 和自主构建 agent 的诞生",
-      "summary": "手工为 Societas 构建 advisor 之后，意识到这个过程可以自动化。于是构建了 repo-advisor-builder skill，并发明了 STATE.md + /loop 的自主构建 agent 模式——一个能跨 session 接力工作的 autonomous agent 原型。",
       "date": "2026-04-09",
+      "project": "societas",
       "tags": [
         "meta-tooling",
         "autonomous-agent",
@@ -1395,9 +1809,6 @@
         "STATE.md",
         "repo-advisor-builder"
       ],
-      "project": "societas",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-repo-advisor-builder-agent.png",
-      "path": "2026/04/09/2026-04-09-factory-of-factories-repo-advisor-builder.json",
       "chunkIndices": [
         29,
         30,
@@ -1461,13 +1872,26 @@
         88,
         89,
         90
-      ]
+      ],
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-09-repo-advisor-builder-agent.png",
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "造工厂的工厂：repo-advisor-builder 和自主构建 agent 的诞生",
+          "summary": "手工为 Societas 构建 advisor 之后，意识到这个过程可以自动化。于是构建了 repo-advisor-builder skill，并发明了 STATE.md + /loop 的自主构建 agent 模式——一个能跨 session 接力工作的 autonomous agent 原型。",
+          "path": "2026/04/09/2026-04-09-factory-of-factories-repo-advisor-builder.zh.json"
+        },
+        "en": {
+          "title": "Factory Factory: How repo-advisor-builder Gave Birth to Self-Building Agents",
+          "summary": "After hand-crafting an advisor for Societas, I realized this process could be automated. So I built the repo-advisor-builder skill and invented the STATE.md + /loop autonomous agent pattern—a prototype that can hand off work across sessions.",
+          "path": "2026/04/09/2026-04-09-factory-of-factories-repo-advisor-builder.en.json"
+        }
+      }
     },
     {
       "slug": "2026-03-24-supercrew-plugin-system",
-      "title": "三天、57M Tokens、六条战线——一个 session 里同时打完博客双语、开源推广、和 plugin 体系",
-      "summary": "一个 session 横跨三天，同时推进 Astro 博客双语改造、memex 开源推广（LinkedIn + Glama + awesome-mcp-servers）、msft-model 切换 skill、linkedin-skills marketplace plugin。14 个 subagent 并行，387 次 tool call，$59 烧完之后发现最大的坑不是代码——是 LinkedIn 不支持 markdown。",
       "date": "2026-03-24",
+      "project": "supercrew",
       "tags": [
         "supercrew",
         "plugin",
@@ -1480,9 +1904,20 @@
         "open-source",
         "copilot-api"
       ],
-      "project": "supercrew",
       "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-03-24-supercrew-plugin-system.png",
-      "path": "2026/03/24/2026-03-24-supercrew-plugin-system.json"
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "三天、57M Tokens、六条战线——一个 session 里同时打完博客双语、开源推广、和 plugin 体系",
+          "summary": "一个 session 横跨三天，同时推进 Astro 博客双语改造、memex 开源推广（LinkedIn + Glama + awesome-mcp-servers）、msft-model 切换 skill、linkedin-skills marketplace plugin。14 个 subagent 并行，387 次 tool call，$59 烧完之后发现最大的坑不是代码——是 LinkedIn 不支持 markdown。",
+          "path": "2026/03/24/2026-03-24-supercrew-plugin-system.zh.json"
+        },
+        "en": {
+          "title": "Three Days, 57M Tokens, Six Fronts — Building a Bilingual Blog, Open Source Push, and Plugin Ecosystem in One Session",
+          "summary": "A single session spanning three days, simultaneously tackling Astro blog i18n, memex open source promotion (LinkedIn + Glama + awesome-mcp-servers), msft-model skill switching, and linkedin-skills marketplace plugin. 14 subagents running in parallel, 387 tool calls, $59 burned — only to discover the biggest gotcha wasn't in the code, but LinkedIn's complete lack of markdown support.",
+          "path": "2026/03/24/2026-03-24-supercrew-plugin-system.en.json"
+        }
+      }
     }
   ],
   "lastUpdated": "2026-04-18",

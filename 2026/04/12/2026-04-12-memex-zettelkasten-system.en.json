@@ -1,0 +1,169 @@
+{
+  "slug": "2026-04-12-memex-zettelkasten-system",
+  "title": "575 Flomo Fragments, 31 Zettelkasten Cards, 96% Should Be Thrown Away",
+  "summary": "Digesting 575 flomo quick-capture notes into memex Zettelkasten cards — not mechanical import, but real AI agent digest across 22 OPC ticks and 17 subagents. Discovered that business insight cards are far more valuable than AI ones, and that 'what to discard matters more than what to keep' was itself the biggest insight.",
+  "body": "The first time I realized most of my 575 flomo memos were garbage was when I ran `parseFlomoHtml()` and saw 74 entries under 150 bytes.\n\n\"Ah\", \"null\", bare hashtags like `#MSFT`, blank cards. Plus 196 Chinese memos that got stripped down to `flomo-memo-1`, `flomo-memo-2` by the slug generator — completely unsearchable numbering. Between flomo's \"quick capture\" essence and Zettelkasten's \"atomic insights\" lies an entire digestion pipeline.\n\nThat's what this session was about: not import, but digest.\n\n---\n\n## Why 1:1 Import Doesn't Work\n\nIntuitively, the easiest approach would be writing a parser to convert all 575 memos into memex cards. I tried that before — `memex flomo import` mechanically processed everything, turning 189 cards into 764. But the quality was obviously wrong: a 6KB podcast note became one giant card, violating atomic principles; single-sentence insights became orphaned nodes without context.\n\nDeleted everything, back to 189 cards.\n\nOnly three core rules:\n1. Flomo content must be **digested** — rewritten in your own words, not copied. Mark origin with `source: flomo`.\n2. **Anti-loopback**: Cards with `source: flomo` never get pushed back to flomo. Code-level guards in both `pushSingleCard()` and batch filters.\n3. **Small-batch verify**: Process a few at a time, run OPC review (curator + devil's advocate dual perspective), only continue after PASS.\n\nThe user (me) was direct: \"I want you to get it right the first time, but with small-step verification.\"\n\n---\n\n## Build the Gun Before the Hunt\n\nBefore digesting 575 memos, I had to build the bidirectional sync pipeline between memex and flomo. This went through a complete OPC loop — 8 ticks of implement / review / fix / e2e-verify / accept.\n\n**F1.1: Config + Push commands.** 18 tests, 390 all green, commit. Seemed smooth, but during review three independent agents (backend, security, tester) opened fire simultaneously, finding 6 criticals:\n\n- `pushSingleCard` didn't call `autoSync()` after writing — git sync users would lose `flomoPushedAt` markers, causing duplicate pushes after crashes\n- `tags` field might be array (OpenClaw importer writes arrays), current code only handles strings, silently dropping tags\n- `--tag` filter uses substring match instead of exact match — `#AI` would match `#AI-agent`\n- MCP's `flomo_import_parse` arbitrary file read — zero validation on `file_path` parameter, theoretically could read `/etc/passwd`\n- Content regex `([\\s\\S]*?)<\\/div>` truncates content with nested divs\n- Slug collision only tries `-flomo` suffix once, drops data on second collision\n\n**This is why OPC's \"implementers can't review themselves\" principle has value.** Writing the code, I thought it was solid — 18 tests green, decent coverage. But three reviewers from completely different angles poked 6 holes, including security (arbitrary file read) and backend (missing autoSync) issues that would actually bite in production.\n\nAfter fixing all findings, tests grew from 390 to 452. Then import commands, MCP tools, Chinese slug deduplication — each step through implement → review → fix cycles. Finally E2E verification: build CLI, dry-run push, dry-run import, verify 189 existing cards intact.\n\n---\n\n## 22 Ticks of Digestion\n\nWith infrastructure ready, real digest began. OPC loop auto-advanced, each tick processing one thematic batch:\n\n| Batch | Theme | Source Memos | Output Cards | Skip Rate |\n|-------|-------|--------------|--------------|----------|\n| F1-F2 | LLM/AI | 55 | 6 | 89% |\n| F3-F4 | Product Research | ~80 | 6 | 93% |\n| F5-F6 | Discussion/Reading | ~60 | 4 | 93% |\n| F7-F8 | Business/Strategy | ~90 | 9 | 90% |\n| F9-F10 | Misc/Life | ~34 | 0 | 100% |\n| F11 | Index + back-link | - | - | - |\n\nEach digest batch went through curator + devil's advocate dual-perspective review. Curator checks quality — atomic? your own words? wikilinks with reasoning value? Devil's advocate nitpicks — is this insight just common sense masquerading as revelation? Are connections decorative or reasoning-based?\n\n**Misc batch (F9-F10) produced zero cards.** 34 memos including novel notes, vocabulary lists, outdated tech factoids — all correctly skipped. This batch's review ran fastest: confirming \"don't do\" is easier than confirming \"did right.\"\n\n---\n\n## Most AI Cards, But Business Cards Most Valuable\n\nAfter finishing everything, I had an agent run independent evaluation via `/opc`. The verdict was honest:\n\n**7.5/10.**\n\nAccomplished the most important thing — real digest rather than copying, skipped what should be skipped. But several real issues:\n\n**AI/Agent cards too dense (11 cards), marginal value low.** These insights — agent form evolution, defensive paradox, multi-agent failure taxonomy — I use daily with OPC and agent pipelines, already internalized through practice. Reminder value as cards is limited.\n\n**Instead, the 9 business/strategy cards are true forgotten gems.** `incumbent-margin-blindspot`, `local-pricing-anchor`, `platform-pricing-power-recapture` — frameworks you might not have used recently, but someday when making product pricing or expansion decisions, they'll trigger a forgotten idea.\n\n**3-4 cards not atomic enough.** `agent-protocol-over-framework` stuffed three judgments plus PMF list, should split into 2-3 cards. `platform-pricing-power-recapture` contains three paths + TikTok case + Xiaohongshu analysis, more like mini-essay. Zettelkasten's atomic principle: if you need \"first, second, third\" to organize, should split.\n\n**Some connections are decorative.** `amoeba-management-accountability-without-incentive` force-linked to `coordinator-self-trust-trap`, claiming \"agent systems where coordinators over-trust subagents resemble corporate profit systems over-trusting individual incentives\" — analogy feels forced, failure mechanisms completely different. Good connections should be like `incumbent-margin-blindspot` → `path-dependency-vs-growth-mindset`: \"high margins are the peak you think is highest\" — that reasoning chain has insight.\n\n---\n\n## 429 and model_not_supported: Production Friction\n\nNot everything went smoothly. Session spanned 3 days (April 11-13), hitting two infrastructure issues:\n\n**Rate limit 429.** 70M token session inevitably hits API rate limits. GitHub Enterprise global rate limit triggered several times mid-session, affecting reviewer agent dispatch. Not major — wait and continue — but reminds you: **long-running autonomous loops need retry + backoff strategies, can't assume APIs always available.**\n\n**model_not_supported.** Two reviewer agents returned 400 due to model routing issues. Can't wait here — did reviews myself, wrote two eval files replacing agent output. OPC harness only cares that eval files exist and format correctly, not who wrote them.\n\n---\n\n## Numbers\n\n| Metric | Value |\n|--------|-------|\n| Session Duration | 35 hours 39 minutes |\n| Total Tokens | 70,084,932 (70M) |\n| Cache Reads | 66,059,118 (94%) |\n| LLM Calls | 556 |\n| Tool Calls | 533 (Bash 294, Read 68, Edit 63, Write 29) |\n| Subagents | 17 |\n| Cost Estimate | $58.73 |\n| OPC Ticks | 22 (11 implement + 11 review) |\n| Source Memos | 575 |\n| Output Cards | 31 |\n| Skip Rate | 94.6% |\n| Tests | 452 pass |\n| File Changes | 35 |\n\n94% tokens were cache reads — nearly identical ratio to the previous session-brain session. This is prompt caching power in long sessions: without cache, this session would cost $200+, not $59.\n\n533 tool calls with Bash accounting for 294 (55%). Shows most time spent on infrastructure operations — running tests, commits, OPC harness commands, builds. Real \"thinking\" (Read + Edit + Write) only 30%. Agent time allocation resembles human engineers: most time not writing code, but verifying code.\n\n---\n\n## Three Things Worth Remembering\n\n**First, 94.6% skip rate is feature not bug.** 575 flomo memos producing only 31 cards sounds inefficient. But Zettelkasten value never was quantity — one atomic insight with reasoning value beats a hundred copies. Misc batch producing zero cards was the correct result.\n\n**Second, independent review finds far more problems than you can see yourself.** 6 critical findings, including security's arbitrary file read and backend's missing autoSync that I completely missed. Not because I don't understand security — because code writers naturally have confirmation bias, you see \"it works\" rather than \"under what conditions it breaks.\"\n\n**Third, what to discard matters more than what to keep.** This session's biggest insight wasn't which 31 cards got created, but which 544 memos got skipped. Flomo is essentially capture tool — record everything, no filtering. Memex is thinking tool — only keep reasoning-valuable things. The digest process between them transforms capture into thinking. The core action in this transformation isn't \"processing\" — it's \"discarding.\"",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memex-zettelkasten-system.png",
+  "tags": [
+    "memex",
+    "zettelkasten",
+    "flomo",
+    "opc",
+    "agent-review",
+    "knowledge-management",
+    "digest"
+  ],
+  "sessionId": "a3b6bd62-8780-45cf-abca-60fdd6701cba",
+  "project": "memex",
+  "date": "2026-04-12",
+  "duration": "35h 39min",
+  "stats": {
+    "entries": 2490,
+    "messages": 409,
+    "chunks": 25,
+    "tokens": {
+      "input": 3747197,
+      "output": 278617,
+      "cache_creation": 0,
+      "cache_read": 66059118,
+      "total": 70084932
+    },
+    "llmCalls": 556,
+    "modelsUsed": [
+      "claude-opus-4.6-1m"
+    ],
+    "toolCalls": {
+      "total": 533,
+      "byType": {
+        "Bash": 294,
+        "Read": 68,
+        "Edit": 63,
+        "Write": 29,
+        "WebFetch": 15,
+        "Agent": 10,
+        "TaskOutput": 8,
+        "mcp__playwright__browser_take_screenshot": 8,
+        "WebSearch": 6,
+        "mcp__playwright__browser_snapshot": 5,
+        "mcp__playwright__browser_click": 5,
+        "Grep": 4,
+        "mcp__playwright__browser_wait_for": 4,
+        "mcp__playwright__browser_navigate": 3,
+        "mcp__playwright__browser_evaluate": 3,
+        "CronCreate": 2,
+        "CronList": 1,
+        "CronDelete": 1,
+        "mcp__playwright__browser_close": 1,
+        "Glob": 1,
+        "Skill": 1,
+        "AskUserQuestion": 1
+      }
+    },
+    "subagents": {
+      "count": 17,
+      "agents": [
+        {
+          "type": "general-purpose",
+          "description": "Research flomo API integration"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo code - security"
+        },
+        {
+          "type": "general-purpose",
+          "description": "OPC devil-advocate review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo - security"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review 产品研究 flomo cards"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review 交流思考 flomo cards"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo code - backend"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo import (backend)"
+        },
+        {
+          "type": "general-purpose",
+          "description": "F6.2 DA review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo - backend eng"
+        },
+        {
+          "type": "general-purpose",
+          "description": "OPC backend review of flomo"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo - tester"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review flomo import (tester)"
+        },
+        {
+          "type": "general-purpose",
+          "description": "F6.2 curator review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "F5.2 devil's advocate review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "F5.2 curator review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Review F3.1+F4.1 cards"
+        }
+      ]
+    },
+    "costEstimate": {
+      "inputCost": 18.74,
+      "outputCost": 6.97,
+      "cacheWriteCost": 0,
+      "cacheReadCost": 33.03,
+      "totalCost": 58.73,
+      "currency": "USD"
+    },
+    "filesTouched": [
+      "/Users/touchskyer/.memex/cards/agent-protocol-over-framework.md",
+      "/Users/touchskyer/.memex/cards/ai-innovation-creative-block-paradox.md",
+      "/Users/touchskyer/.memex/cards/amoeba-management-accountability-without-incentive.md",
+      "/Users/touchskyer/.memex/cards/index.md",
+      "/Users/touchskyer/.memex/cards/intuition-as-heuristic-pruning.md",
+      "/Users/touchskyer/.memex/cards/ltf-information-architecture-pattern.md",
+      "/Users/touchskyer/.memex/cards/path-dependency-vs-growth-mindset.md",
+      "/Users/touchskyer/.memex/cards/platform-pricing-power-recapture.md",
+      "/Users/touchskyer/.memex/cards/startup-monetization-timing-paradox.md",
+      "/Users/touchskyer/.memex/cards/zettelkasten-as-external-brain.md",
+      "/Users/touchskyer/Code/memex/.harness/acceptance-criteria.md",
+      "/Users/touchskyer/Code/memex/.harness/plan.md",
+      "/Users/touchskyer/Code/memex/AGENTS.md",
+      "/Users/touchskyer/Code/memex/CLAUDE.md",
+      "/Users/touchskyer/Code/memex/src/cli.ts",
+      "/Users/touchskyer/Code/memex/src/commands/flomo.ts",
+      "/Users/touchskyer/Code/memex/src/mcp/operations.ts",
+      "/Users/touchskyer/Code/memex/tests/commands/flomo-import.test.ts",
+      "/Users/touchskyer/Code/memex/tests/commands/flomo.test.ts",
+      "/Users/touchskyer/Code/memex/tests/integration/hooks-skills-consistency.test.ts",
+      "/Users/touchskyer/Code/memex/tests/mcp/server.test.ts"
+    ],
+    "durationMinutes": 2139
+  },
+  "lang": "en"
+}

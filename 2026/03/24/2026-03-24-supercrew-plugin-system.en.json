@@ -1,0 +1,188 @@
+{
+  "slug": "2026-03-24-supercrew-plugin-system",
+  "title": "Three Days, 57M Tokens, Six Fronts — Building a Bilingual Blog, Open Source Push, and Plugin Ecosystem in One Session",
+  "summary": "A single session spanning three days, simultaneously tackling Astro blog i18n, memex open source promotion (LinkedIn + Glama + awesome-mcp-servers), msft-model skill switching, and linkedin-skills marketplace plugin. 14 subagents running in parallel, 387 tool calls, $59 burned — only to discover the biggest gotcha wasn't in the code, but LinkedIn's complete lack of markdown support.",
+  "body": "I discovered that Astro strips dots from filenames right after I'd configured the frontmatter for `memex.en.md`, written the translation, and spun up the dev server.\n\nThe URL became `/blog/memexen`. Not `/blog/memex.en`, but `memexen`. Astro content collections' slug generation logic strips `.` characters, and the docs don't mention this anywhere.\n\nThe bug itself takes three seconds to fix—change `.en` to `--en`. But it revealed a pattern that ran through this entire session: **what you think is a small change always hides a platform limitation you didn't see coming.**\n\n---\n\n## Six Fronts\n\nThis session ran from March 22nd to March 25th, 77 hours total, 4620 active minutes. Not a focused session with a clear goal, more like an operational sprint—I had a bunch of things piling up that needed pushing forward, so I tackled them all in one session.\n\nThe front list:\n\n1. **Bilingual blog system** — Complete i18n for Astro SSG + ClientRouter: language detection, CSS-based filtering, SPA navigation state persistence\n2. **Content translation** — Chinese to English for 2 blog posts + 6 notes\n3. **memex open source promotion** — LinkedIn article/post writing, Glama MCP registry submission, awesome-mcp-servers PR\n4. **msft-model skill** — A slash command to switch Claude Code's model through copilot-api proxy\n5. **linkedin-skills plugin** — Based on xiaohongshu-skills structure, building a marketplace plugin for LinkedIn operations\n6. **marketing-skills plugin** — Extending linkedin-skills to cover Twitter/Instagram/YouTube/TikTok as a general marketing plugin\n\nThe six fronts had dependencies but weren't completely linear. The bilingual blog system was a prerequisite—memex's English blog post needed it to go live. LinkedIn promotion depended on the English blog post URL. The msft-model skill was independent, but its registration issues exposed a blind spot in the superpowers plugin architecture.\n\n---\n\n## Astro's Bilingual Strategy: CSS Beats Routing\n\nThere are two paths for bilingual implementation: routing-based (`/en/blog/memex` vs `/zh/blog/memex`) and CSS-based (same page, hide unneeded languages based on `data-lang` attribute).\n\nI went with CSS-based. The reason is simple: Astro is SSG, each route corresponds to a static HTML file. Routing-based means generating two copies of every page, adding locale prefixes to all internal links, making nav components locale-aware. Three times the work, but no fundamental difference in user experience.\n\nCore implementation is just three files:\n\n- `LangInit.astro` — inline script detects `navigator.language`, sets `html[data-lang]`, works with CSS `display: none` for zero-FOUC switching\n- `LangToggle.astro` — language toggle button in the top right\n- `i18n.ts` — `getLang()` determines language from slug (contains `--en` → en, otherwise zh)\n\nThe key trick is **two-layer scripts**: `is:inline` script executes before first paint (prevents flashing), module script listens for `astro:page-load` event to reapply language state after SPA navigation. Astro's ClientRouter doesn't re-execute inline scripts in `<head>` during SPA navigation—this behavior isn't documented anywhere, took some debugging to figure out.\n\n---\n\n## LinkedIn's Format Hell\n\nThe most surprising thing in this session wasn't any code problem—it was LinkedIn's article editor.\n\nI wrote a deep dive on memex in markdown—architecture diagrams in ASCII art, feature comparisons in tables, install commands in code blocks. Looked perfect locally.\n\nPasted into LinkedIn article editor, everything broke:\n\n- **Tables not supported.** Just becomes a blob of text.\n- **Code block behavior inconsistent.** Sometimes renders, sometimes doesn't.\n- **Inline code not supported.** Backticks show literally.\n- **Post composer is plain text.** No markdown formatting works.\n- **List items get collapsed.** Three `→` bullet points become one continuous paragraph.\n\nWent through three rounds of fixes: tables → lists, code blocks → plain text, inline code → remove backticks. Finally realized LinkedIn uses its own rich text editor that lives in a completely different world from markdown.\n\nLesson is simple: **Don't write everything in your local editor then paste it over. Write directly in the target platform's editor, or at least paste a test section first to see how it renders.**\n\n---\n\n## msft-model: The Registration Location Wars\n\n`msft-model` is a slash command for switching AI models. Through the `localhost:4141` copilot-api proxy, it can point Claude Code's primary/sonnet/haiku slots to any Claude, GPT, or Gemini model.\n\nThe functionality isn't complex—`curl /v1/models` to pull the list, `jq` to filter out embedding models, write to the env field in `~/.claude/settings.json`. Supports presets (`all-claude`, `all-gpt`, `all-gemini`, `mixed-best`), single slot switching, and lifecycle operations like `list`/`on`/`off`/`reauth`.\n\nWhat's interesting is the registration location issue. First time I put it under `supercrew/plugins/skills/msft-model/SKILL.md`—because that's the skill directory structure for superpowers marketplace plugins. Claude Code didn't recognize it: `Unknown skill: msft-model`.\n\nThe reason is that plugin skills discovery goes through the `marketplace.json` manifest, not directory scanning. For a SKILL.md file to be recognized, it must belong to a registered plugin, and that plugin's manifest must declare it.\n\nBut `msft-model` doesn't belong to any plugin—it's a personal tool, same category as `publish-blog` and `save-to-obsidian`. The correct location is `~/.claude/commands/msft-model.md`—the global slash command directory.\n\nThis mistake exposed a blind spot in my understanding of the superpowers architecture: **plugin skills and global commands are completely different registration mechanisms**, even though they look identical from the user perspective (both triggered with `/xxx`). Plugin skills have marketplace distribution, version management, dependency declarations; global commands are local-only, drop-and-use, no manifest.\n\n---\n\n## LinkedIn Skills Plugin: From 139 Down to 21\n\nI referenced the xiaohongshu-skills structure—139 skills covering the entire xiaohongshu operations pipeline. But LinkedIn's content formats are much simpler than xiaohongshu (no live commerce, product seeding posts, short video scripts, etc.), so it doesn't need that many.\n\nFinal trim down to 5 categories, 21 skills:\n\n| Category | Skills |\n|----------|--------|\n| Content Creation | article-writing, post-writing, visual-content |\n| Personal Brand | profile-optimization, positioning-strategy, thought-leadership, personal-ip |\n| Engagement & Growth | algorithm-understanding, comment-strategy, engagement-sequences, networking-tactics, publishing-timing |\n| Analytics | content-performance, linkedin-analytics, competitor-analysis |\n| Marketing | b2b-content-marketing, lead-generation, newsletter-strategy, paid-advertising |\n\nEach skill is a `SKILL.md` file, same format as xiaohongshu-skills: frontmatter + Overview + When to Use + Core Pattern (Before/After) + Quick Reference + Implementation + Common Mistakes + Real-World Impact + Related Skills.\n\nThen I realized linkedin-skills was too narrow—Twitter, Instagram, YouTube, TikTok operations have 70% overlap (content strategy, publishing timing, algorithm understanding, data analysis). So I expanded it into `marketing-skills`, a general marketing plugin covering multiple platforms.\n\nThere's a subagent gotcha worth noting here: the subagent creating engagement & analytics skills threw a `model_not_supported` error. Some model in the copilot-api proxy wasn't available during subagent calls. Workaround was going back to the main session and writing manually. **When running multiple agents in parallel, model availability at the proxy layer isn't 100% consistent—main session working doesn't guarantee subagents will work too.**\n\n---\n\n## Glama's Rating Trap\n\nSubmitting a PR to awesome-mcp-servers requires a rating badge from Glama MCP server registry. After submitting to Glama, License got an F—because there was no LICENSE file in the repo. README said MIT, `package.json` declared MIT, but Glama only recognizes a LICENSE file in repo root.\n\nAfter adding the LICENSE file through GitHub API, Glama's rating didn't refresh. Still F after two hours. No rescan button, no webhook, no manual trigger anywhere. Finally asked Glama maintainer punkpeye in the PR, he said even he can't control the scan cycle.\n\nThis kind of platform dependency is the lowest-leverage part of open source promotion—you can see the problem, but you can't fix it, you can only wait.\n\n---\n\n## Numbers\n\n| Metric | Value |\n|--------|-------|\n| Time span | 77 hours (March 22-25) |\n| Total tokens | 57M |\n| Cache reads | 51.7M (91%) |\n| LLM calls | 440 |\n| Tool calls | 387 |\n| Subagents | 14 |\n| Estimated cost | $58.69 |\n| File changes | 52 |\n\nTool call distribution: Bash 105, Write 53, Read 37, Playwright screenshot 31, Playwright navigate 27, Edit 25, Playwright evaluate 21, Playwright click 16. Playwright-related tool calls add up to 100—26% of the total. This shows the session involved heavy UI verification and screenshot work (bilingual blog validation + LinkedIn draft review).\n\n---\n\n## Looking Back\n\nThis session's characteristic was broad rather than deep—no feature was a zero-to-one major project, but each had its own gotchas. Three things most worth remembering:\n\n**1. Platform limitations are harder to debug than code bugs.** Astro stripping dots, LinkedIn not supporting markdown, Glama not refreshing ratings—none of these are your code problems, but they consume more time and energy than any code bug. And you can't fix them, you can only work around them.\n\n**2. Plugin skills vs global commands are two different worlds.** If it's just a tool for your own use, putting it in `~/.claude/commands/` is enough. Plugin skills are for distribution—they have marketplace manifests, versions, dependency graphs. Don't mix them up.\n\n**3. A session with 91% cache reads is fundamentally a context-heavy operation.** Of 57M tokens, 51.7M were cache reads, meaning most time was spent consuming existing context rather than generating new content. This session's cost structure is completely different from a code generation session—without prompt caching, $59 would become $250+.",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-03-24-supercrew-plugin-system.png",
+  "tags": [
+    "supercrew",
+    "plugin",
+    "i18n",
+    "astro",
+    "linkedin",
+    "memex",
+    "msft-model",
+    "marketplace",
+    "open-source",
+    "copilot-api"
+  ],
+  "sessionId": "ee4fd7d1-bd0f-4a6a-9382-e4bebae753f1",
+  "project": "supercrew",
+  "date": "2026-03-24",
+  "duration": "77h (4620min active)",
+  "stats": {
+    "entries": 2382,
+    "messages": 344,
+    "chunks": 21,
+    "tokens": {
+      "input": 4705022,
+      "output": 372863,
+      "cache_creation": 0,
+      "cache_read": 51676689,
+      "total": 56754574
+    },
+    "llmCalls": 440,
+    "modelsUsed": [
+      "claude-opus-4.6",
+      "claude-opus-4.6-1m"
+    ],
+    "toolCalls": {
+      "total": 387,
+      "byType": {
+        "Bash": 105,
+        "Write": 53,
+        "Read": 37,
+        "mcp__playwright__browser_take_screenshot": 31,
+        "mcp__playwright__browser_navigate": 27,
+        "Edit": 25,
+        "mcp__playwright__browser_evaluate": 21,
+        "mcp__playwright__browser_click": 16,
+        "TaskUpdate": 14,
+        "Grep": 9,
+        "Agent": 8,
+        "AskUserQuestion": 8,
+        "WebFetch": 7,
+        "mcp__playwright__browser_snapshot": 5,
+        "WebSearch": 4,
+        "mcp__playwright__browser_resize": 4,
+        "TaskOutput": 3,
+        "EnterPlanMode": 2,
+        "ExitPlanMode": 2,
+        "TaskCreate": 2,
+        "mcp__playwright__browser_tabs": 2,
+        "mcp__playwright__browser_navigate_back": 1,
+        "Skill": 1
+      }
+    },
+    "subagents": {
+      "count": 14,
+      "agents": [
+        {
+          "type": "Explore",
+          "description": "Explore blog codebase structure"
+        },
+        {
+          "type": "Explore",
+          "description": "Explore blog codebase for i18n"
+        },
+        {
+          "type": "Explore",
+          "description": "Explore marketplace plugin structure"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Create personal brand skills"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Write Twitter skills"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Write Instagram skills"
+        },
+        {
+          "type": "Explore",
+          "description": "Explore xiaohongshu-skills repo"
+        },
+        {
+          "type": "Explore",
+          "description": "Check pptx skill license"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Create engagement & analytics skills"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Marketing expert review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Write YouTube skills"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Write TikTok skills"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Create marketing skills"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Create content creation skills"
+        }
+      ]
+    },
+    "filesTouched": [
+      "/Users/touchskyer/.claude/commands/msft-model.md",
+      "/Users/touchskyer/.claude/plans/cozy-scribbling-goblet.md",
+      "/Users/touchskyer/.claude/settings.json",
+      "/Users/touchskyer/Code/Jingxia/supercrew/plugins/skills/msft-model/SKILL.md",
+      "/Users/touchskyer/Code/blog/linkedin-cover.html",
+      "/Users/touchskyer/Code/blog/linkedin-memex-article.md",
+      "/Users/touchskyer/Code/blog/linkedin-memex-post.md",
+      "/Users/touchskyer/Code/blog/src/components/Footer.astro",
+      "/Users/touchskyer/Code/blog/src/components/Header.astro",
+      "/Users/touchskyer/Code/blog/src/components/LangInit.astro",
+      "/Users/touchskyer/Code/blog/src/components/LangToggle.astro",
+      "/Users/touchskyer/Code/blog/src/content/blog/memex.en.md",
+      "/Users/touchskyer/Code/blog/src/content/blog/memex.md",
+      "/Users/touchskyer/Code/blog/src/content/blog/superpowers--en.md",
+      "/Users/touchskyer/Code/blog/src/content/notes/2026-03-09-building--en.md",
+      "/Users/touchskyer/Code/blog/src/content/notes/2026-03-10-superpowers-insight--en.md",
+      "/Users/touchskyer/Code/blog/src/content/projects/memex/index.md",
+      "/Users/touchskyer/Code/blog/src/layouts/PageLayout.astro",
+      "/Users/touchskyer/Code/blog/src/lib/i18n.ts",
+      "/Users/touchskyer/Code/blog/src/pages/blog/[...slug].astro",
+      "/Users/touchskyer/Code/blog/src/pages/blog/index.astro",
+      "/Users/touchskyer/Code/blog/src/pages/index.astro",
+      "/Users/touchskyer/Code/blog/src/pages/notes/index.astro",
+      "/Users/touchskyer/Code/linkedin-skills/.claude-plugin/marketplace.json",
+      "/Users/touchskyer/Code/linkedin-skills/README.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/01-content-creation/article-writing/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/01-content-creation/post-writing/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/01-content-creation/visual-content/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/02-personal-brand/personal-ip/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/02-personal-brand/positioning-strategy/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/02-personal-brand/profile-optimization/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/02-personal-brand/thought-leadership/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/03-engagement-growth/algorithm-understanding/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/03-engagement-growth/comment-strategy/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/03-engagement-growth/engagement-sequences/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/03-engagement-growth/networking-tactics/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/03-engagement-growth/publishing-timing/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/04-analytics/competitor-analysis/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/04-analytics/content-performance/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/04-analytics/linkedin-analytics/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/05-marketing/b2b-content-marketing/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/05-marketing/lead-generation/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/05-marketing/newsletter-strategy/SKILL.md",
+      "/Users/touchskyer/Code/linkedin-skills/skills/05-marketing/paid-advertising/SKILL.md",
+      "/Users/touchskyer/Code/marketing-skills/.claude-plugin/marketplace.json",
+      "/Users/touchskyer/Code/marketing-skills/README.md",
+      "/Users/touchskyer/Code/marketing-skills/skills/instagram/01-content-creation/reels-strategy/SKILL.md",
+      "/Users/touchskyer/Code/marketing-skills/skills/twitter/03-engagement-growth/algorithm-understanding/SKILL.md",
+      "/Users/touchskyer/Code/marketing-skills/skills/twitter/05-marketing/paid-advertising/SKILL.md",
+      "/Users/touchskyer/Code/marketing-skills/skills/youtube/01-content-creation/shorts-strategy/SKILL.md",
+      "/tmp/awesome-mcp-servers/README.md"
+    ],
+    "costEstimate": {
+      "total_cost": 58.69,
+      "currency": "USD"
+    },
+    "durationMinutes": 4619.9
+  },
+  "lang": "en"
+}

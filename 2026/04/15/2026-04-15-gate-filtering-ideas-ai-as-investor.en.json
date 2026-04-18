@@ -1,0 +1,52 @@
+{
+  "slug": "2026-04-15-gate-filtering-ideas-ai-as-investor",
+  "title": "When AI Plays Venture Capitalist: Screening Ideas with Gate-Based Validation",
+  "summary": "Built a Gate 1/2/3 validation pipeline using Cohen's kappa to measure LLM judge consistency, developer interest scores for Gate 2, and MCP spikes to verify feasibility. User initially got confused about direction, then realized they wanted full AI simulation instead of real human validation.",
+  "body": "# When AI Plays Venture Capitalist: Screening Ideas with Gate-Based Validation\n\nFirst thing was using the OPC (One Person Company) skill to review freshly generated ideas: \"Review this idea, give harsh feedback, ask yourself: would you invest in this?\"\n\nThat sentence set the tone for the next twenty-plus chunks—not gentle \"help me refine this,\" but adversarial \"convince me.\"\n\n## Gate Design\n\nUser designed a three-layer filtering system:\n\n- **Gate 1: LLM Judge Reliability**—Have multiple AIs independently evaluate the same idea, measure consistency with Cohen's kappa. Only pass if kappa > 0.6. This isn't an arbitrary threshold; 0.6 is the lower bound for \"substantial agreement\" in statistics.\n- **Gate 2: Developer Interest Score**—At least 3 simulated developer roles must say \"I'd actually build a prototype of this.\"\n- **Gate 3: Executor Feasibility**—Verify technical feasibility through MCP + OpenAI spikes.\n\nThere's something interesting about this design: it doesn't ask \"is this idea good?\" but rather \"what specific tests can this idea pass?\" Good vs. bad is subjective; pass rates are measurable.\n\n## Problems That Only Surface When You Actually Run It\n\nIn theory, Gate 1 → 2 → 3 sequential execution is clean. In practice, sessions kept breaking—context window exhausted, user leaves and returns, progress lost. By chunk 15 the user straight up said: \"What are we doing? I'm a bit lost.\"\n\nThis is the reality of long sessions. Not eight hours straight staring at a screen, but fragmented across life, other work, sleep. Every return requires re-orientation.\n\nUser tried the `/loop` command, having Claude auto-advance Gate validation every 30 minutes. This was the first attempt at \"I don't want to babysit this\"—an impulse that would escalate as we'll see.\n\n## The Key Pivot: Full AI Simulation\n\nBy chunk 29, user said something crucial:\n\n\"I'm confused, what were you just doing? I actually don't want to find real people—I want these gates to be fully AI simulated.\"\n\nGate 2 was originally designed to find real developers to validate interest. But user realized they didn't want \"accurate market validation\"—they wanted \"fast signal filtering.\" Real human validation is more accurate, sure, but takes days per idea. Full AI simulation has bias, but runs in ten minutes.\n\nThis is deeply pragmatic: in 0-to-1 phases, speed beats precision. You don't need to know an idea has 73.2% success probability—you need to know if it's \"probably worth pursuing\" or \"probably garbage.\"\n\n\"Can you use my OPC skill for this?\"\n\nUser wanted to use OPC's multi-role debate mechanism to simulate Gate 2's \"developer interest\" validation. OPC has PM, Engineer, Devil's Advocate and other roles, each evaluating ideas from their perspective. Not perfect validation, but more reliable than one LLM grading itself—at least you get perspective diversity from role differentiation.\n\n## The Reality of Cohen's Kappa\n\nAbout Gate 1's Cohen's kappa—there's a trade-off worth discussing. Kappa measures inter-rater agreement beyond random chance. Applied to LLMs, you're essentially measuring how consistently the same model (or different models) evaluates the same idea across different prompts.\n\nHigh kappa means the idea's \"good\" or \"bad\" signal is pretty definitive. Low kappa means even AI can't decide—which is valuable information itself. This idea might be in a gray zone requiring more data to judge.\n\nBut let's be honest: this entire framework assumes LLM judgment correlates somewhat with human expert judgment. That assumption probably holds in 2026, but it's not guaranteed. If your idea happens to hit an LLM knowledge blind spot (say, some hyper-vertical industry), Gate 1 results could be completely unreliable.\n\n## Looking Back\n\nGate 1/2/3 didn't survive in its original form. As the idea factory skill matured, these gates got reorganized into a more complete pipeline. But the core thinking remained: layer by layer filtering, each layer with clear pass criteria, fail fast on anything that doesn't make it through.\n\nIn traditional startup methodology, this is called a funnel. In the AI era, funnels can run faster, more automated, cheaper. You don't need three months of market research—you can initial-screen twenty ideas in one afternoon.\n\nWhat's the cost? You might kill some good ideas—Cohen's kappa is a statistical tool, not prophecy. But between \"killing good ideas\" and \"wasting three months on bad ideas,\" the former costs way less.\n\nThat's the philosophy of gate-based validation: better to miss gold than mine sand.",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-gate-filtering-ideas-ai-as-investor.png",
+  "tags": [
+    "gate-validation",
+    "cohens-kappa",
+    "llm-judge",
+    "opc",
+    "idea-screening",
+    "ai-simulation"
+  ],
+  "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+  "project": "idea-factory",
+  "date": "2026-04-15",
+  "duration": "",
+  "stats": {
+    "entries": 25005,
+    "messages": 3466,
+    "chunks": 269
+  },
+  "chunkIndices": [
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50
+  ],
+  "lang": "en"
+}

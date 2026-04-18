@@ -1,0 +1,28 @@
+{
+  "slug": "2026-04-17-ba9b2d27-article-1",
+  "title": "When Your Frontend Goes Blind: How a Snake-to-Camel Rename Broke Production and Exposed Our CI",
+  "summary": "Opened the agent page to find all toolcall views and ask cards reduced to bare numbered lists. The fix was easy—the scary part was realizing that a simple field rename from snake_case to camelCase sailed through 20+ green tests straight into main without a single failure.",
+  "body": "## The Scene\n\nThursday morning: opened `http://localhost:3000/agents/64c60fe4-…` expecting to see our beautiful Task Clarification card. Instead: a bare `1. 2. 3.` numbered list—all form controls, labels, field descriptions vanished. Ask cards, other tool views, all blind.\n\nFirst instinct: someone broke the protocol.\n\n## The Hunt\n\nSpun up two subagents in parallel: one tracing frontend's toolcall render pipeline, another scanning backend's recent message_converter changes. Five-minute verdict: `backend/apps/mitsein-api-service/routes/orchestrator_next/message_converter.py` had changed `form_schema` to `formSchema` (snake → camel), while frontend's `task-clarify-card.tsx` was still reading `form_schema`.\n\nField name mismatch: `formSchema` comes in, `form_schema` reads `undefined`, `normalize-form-schema` gets `undefined` and falls back to a numbers-only renderer. The fallback was too polite—no errors thrown, no warnings logged, UI just rendered an empty shell.\n\nThe change itself was unidirectional, one-time. Fix was one line—either change frontend to read `formSchema` or make converter provide both. Went with the former for style consistency.\n\n## The Actually Scary Part\n\nAfter the fix and restart, the user question wasn't about the bug:\n\n> \"Why did we get this regression, why didn't our tests catch it? That's scary.\"\n\nThat question mattered more than the bug itself.\n\nChecked git log—the change was committed two days ago by someone else. Checked CI status—that commit's checks **never ran**. Specifically: the change was split across frontend and backend PRs, backend PR passed its own pytest, frontend PR wasn't pulled into contract tests, merge used squash and didn't trigger integration jobs.\n\nUnfurling this revealed three layers of defense that all failed:\n\n**Layer 1: unit tests**. Backend converter had tests, but the test fixtures were updated to `formSchema` too—testing \"what do I call the fields I output\" where the test author's hands and production code hands are the same hands. Tests always green. Classic tautological testing, self-validating.\n\n**Layer 2: contract tests**. `contracts/client-tools/types.ts` is our frontend-backend source of truth, but this change didn't update types.ts—backend running camelCase, frontend running snake_case, contracts still saying the old thing. Contract tests only ran on the types.ts side, no cross-check for \"does actual runtime message output match types.ts\".\n\n**Layer 3: E2E**. The `e2e-testing/` framework has browser tests, but those run happy path—open some agent, chat, receive one message, green. No opening a real task clarification flow, expanding the card, asserting the card internals have expected labels. Classic smoke test false positive—surface passes, depth empty.\n\n## Three Patches\n\nWrote a frontend unit test specifically for `normalize-form-schema`: give it both `{formSchema: {...}}` and `{form_schema: {...}}` payloads, both must produce identical normalized results—**this is a guard**, forcing any future field renames to think through compatibility first.\n\nWrote a backend test that runs real messages through `message_converter.convert()`, asserting output JSON contains all top-level keys the frontend expects. This test starts from production code's actual behavior, not from fixtures.\n\nFinally added a contract lint for this path: fields defined in `contracts/client-tools/*.schema.json` must be covered by backend converter tests on matching paths—mismatch fails CI.\n\n34 passed 0 skipped, 20 frontend tests all green, commit pushed.\n\n## Lessons\n\nRefactor rules are already in CLAUDE.md—\"ONLY change import paths, never modify logic\"—but does snake→camel **field-level** renaming count semantically as \"import path changed\" or \"logic changed\"? CLAUDE.md doesn't say. Result: renames became a \"I changed it but not really\" gray zone that slipped the safety net.\n\nDeeper layer: CI missed this because the change **crossed PR boundaries** (backend one PR, frontend another PR), each PR looking correct in isolation. Contracts exist precisely for cross-PR coordination, but contract test coverage wasn't enough—didn't cover field naming conventions.\n\nAdded to backlog: contract tests need field-name-style lint (snake vs camel must align with schema). These guards are probability-stacking defense—each layer individually bypassable, but three layers together make simultaneous failure much harder.\n\nUntil fully fixed, my personal rule: any field rename crossing frontend-backend boundaries, **write the other side's tests first**, then change the field name.",
+  "heroImage": "",
+  "tags": [
+    "frontend",
+    "contract-test",
+    "ci",
+    "regression",
+    "mitsein"
+  ],
+  "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "project": "mitsein-pptx-migration",
+  "date": "2026-04-17",
+  "duration": "",
+  "stats": {},
+  "lang": "en"
+}

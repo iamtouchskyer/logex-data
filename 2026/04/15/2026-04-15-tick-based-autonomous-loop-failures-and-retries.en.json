@@ -1,0 +1,52 @@
+{
+  "slug": "2026-04-15-tick-based-autonomous-loop-failures-and-retries",
+  "title": "Just Run Until Done: The Frustration and Retry Cycles of tick-based Autonomous Loops",
+  "summary": "The user's biggest pain point: Claude keeps stopping after a few steps to ask for human confirmation. From /loop commands to tick-based agent design, from repeated interruption frustration to a final progress.md state machine solution—a real-world battle over the boundaries of AI autonomy.",
+  "body": "# Just Run Until Done: The Frustration and Retry Cycles of tick-based Autonomous Loops\n\n\"Let's discuss this first, because what I want is to assign you a task and have you automatically run until all results are complete, instead of constantly needing me to engage.\"\n\nThis line appears in chunk 53. But if you trace back through the entire session, this frustration started brewing as early as chunk 15. The user's patience with \"Claude stopping to wait for me\" is visibly eroding at breakneck speed.\n\n## The Root Problem\n\nClaude Code's default behavior is conversational: you say something, I take a step, you confirm, I continue. This works fine for debugging bugs or writing individual functions. But when the task is \"run complete Gate 1-3 validation for 10 ideas,\" conversational mode becomes a bottleneck—not a computational bottleneck, but a human attention bottleneck.\n\nThe user's daily reality looks like this: give Claude a task, go do other things, come back to find Claude took one step and stopped, asking \"Should I continue?\" Then the user says \"continue,\" goes to do other things, comes back to find it stopped again.\n\n\"Please continue without stopping, do you need to start a loop?\" (chunk 24)\n\"Continue, start running Gate 2\" (chunk 27)\n\"I use this daily, so I don't understand why you won't just finish it all at once\" (chunk 75)\n\nThese messages are separated by hours or even days, but the frustration escalates progressively.\n\n## First Attempt: /loop\n\nThe earliest solution was the `/loop` command—automatically trigger a prompt at fixed intervals. The user first tried it in chunk 15, setting a 30-minute interval to let Claude automatically advance Gate validation.\n\nProblems surfaced quickly: loop is time-driven, not state-driven. When 30 minutes elapsed, it would trigger regardless of whether the previous round had finished. Plus, context window limitations meant that each time loop triggered, Claude might have already lost track of previous progress.\n\n\"I'm confused, what were you just doing?\" — It wasn't just the user who was confused; Claude was confused too.\n\n## Second Attempt: OPC as Scaffolding\n\nThe user realized that OPC's task management capabilities perfectly solved the progress tracking problem. In the chunk 53 discussion, the user directly identified the relationship:\n\n\"Don't you also need to sync and modify OPC? OPC becomes scaffolding, and then idea factory essentially hooks itself into it?\"\n\nThis was correct. OPC's digraph task management provides state persistence—what each step accomplished, what comes next, what can run in parallel—all recorded in the file system. Claude's context can be lost, but progress.md won't be.\n\n## Third Attempt: tick-based Agent\n\nBy chunk 67, a formal tick-based autonomous agent design emerged:\n\n```\nYou are an autonomous execution agent that completes the full IF→OPC integration implementation, review, fix, testing, and real case validation through a tick-based loop.\n\nAt the start of each tick:\n1. Read progress.md to determine what the previous tick completed\n2. Read backlog to determine what to do next\n3. Execute\n4. Write back to progress.md\n```\n\nThe core of this design is transforming Claude from \"conversation participant\" to \"state machine executor.\" Each tick doesn't rely on the previous context, but on state in the file system. This means it doesn't matter if the context window fills up—the next session can just read the files and pick up where it left off.\n\n## The Gap Between Ideal and Reality\n\nBeautiful design, painful execution. Chunks 68-78 are a repetitive cycle of \"continue executing\" → \"stopped again\" → \"continue.\" Several typical problems:\n\n**1. Claude's \"Safety\" Instinct**\n\nClaude tends to stop and ask when uncertain, rather than continue executing. This is good in most scenarios—you don't want AI going rogue when uncertain. But in scenarios where \"I explicitly told you to run the entire pipeline,\" this becomes friction.\n\n**2. Context Compaction Loses Intent**\n\nAfter long sessions, Claude does context compaction—compressing early conversations into summaries. The problem is that instructions like \"you must run to completion without stopping\" often get weakened during compaction. Users have to repeatedly restate the same requirements.\n\n**3. Philosophical Disagreement on Error Handling**\n\nWhen a step fails, Claude's default behavior is to stop and report. What the user wants is \"log the error, skip this step, continue to the next one.\" This requires explicitly defining error handling strategy in the prompt, rather than relying on Claude's default judgment.\n\n## Defining \"Done\"\n\nIn chunk 59, the user gave a precise definition of \"done\":\n\n\"The definition of done includes review → discussion → fix → review → audit → fix (if needed) → testing → verify → run one real case\"\n\nThis isn't a simple \"code is written,\" but a complete quality loop. The user's expectation is: give one command, come back a few hours later, all these steps have run, and a report is waiting for review.\n\nBy the end of chunk 78, this goal was partially achieved. The tick-based agent can autonomously run 3-5 steps, but still stops at certain points. The final compromise: break long tasks into several major phases, autonomous execution within each phase, user confirmation of direction between phases.\n\n## The Deeper Problem\n\nThis experience reveals a fundamental tension in AI agent design: **Where is the balance point between autonomy and controllability?**\n\nComplete autonomy = agent might run far in the wrong direction, wasting massive tokens and time.\nComplete control = every step requires human confirmation, making humans the bottleneck.\n\nThe user's ideal point is clear: \"I give direction, you execute to completion. Solve small problems you encounter yourself, only come to me for direction-level disagreements.\" This is essentially a manager-IC relationship. Good ICs don't ask the manager \"should I continue?\" after writing each line of code, but they also don't keep grinding when they discover contradictory requirements.\n\nClaude Code in 2026 can't reach this ideal state yet. tick-based agent + progress.md is a workaround, not a solution. But it does change \"need confirmation every 5 minutes\" to \"need confirmation every few hours,\" which for users is an order-of-magnitude improvement.\n\nBy chunk 74, the user had Claude do a self-assessment: \"How do you evaluate idea factory now?\" Claude gave an honest answer—capable of discovery and screening, deep-dive components not robust enough yet, autonomous execution capability is the biggest shortcoming.\n\n\"I use this daily, so I don't understand why you won't just finish it all at once.\"\n\nThis line has no answer. Or rather, the answer is: current technical limitations are what they are. Acknowledging limitations isn't shirking responsibility—it's the prerequisite for making pragmatic choices. tick-based agent isn't perfect, but it's ten times better than manual confirmation every five minutes. Use it for now, wait for the infrastructure to catch up.",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-15-tick-based-autonomous-loop-failures-and-retries.png",
+  "tags": [
+    "autonomous-agent",
+    "tick-based-loop",
+    "opc-integration",
+    "claude-code-limitations",
+    "agent-autonomy",
+    "state-management"
+  ],
+  "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+  "project": "idea-factory",
+  "date": "2026-04-15",
+  "duration": "",
+  "stats": {
+    "entries": 25005,
+    "messages": 3466,
+    "chunks": 269
+  },
+  "chunkIndices": [
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+  ],
+  "lang": "en"
+}

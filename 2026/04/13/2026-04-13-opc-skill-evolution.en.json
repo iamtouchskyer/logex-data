@@ -1,0 +1,224 @@
+{
+  "slug": "2026-04-13-opc-skill-evolution",
+  "title": "28 Subagents, $130, and an LLM That Won't Pay: OPC's Two-Day Evolution",
+  "summary": "A code audit revealed brutal truth: 4 reviewer agents unanimously failed my testing, exposing 7 Critical+High issues. After fixing those, the system evolved to include quality tiers, zero-trust validation chains, and contract-style frameworks. But when I deployed 4 simulated users to test willingness-to-pay gates, I discovered LLM-generated economic signals aren't economic signals at all. 148M tokens, 487 tool calls, two days and nights—OPC evolved from personal tool to a pipeline that dares to face user judgment.",
+  "body": "The first time I realized my tests were lying to me was when four reviewer agents independently pointed to the same fatal flaw.\n\nDevil's Advocate said: \"`test-gaps2.sh` has at least 9 tests where both if/else branches return `PASS++`—structurally impossible to fail.\" Engineer said: \"`npm test` only runs 1 of 11 test files, 95% of tests never execute in CI.\" Security said: \"Read-only doesn't mean safe, viz and replay bypass resolveDir.\" Architect said: \"ITERATE—backlog enforcement uses graph topology to infer upstream, which is wrong on convergent graphs.\"\n\nFour roles, zero crosstalk, unanimous FAIL verdict. Gate calculation: 6 critical findings, ITERATE.\n\nThis was OPC auditing itself, day one.\n\n---\n\n## From Personal Tool to CI-Ready\n\nStep back for context. OPC (One Person Company) is a Claude Code skill built on the principle that \"agents who do work don't judge their own work.\" A digraph engine drives arbitrary flows—build, review, brainstorm—each path ending with independent evaluation. One person + a swarm of agents = one company.\n\nThis time I wasn't using OPC to build products—I was using OPC to audit OPC itself. Started with `/hermes-advisor` for code review, then manually switched to `/opc` proper flow with 4 expert agents running parallel review.\n\nThe user (me) asked a good question: \"After these fixes, what does that mean?\"\n\nThe answer was stark: **OPC goes from \"only works on my machine\" to \"anyone can clone and trust the test results.\"**\n\nThe 7 Critical+High fixes weren't adding features—they were fixing \"trust infrastructure\":\n\n| What Got Fixed | Before | After |\n|----------------|--------|-------|\n| npm test coverage | Only runs 1/11 test files | `run-all.sh` runs all 11 |\n| Tautological tests | 9 if/else branches both PASS | 7 fixed to honest assertions, exposed 2 real bugs |\n| file-lock release | read-check-unlink TOCTOU window | rename-then-verify-then-delete atomic pattern |\n| loadState exit | `process.exit(1)` skips finally block → lock leak | Return error object, finally executes normally |\n| test paths | Hardcoded `~/.claude/skills/opc/` | `$(cd \"$(dirname \"$0\")/..\" && pwd)` relative |\n| helper duplication | 10 files each define assert | Unified `test-helpers.sh` single source of truth |\n| VALID_TYPES | Two files each define their own | Single definition + import |\n\nAfter fixes, ran Round 2 review. Engineer and Devil's Advocate re-audited. Engineer flagged an interesting critical: \"All fixes uncommitted.\"—code changed, git didn't. The review process caught human error, not LLM error.\n\n---\n\n## The Quality Tier System We Were Forced to Build\n\nAfter fixing infra, product quality discussions began. Started with a specific observation: OPC builds functional products, but they lack craft—no dark mode, no smooth transitions, no styled code blocks, typography uses system fonts. Scores consistently 6.5 to 8.5, always missing that final push to 9+.\n\nThe root cause wasn't role coverage—`designer.md` clearly specifies motion, micro-interactions, responsive design. The problem was pipeline incentive structure:\n\n1. **Acceptance criteria default to ignoring polish.** Task says \"build a docs site,\" the DoD focuses on functional requirements. Nobody spontaneously lists dark mode.\n2. **Implementer's first pass lacks craft guidance.** Polish mode only triggers after ITERATE. First Build round is incentivized to \"pass review\" not \"delight users.\"\n3. **Severity calibration favors function.** Missing dark mode gets blue suggestion at most. Gate calculation: all blue = PASS. System design never loops back for missing delight.\n\nSolution: Quality Tier system—`functional`, `polished`, `delightful` three tiers. Tier chosen at init, written to `flow-state.json`, affects entire pipeline:\n\n- **functional**: CLI/API/backend, no additional UI requirements\n- **polished**: navigation, responsive, code blocks, tables, typography, color scheme all have explicit baselines—missing = yellow warning not blue suggestion\n- **delightful**: all polished requirements + transitions, animations, onboarding flow\n\n`tier-baselines.mjs` is single source of truth for 13 baseline items, `getRequiredBaselineKeys(tier)` mechanically decides required coverage. Code-enforced, not prompt-dependent.\n\n---\n\n## Zero Trust Three-Layer Validation\n\nThe user said something that killed the prompt-only approach: \"Need code validation. Remember, zero trust.\"\n\nThree layers solve different problems:\n\n**Layer 1 — Playwright Screenshot Verification (Evidence Layer).** The test-execute node uses real browser screenshots + `prefers-color-scheme: dark` media query to detect dark mode. Evaluator says LGTM but there's actually no dark mode? Screenshots don't lie.\n\n**Layer 2 — Harness Validate Tier-Aware (Envelope Layer).** Ensures evaluator at least checked each baseline item. If eval.md contains zero baseline keywords, reject handshake. Evaluator skips typography check? Code blocks it.\n\n**Layer 3 — test-design Auto-Inject P0 Cases (Design Layer).** When tier is polished/delightful, automatically inject mandatory test cases into test plan. Tester role forgets dark mode case? Don't need to remember, code adds it.\n\nThree layers linked: tier selection → auto-inject test cases → Playwright executes screenshots → evaluator must give verdict on each item → gate mechanically synthesizes. Every step has code guardians, not LLM self-discipline.\n\n---\n\n## Contract Framework: When DoD Becomes Client-Vendor Agreement\n\nThen discussion took an unexpected turn. Audit revealed that Stage 2 (Definition of Done) is the control plane for the entire pipeline—all downstream stages are executors. But this control plane had almost zero code protection: DoD file existence, concrete outcomes, verification methods—all prompt conventions, no code validation.\n\nThe user gave a precise analogy: \"This is actually more like signing a contract—client requirements for the vendor. The client wants to find vendor problems to withhold payment.\"\n\nThis reframing completely changed the architectural approach. Acceptance criteria are collaborator checkpoints, contracts are naturally adversarial:\n\n- All ambiguity favors the vendor\n- Every clause must be quantified\n- Milestones tied to payment\n- Punch list checked item by item\n- Both parties sign and seal\n\nLLM failure mode isn't \"laziness\" (it doesn't get paid), but \"hallucinate reasonable completion when uncertain.\" Contract framework value isn't \"blocking vendor excuses\" but **forcing LLM to write content with grounded details**.\n\nIntroduced a tenth person for sanity check. The tenth person identified 6 fatal assumptions: LLMs lack economic rationality so \"vendor\" analogy is limited, adversarial contracts in real construction have 30% cost overrun rates, false precision more dangerous than vagueness, milestone-payment binding has no real economic leverage in OPC...\n\nAll good pushback. But the user's 4-point response moved the discussion to new territory.\n\n---\n\n## Fatal Discovery: LLMs Won't Pay\n\nThe final discussion segment was about Willingness-to-Pay Gate. User said: \"Deliverable quality is functional, but just barely functional. My goal is something users would pay for. Shouldn't final user simulation—whether they'd actually pay—be part of the flow?\"\n\nAnswer: absolutely should be. Designed a wtp-simulation node: 5 independent subagents as simulated buyers, each with different personas, forced structured output (`would_pay: boolean, max_monthly: number, dealbreakers: string[]`), code parsing not free text. payRate and confidence interval mechanically calculated, fail threshold triggers ITERATE.\n\nThen launched 4 reviewers to audit this spec: Senior Skeptic, Indie Founder, Devil's Advocate, LLM Systems Engineer.\n\n**Not one said ship as-is.**\n\nCore breakpoint was fatal: **LLM-generated \"willingness to pay\" isn't WTP signal, it's prompt prior.**\n\nLLM Systems Engineer provided experimental data: asked Claude for WTP on 10 fake SaaS products, price median clustered in ±30% range regardless of product quality. Indie Founder said: 40% unconditional PAY rate would put me in global SaaS top 0.1%, my real conversion rate is 4%. Devil's Advocate found `[1, 1]` passes all checks—no minimum sanity validation.\n\nWorse, persona prompts directly list price ranges ($5-$25/mo)—textbook anchoring attack. LLM forced to sample from this range. **I planted anti-independence seeds in my own spec.**\n\n3 \"independent\" buyers aren't independent—parallel dispatch solves temporal independence, not epistemic independence. Same model's persona role-play can't replicate real user \"I already have a Notion page\" psychological resistance.\n\nUser asked direct followup: \"Why? LLMs can't generate economic signals?\"\n\nSimply put: **LLM can simulate \"feels good/bad\" but can't simulate \"will/won't pay.\"** Former is taste judgment, latter requires opportunity cost—spend this $20, can't buy that thing. LLMs have no wallet, no budget constraints, no \"last month's credit card bill was high so cutting back this month\" emotions. They always do unconstrained evaluation, while payment decisions are constrained.\n\n---\n\n## The Numbers\n\n| Metric | Value |\n|--------|-------|\n| Session duration | 27 hours 23 minutes |\n| Total tokens | 147,789,612 (148M) |\n| Cache read | 139,518,993 (94%) |\n| LLM calls | 629 |\n| Tool calls | 487 (Bash 215, Edit 85, Read 70, TaskUpdate 37, Grep 23) |\n| Subagents | 28 |\n| Estimated cost | $130.28 |\n| File changes | 39 |\n| Models | claude-opus-4-6, claude-opus-4.6-1m |\n\n94% cache read matches previous session pattern—massive consumption of prior context. Of $130 cost, $70 is cache read, indicating extremely high context window utilization. 28 subagents were byproduct of OPC auditing itself: 4 reviewers x 3 rounds + various fix agents + 4 spec reviewers.\n\n487 tool calls with 215 Bash calls—running tests, verifying fixes, syncing files. This wasn't a brainstorm session, this was an engineering session.\n\n---\n\n## Looking Back\n\nTwo days, three accomplishments:\n\n**First: Fixed foundations.** After 7 Critical+High fixes, OPC testing went from \"exists but untrustworthy\" to \"pass = actually works.\" Tautological tests exposed 2 previously hidden real bugs. `npm test` went from running 1 file to running 11. Least dramatic but highest ROI work.\n\n**Second: Added layers.** Quality tier + zero trust three-layer validation + multi-platform role expansion. OPC went from \"can review code\" to \"can review code to standards.\" Tier isn't feature, it's calibration—teaching pipeline what \"good\" looks like.\n\n**Third: Hit the wall.** WTP gate design looked perfect—structured output, parallel independent buyers, code mechanical judgment. But 4 reviewers unanimously pierced core assumption: LLM economic judgments aren't economic judgments. This discovery worth more than any fix.\n\nHonest assessment: First and second were solid engineering, already committed and synced to `~/.claude/skills/opc/`. Third was a $130 lesson—**LLM can be taste judge but not purchase judge**. WTP gate needs redesign, possibly requiring real user signals (even manual), or accepting it can only be regression detector not quality oracle.\n\nNext step: Downgrade WTP gate from \"simulate payment decisions\" to \"simulate first impressions + dealbreaker detection.\" Indie Founder was right—it can be regression detector, can't be conversion predictor. That's already valuable, just don't pretend it's the latter.",
+  "tags": [
+    "opc",
+    "code-review",
+    "quality-tier",
+    "zero-trust",
+    "subagent",
+    "willingness-to-pay",
+    "testing-integrity",
+    "devil-advocate",
+    "multi-agent"
+  ],
+  "sessionId": "98efc892-2821-40cf-b0a4-22aa257cbfa1",
+  "project": "opc",
+  "date": "2026-04-13",
+  "duration": "27h 23min",
+  "stats": {
+    "entries": 3272,
+    "messages": 353,
+    "chunks": 28,
+    "tokens": {
+      "input": 4398564,
+      "output": 764314,
+      "cache_creation": 3107741,
+      "cache_read": 139518993,
+      "total": 147789612
+    },
+    "llmCalls": 629,
+    "modelsUsed": [
+      "claude-opus-4-6",
+      "claude-opus-4.6-1m"
+    ],
+    "toolCalls": {
+      "total": 487,
+      "byType": {
+        "Bash": 215,
+        "Edit": 85,
+        "Read": 70,
+        "TaskUpdate": 37,
+        "Grep": 23,
+        "Agent": 16,
+        "Write": 16,
+        "TaskCreate": 9,
+        "TaskOutput": 5,
+        "AskUserQuestion": 3,
+        "Glob": 3,
+        "TaskList": 1,
+        "Skill": 1,
+        "EnterPlanMode": 1,
+        "ExitPlanMode": 1,
+        "ToolSearch": 1
+      }
+    },
+    "subagents": {
+      "count": 28,
+      "agents": [
+        {
+          "type": "general-purpose",
+          "description": "Fix tautological tests gaps2"
+        },
+        {
+          "type": "general-purpose",
+          "description": "R2 engineer re-review OPC"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Refactor test files group B helpers"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Fix H-3 file-lock TOCTOU"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Fix H-4 and H-5 deduplication"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Devil's advocate review of OPC"
+        },
+        {
+          "type": "Plan",
+          "description": "Design multi-platform role expansion"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Fix C-1 test-verify references"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Fix release TOCTOU and lock leak"
+        },
+        {
+          "type": "Explore",
+          "description": "Explore roles and test protocols"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Fix C-2 idea-factory dependency"
+        },
+        {
+          "type": "general-purpose",
+          "description": "R2 devil-advocate re-review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "R3 devil-advocate verification"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Devil's advocate attacks v0.10 spec"
+        },
+        {
+          "type": "general-purpose",
+          "description": "R2 engineer review agent"
+        },
+        {
+          "type": "general-purpose",
+          "description": "R2 devil-advocate review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Security review of OPC"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Senior skeptic reviews v0.10 spec"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Refactor test files group A helpers"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Architect review of OPC"
+        },
+        {
+          "type": "general-purpose",
+          "description": "R3 engineer verification"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Engineer review of OPC"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Extract Medium issues from review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Fix H-2 hardcoded test paths"
+        },
+        {
+          "type": "code-review-strict",
+          "description": "Full OPC codebase review"
+        },
+        {
+          "type": "general-purpose",
+          "description": "Indie founder reviews v0.10 spec"
+        },
+        {
+          "type": "Explore",
+          "description": "Explore harness validate code"
+        },
+        {
+          "type": "general-purpose",
+          "description": "LLM systems engineer reviews v0.10 empirically"
+        }
+      ]
+    },
+    "filesTouched": [
+      "/Users/touchskyer/.claude/plans/kind-wibbling-origami.md",
+      "/Users/touchskyer/Code/Jingxia/opc/.harness/acceptance-criteria.md",
+      "/Users/touchskyer/Code/Jingxia/opc/.harness/nodes/review/handshake.json",
+      "/Users/touchskyer/Code/Jingxia/opc/bin/lib/eval-commands.mjs",
+      "/Users/touchskyer/Code/Jingxia/opc/bin/lib/flow-core.mjs",
+      "/Users/touchskyer/Code/Jingxia/opc/bin/lib/flow-transition.mjs",
+      "/Users/touchskyer/Code/Jingxia/opc/bin/lib/tier-baselines.mjs",
+      "/Users/touchskyer/Code/Jingxia/opc/bin/opc-harness.mjs",
+      "/Users/touchskyer/Code/Jingxia/opc/package.json",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/devil-advocate-drafting.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/executor-protocol.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/implementer-prompt.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/quality-tiers.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/role-evaluator-prompt.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/simulated-buyer-protocol.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/test-design-protocol.md",
+      "/Users/touchskyer/Code/Jingxia/opc/pipeline/wtp-gate-protocol.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/a11y.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/active-user.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/churned-user.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/designer.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/frontend.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/mobile.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/new-user.md",
+      "/Users/touchskyer/Code/Jingxia/opc/roles/tester.md",
+      "/Users/touchskyer/Code/Jingxia/opc/skill.md",
+      "/Users/touchskyer/Code/Jingxia/opc/test/run-all.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-coverage.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-gaps.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-gaps2.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-gaps4.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-gaps5.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-gaps6.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-harness.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-helpers.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-multiflow.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-schema-strict.sh",
+      "/Users/touchskyer/Code/Jingxia/opc/test/test-tier.sh",
+      "/tmp/opc-e2e-test/run-e2e.sh"
+    ],
+    "costEstimate": {
+      "total_cost": 130.28,
+      "currency": "USD"
+    },
+    "durationMinutes": 1643
+  },
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-13-opc-skill-evolution.png",
+  "lang": "en"
+}

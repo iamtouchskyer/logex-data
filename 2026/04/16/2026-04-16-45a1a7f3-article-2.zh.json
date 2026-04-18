@@ -1,0 +1,24 @@
+{
+  "slug": "2026-04-16-45a1a7f3-article-2",
+  "title": "CSS Grid 回退术：保留新功能但恢复旧版 feel",
+  "summary": "dream-works showcase site 加了 category filter 和 card preview images 后变丑了。怎么保留功能增量、回退视觉质感？答案在三行 CSS 和一个 Playwright 截图。",
+  "body": "## 问题：加了功能，丢了质感\n\ndream-works 的 showcase site 在三天内连续做了几个改动：\n- 加了 category filter（按标签筛选 project）\n- 给 card 加了 preview image 区域\n- hero section 加了 scroll-hint 动画\n- 改了 grid 为 `auto-fit minmax(340px, 1fr)`\n\n功能都对，但视觉质感崩了。用户打开后的反应：「我见过一个更 clean 的版本。」\n\n## 诊断：哪些改动破坏了 feel？\n\n用 Playwright 截图对比 3 天前的 deployment 和当前版本：\n\n```bash\nnpx playwright screenshot https://dreamworks-6l6hc3fnd-mitsein.vercel.app old.png --full-page\nnpx playwright screenshot http://localhost:4324 new.png --full-page\n```\n\n对比发现三个差异：\n\n1. **Hero 被压缩了**：`max-height: max(50vh, 320px)` 把 hero 区域压成了扁平条\n2. **Card preview images 导致高度不均**：有图的 card 比没图的高 150px，grid 变得参差不齐\n3. **`auto-fit minmax()` 在宽屏上出现 2 列 + 半列的尴尬布局**\n\n## 决策：混合策略\n\n用户明确说：「混合，需要更多的功能，但是要旧版的 feel。」\n\n翻译成工程语言：\n- ✅ 保留 category filter（新功能）\n- ❌ 删掉 card preview images（破坏高度一致性）\n- ❌ 删掉 scroll-hint（多余的视觉噪音）\n- 🔧 恢复 hero 的 breathing room\n- 🔧 Grid 回退到固定 3 列\n\n## 关键改动\n\n### Grid：`repeat(3, 1fr)` vs `auto-fit minmax()`\n\n```css\n/* 之前 — 响应式但不可控 */\ngrid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));\n\n/* 之后 — 确定性布局 */\ngrid-template-columns: repeat(3, 1fr);\n```\n\n`auto-fit minmax()` 的问题：在 1200px 宽度下，`minmax(340px, 1fr)` 计算出 3.5 列 → 浏览器取 3 列 → 每列 400px，看起来还行。但加上 gap 和 padding 后，边缘 case 下会跳成 2 列，整个布局突然变成左重右轻。\n\n固定 3 列 + 响应式断点更可预测：\n\n```css\n@media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }\n@media (max-width: 600px) { grid-template-columns: 1fr; }\n```\n\n### Hero：删掉高度限制\n\n```css\n/* 删掉这行 */\nmax-height: max(50vh, 320px);\n\n/* 改成自然流 */\npadding: 6rem 2rem 3rem;\n```\n\n让内容决定高度，不是容器压内容。\n\n### Animation stagger：15 张卡片的数学\n\n原来每张卡片延迟 0.15s，15 张 = 2.25s。加上 `cardIn` 动画本身 0.6s，最后一张 card 在 2.85s 后才完全可见。Playwright 截图等 2s 拍到的是一堆 `opacity: 0` 的幽灵卡片。\n\n```js\n// 之前\nanimation-delay: ${0.15 + index * 0.15}s  // 2.25s 总计\n\n// 之后\nanimation-delay: ${0.1 + index * 0.08}s   // 1.3s 总计\n```\n\n减少单卡延迟从 150ms 到 80ms，总动画时间压缩到 1.3s。视觉上仍有「逐卡出现」的 stagger 效果，但不至于让底部卡片在截图时还是透明的。\n\n### Card min-height\n\n```css\n/* 从 380px 降到 320px */\nmin-height: 320px;\n```\n\n删掉 preview image 后，card 内容变少了，380px 显得空洞。320px 刚好让最短的 card（tooleval，86 字 description）也不会显得空。\n\n## 验证\n\n改完后跑 Playwright 截图确认：\n```bash\nnpx playwright screenshot http://localhost:4324 --full-page --wait-for-timeout 3000\n```\n\n三列对齐、高度一致、hero 有 breathing room、category filter 正常工作。部署：\n```bash\nvercel build --prod --yes && vercel deploy --prebuilt --prod --yes --scope dreamworks\n```\n\n## Takeaway\n\n1. **`auto-fit minmax()` 适合卡片数量不确定的场景**，确定数量时 `repeat(N, 1fr)` 更可控\n2. **Animation stagger 要算总时长**，15 × 150ms = 2.25s 已经超出用户耐心阈值\n3. **「保留功能回退视觉」是正常需求** — 不是 revert，是 cherry-pick 式的混合\n4. **Playwright 截图是前端改动的 ground truth**，不要凭记忆判断「看起来对」",
+  "heroImage": "",
+  "tags": [
+    "CSS Grid",
+    "Astro",
+    "frontend",
+    "animation",
+    "Playwright"
+  ],
+  "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
+  "chunkIndices": [
+    3,
+    4
+  ],
+  "project": "dream-works",
+  "date": "2026-04-16",
+  "duration": "",
+  "stats": {},
+  "lang": "zh"
+}

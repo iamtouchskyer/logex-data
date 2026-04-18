@@ -1,0 +1,39 @@
+{
+  "slug": "2026-04-14-opc-extension-framework-growing-bones",
+  "title": "When Your Framework Grows a Skeleton: The OPC Extension Architecture",
+  "summary": "After building logex's UI, the lack of design lint exposed a structural problem in OPC: how to let third parties (including ourselves) extend the pipeline without breaking core simplicity. A late-night architectural discussion about hooks, skills, and prompt injection.",
+  "body": "# When Your Framework Grows a Skeleton: The OPC Extension Architecture\n\nAt 12:25 AM, staring at the freshly deployed logex page, I asked a very direct question:\n\n> \"Do you honestly think this design looks good?\"\n\nIt doesn't. Inconsistent colors, arbitrary spacing, no rhythm in font sizes. This isn't a problem with any single component—it's the absence of a cohesive design language. logex's UI is auto-generated in the OPC Loop, with each subagent making decisions based on its own understanding, without unified design constraints from above.\n\nThis exposed a deeper issue: OPC needs design lint. And design lint shouldn't be hardcoded into OPC's core—it's an \"enhancement\" that some projects need and others don't. This is what extensions are for.\n\n## The Real Problem\n\nOPC's pipeline is PM → Designer → Developer → Tester → Gate, with each step executed by a subagent. Now I want to inject a \"design consistency check\" into this pipeline:\n\n1. **Before subagent execution**: Inject design guidelines into prompts (\"you must use these colors, these spacing rules\")\n2. **During gate validation**: Beyond functional acceptance, add visual consistency validation\n\nSounds like middleware or hooks, right? The problem is: where does this hook code live? How does it register? How do we guarantee it executes instead of being skipped?\n\n## Three Failed Design Approaches\n\n**Approach 1: Directly modify OPC core.** Write design lint logic into OPC's subagent prompt templates. Problem: OPC is a general framework—not every project needs design lint. Hardcoding domain-specific logic into the core violates SRP.\n\n**Approach 2: Standalone skill.** Create an `opc-extend-design-lint` skill that users call manually when needed. Problem: \"manual invocation\" means it can be forgotten. No hard guarantees. Plus this skill's execution timing—before subagent prompt generation—requires cooperation from OPC core. A standalone skill can't do prompt injection.\n\n**Approach 3: Standalone skill + hook registration.** OPC core exposes hook points (`pre-subagent-prompt`, `post-gate`), extensions register to these hooks. At runtime, OPC automatically calls them. This is standard plugin architecture.\n\nApproach 3 seems most reasonable, but the implementation details are full of pitfalls.\n\n## Hook Mechanism Design Debates\n\nThe AI and I went back and forth on this for five or six rounds. Core debate:\n\n**Hook registration approach.** Should extensions declare in OPC's `flow-context.json`, or register themselves? The former means users must manually edit config files (easy to forget), the latter means extensions need the ability to \"modify OPC runtime state\" (too much power).\n\nThe final design is a compromise: extensions declare which hooks they need during installation, OPC scans installed extensions at startup and auto-registers them. Users don't need manual configuration, but OPC core doesn't need to know specific extensions—it only knows \"at this hook point, I need to call these callbacks.\"\n\n**Extension storage location.** Finally settled on `~/.opc/extensions/`, with each extension as a directory containing:\n\n```\n~/.opc/extensions/\n  design-contract/\n    manifest.json    ← declares hook points, dependencies\n    prompt.md        ← prompt fragments injected into subagent\n    gate-check.js    ← validation logic for gate stage\n```\n\nThe key decision in this structure: **separate prompts from code**. `prompt.md` contains design guidelines for the LLM (\"use 4px spacing increments\"), `gate-check.js` contains machine-executable validation logic (screenshot comparison, color extraction). Both provided by the same extension, but operating at different pipeline stages.\n\n## Core Principles Push Back\n\nHalfway through the discussion, I found myself heading toward over-engineering. I wanted more and more extensions—design lint, accessibility check, performance budget, i18n validation—each as an independent extension, each needing hooks.\n\nThe AI delivered valuable push back here:\n\n> \"What if not designing extensions is actually the best approach?\"\n\nSharp question. If each enhancement is small (a prompt fragment + a check function), writing them directly into OPC's config file and managing them with convention over configuration might be simpler than a complete extension registry + manifest + lifecycle system.\n\nBut I ultimately stuck with the extension architecture. The reason: I already have three years of usage expectations. OPC users aren't just me anymore, and extension authors won't just be me either. Without a standardized interface, if everyone stuffs their own hooks into OPC core, the codebase becomes a junkyard within three months.\n\n## Unfinished Business\n\nHonestly, this discussion didn't produce runnable code. It produced an architectural design: extension storage structure, manifest schema, hook registration mechanism, collaboration patterns with OPC core. In chunk 68 I said \"let's rest, then continue with section 5\"—meaning implementation waits for the next session.\n\nThis might be the right pace. Architectural discussions shouldn't jump straight into coding—you need to let the design settle, then review yesterday's decisions with fresh eyes the next day. \"Sleep on it\" isn't procrastination, it's part of the review process.\n\n3:30 AM: logex deployed online, OPC extension architecture sketched in my mind. A product's v1 and a framework's v2 design, completed in the same session. Not perfect, but the direction is right.",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-14-opc-extension-framework-growing-bones.png",
+  "tags": [
+    "opc",
+    "extension-architecture",
+    "plugin-system",
+    "design-lint",
+    "hook",
+    "framework-design"
+  ],
+  "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
+  "project": "opc",
+  "date": "2026-04-14",
+  "duration": "",
+  "stats": {
+    "entries": 8675,
+    "messages": 884,
+    "chunks": 68
+  },
+  "chunkIndices": [
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68
+  ],
+  "lang": "en"
+}

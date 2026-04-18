@@ -1,0 +1,28 @@
+{
+  "slug": "2026-04-17-ba9b2d27-article-1",
+  "title": "前端 tool view 突然全瞎了：一次协议 break 引发的 CI 信任危机",
+  "summary": "打开 agent 页面，所有 toolcall view 和 ask card 都只剩一个光秃秃的数字列表。修复不难，真正可怕的是——一个从 snake_case 到 camelCase 的字段重命名，20 多个测试全绿 push 进主干，没有一个测试抓住它。",
+  "body": "## 场景\n\n周四早上，打开 `http://localhost:3000/agents/64c60fe4-…`，本来应该长得很漂亮的 Task Clarification card 变成了一个光秃秃的 `1. 2. 3.` 数字列表——所有 form controls、label、字段说明全部不见了。Ask card、其他 tool view 一样瞎了。\n\n第一反应：协议被 break 了。\n\n## 定位\n\n打开两个 subagent 并行跑：一个 trace frontend 的 toolcall 渲染链路，另一个扫 backend 最近的 message_converter 改动。五分钟结论：`backend/apps/mitsein-api-service/routes/orchestrator_next/message_converter.py` 改了，把 `form_schema` 改成了 `formSchema`（snake → camel），frontend `task-clarify-card.tsx` 那边还在读 `form_schema`。\n\n字段名不匹配，`formSchema` 进来，`form_schema` 读到 `undefined`，`normalize-form-schema` 拿 `undefined` 时退到一个只输出数字的 fallback。Fallback 写得太温柔——没有抛错，没有 warning，UI 直接渲染空壳。\n\n改动本身是单向的、一次性的，修复也就一行——把 frontend 读 `form_schema` 的地方改成读 `formSchema`，或让 converter 两个都给。为了对齐风格选了前者。\n\n## 真正可怕的事\n\n修复重启完，用户问的不是别的：\n\n> \"为啥会有这个 regression，为啥我们的测试之类的会没抓住？这个很可怕。\"\n\n这句话比 bug 本身重要。\n\n翻 git log，改动是别人两天前 commit 进去的。再翻 CI 状态——那个 commit 的 check **本来就没跑**。具体说：改动分成前后端两个 PR，后端 PR 过了自己的 pytest，frontend PR 没被拉去跑 contract test，merge 时走的是 squash，没有触发 integration job。\n\n展开看，有三层防护都失灵了：\n\n**第一层：unit test**。Backend converter 那边有测试，但测试里的 fixture 也同步改成了 `formSchema`——测试 \"我转出来的字段叫啥\"，测试作者的手和产品代码的手是同一双手，测试永远绿。这是经典的 tautological test，自己测自己。\n\n**第二层：contract test**。`contracts/client-tools/types.ts` 是前后端共识的 source of truth，但这个改动没有更新 types.ts——backend 跑在 camelCase，frontend 跑在 snake_case，contracts 说的还是老的。Contract test 只跑在 types.ts 一侧，没有 cross-check \"实际 runtime 产出的 message 是否符合 types.ts\"。\n\n**第三层：E2E**。`e2e-testing/` 框架有 browser test，但那些 test 跑在 happy path，打开某个 agent 聊天收一个消息就绿。它没有打开一个真实的 task clarification flow、展开 card、assert card 内部有预期的 label。这是典型的 smoke test false positive——表层通、深层空。\n\n## 补的三件事\n\n写了一个 frontend unit test，专门测 `normalize-form-schema`：给它 `{formSchema: {...}}` 和 `{form_schema: {...}}` 两种 payload，都必须产出同样的 normalized 结果——**这是一个 guard**，逼迫后续任何字段改名必须先想清楚兼容性。\n\n写了一个 backend test，把真实 message 过一遍 `message_converter.convert()`，assert 产出的 JSON 包含前端预期的所有顶层 key。这个 test 从产品代码的实际行为出发，不从 fixture 出发。\n\n最后给这条路径加了一个 contract lint：`contracts/client-tools/*.schema.json` 定义的字段，backend converter 的测试必须覆盖同名路径——对不上 CI 报错。\n\n34 passed 0 skipped，20 frontend tests 全绿，commit 推上去。\n\n## 教训\n\nRefactor 规则已经写在 CLAUDE.md 里——\"ONLY change import paths, never modify logic\"——但 snake→camel 这种**字段级**重命名从语义上算 \"import path 换了\"还是 \"logic 改了\"？CLAUDE.md 没写。结果就是 rename 变成一种 \"我改了但不算大改\" 的模糊地带，跨了防护网。\n\n更深的一层：CI 之所以漏，根本原因是这个改动**跨了 PR 边界**（后端一个 PR、前端一个 PR），每个 PR 各自看自己那一半都是对的。Contract 正是为了 cross-PR coordination 而存在的，但 contract test 的覆盖率不够——没有覆盖字段命名约定。\n\n已加到 backlog：contract test 要加一层 field-name-style lint（snake vs camel 必须和 schema 对齐）。这类 guard 是 probability-stacking 式的防御——单独每一层都可以被绕过，但三层叠在一起就很难同时失守。\n\n彻底修好之前，我自己的规矩：任何跨越前后端边界的字段重命名，**先写对侧的测试**，再改字段名。\n",
+  "heroImage": "",
+  "tags": [
+    "frontend",
+    "contract-test",
+    "ci",
+    "regression",
+    "mitsein"
+  ],
+  "sessionId": "ba9b2d27-ba7b-47ae-901d-756c39610234",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "project": "mitsein-pptx-migration",
+  "date": "2026-04-17",
+  "duration": "",
+  "stats": {},
+  "lang": "zh"
+}

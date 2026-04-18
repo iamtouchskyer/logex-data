@@ -1,0 +1,33 @@
+{
+  "slug": "2026-04-16-opc-loop-bootstrap",
+  "title": "用 Loop 修 Loop：一场注定被 remote 覆盖的 meta 实验",
+  "summary": "把 OPC loop engine 的 4 个 gap 写成 plan.md，用 loop 跑自己。8 ticks 全绿，结果 git push 发现 remote 已经做了更完整的版本。失败里藏着比成功更值钱的 insight。",
+  "body": "## 蛇吃自己的尾巴\n\n下午两点半，我盯着 OPC loop engine 的 4 个 gap 清单，突然想到一个 meta 到极致的主意：把这 4 个 bug fix 写成 plan.md，用 `opc-harness init-loop` 初始化，然后 `next-tick` 逐个推进。用 loop 修 loop。\n\n这不是炫技。这是我能想到的最短路径来验证 loop engine 在真实开发场景中的表现。如果它连修自己都跑不通，那还指望它修别人的代码？\n\n## Plan 长这样\n\n8 个 unit，4 对 implement + review：\n\n```\n- F1.1: implement — criteria-lint gate in init-loop\n- F1.2: review — review criteria-lint gate implementation\n- F2.1: implement — synthesize integration into complete-tick\n- F2.2: review — review synthesize integration\n- F3.1: implement — review independence content verification\n- F3.2: review — review independence verification\n- F4.1: implement — stall decomposition instead of termination\n- F4.2: review — review stall decomposition\n```\n\n`init-loop` 初始化成功，8 units，first = F1.1。开始第一个 tick。\n\n## Tick 1-2: criteria-lint gate\n\n改动很小——在 `loop-init.mjs` 里加一个 `--criteria` flag，提供 acceptance-criteria.md 路径时，自动跑 `runLint()`，fail 就拒绝初始化。从 `criteria-lint.mjs` export 了 `runLint` 函数（之前是内部函数）。\n\n验证三条路径：\n- 不传 `--criteria` → backward compatible，正常初始化\n- 传了但文件不存在 → 报错 \"criteria file not found\"\n- 传了但 lint fail → 报错 + 详细 failure list\n\n18 test suites pass，commit，complete-tick。Loop engine 检查 git HEAD 变化——没 commit 就不让过 implement unit。合理。\n\nReview tick 要求 ≥2 eval files。Loop 真的在 enforce independence——我得写两份 eval（engineer + tester），每份有不同的视角和 findings。它还检查 heading 是否相同，报了个 warning。\n\n## Tick 3-4: synthesize integration\n\n这个改动大一些。Review/accept unit 完成时，自动从 eval 文件解析 severity（用已有的 `parseEvaluation`），计算 verdict：BLOCKED > FAIL (critical) > ITERATE (warning) > PASS。如果 FAIL 或 BLOCKED，next_unit 回退到前一个 implement unit。\n\n关键设计：不 exec 子进程调 `synthesize` CLI command，而是直接调 `parseEvaluation` 做 in-process 计算。避免了 shell escaping、stdout parsing 等脆弱环节。\n\nF2.2 review 完成时，输出了一个有意思的结果：`review_verdict: \"ITERATE\", severity_totals: {critical: 0, warning: 2, suggestion: 8}`。两个 eval 各有一个 🟡，触发了 ITERATE。但 ITERATE 不触发 loopback（只有 FAIL/BLOCKED 才会），所以 loop 继续前进。这是正确的行为。\n\n## Tick 5-6: Jaccard similarity\n\n在 `checkEvalDistinctness` 里加了 word-level Jaccard 相似度检查。已有的 line overlap 检查抓不住「换词不换意」的 copy-paste。Jaccard 在 word set 上算交集/并集比，阈值 85%，filter 掉 ≤3 字符的短词（the, and, is 这些噪音）。\n\n只在两个 word set 都 >10 个词时才触发——避免短 eval 误报。\n\n## Tick 7-8: stall decomposition\n\n这是最有意义的改动。原来 3 tick stall = 直接 terminate，死刑判决。改成 `stall_decompose` status + `action: \"decompose\"` + `terminate: false`。Harness 信号，orchestrator 行动。\n\n同时在 `init-loop` 里把 `stall_decompose` 加到允许 reinit 的 status list——stall 后可以拆 unit 重来，不用从头开始。\n\n保留 oscillation（6-tick A↔B）仍然 terminate——那是更硬的失败，decompose 解决不了。\n\n## Pipeline Complete\n\n```\n{\"ready\":false,\"terminate\":true,\"reason\":\"next_unit is null — pipeline complete\",\"total_ticks\":8}\n```\n\n8 ticks，4 commits，18 suites 0 failures。漂亮的 loop 自举。\n\n然后我 `git push`。\n\n## 被 Remote 打脸\n\n```\n! [rejected] main -> main (fetch first)\n```\n\nRemote 有新代码。`git pull --rebase`——conflict。\n\n看了一眼 remote log，傻了：\n\n```\ne01915e feat(loop): add reinit-loop command for stalled unit decomposition (G4)\n2fc5c5c feat(init-loop): gate on criteria-lint before creating loop state (G3)\n09f2b9f feat(loop): integrate synthesize verdict into complete-tick for review units\n87c8309 feat(loop): strengthen review independence\n```\n\n**另一个 session 已经做了同样的 4 个 gap，而且做得更完整。** Remote 不仅有我做的 G1-G4，还有 G5-G8：context hints、ux-sim unit type、backlog auto-accumulation、git commit content validation、anti-deferral enforcement。21 个 test suite，而我只有 18 个。\n\n`git reset --hard origin/main`。我的 4 个 commit 废了。\n\n## 失败里的 Insight\n\n这不是浪费。这是 loop engine 最诚实的压力测试。暴露了几个真实问题：\n\n**1. Loop 没有 pre-tick pull。** `next-tick` 不检查 remote。两个 agent 可以 independently 做同一件事，直到 push 时才发现冲突。在协作场景中，每个 tick 开始前应该 `git pull`，或者至少检查 remote HEAD。\n\n**2. Review independence 是仪式不是保证。** 我在一个 session 里写了 engineer eval 和 tester eval，换了措辞换了视角，Jaccard 算出来确实 < 85%。但那只是同一个大脑的两个面具。真正的 independence 需要两个独立 context window，甚至不同 model。\n\n**3. 自举成功不等于系统成功。** 8 ticks 全绿，但产出被更好的实现覆盖了。Loop engine 验证了「你做完了」，没验证「你做的是不是最新需要做的」。\n\n## 遗憾清单（基于最新 ddbf0cb）\n\n拉完 remote 最新代码，21 suites 全绿，重新评估还有什么 gap：\n\n- **Stall 先杀后救**：还是 terminate 然后需要手动 reinit-loop，理想情况应该 terminate: false + decompose signal\n- **External validators 检测了不 enforce**：知道有 npm test 但不跑\n- **Anti-deferral 只 lint 关键词**：你可以不说 \"defer\" 但默默跳过 3 个 outcome\n- **Plan 不能运行中演化**：hash 锁死，改了就要 reinit\n- **没有 runtime test execution**：验证「你说你测了」不验证「你真的测了」\n\n一句话：**机械层能验证 artifact 的存在性，但验证不了 artifact 的真实性。** 从「能跑」到「可信」，还有一层。\n\n## 代码即是论证\n\n回头看，这场 meta 实验的价值不在于 4 个 commit（它们确实被覆盖了），而在于它用 loop engine 自己的 output 证明了 loop engine 的极限。你不能通过内省来超越自己的认知边界，正如 loop 不能通过跑自己来发现自己的盲区——那些盲区恰恰是它不知道要检查的东西。",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-opc-loop-bootstrap.png",
+  "tags": [
+    "opc",
+    "loop-engine",
+    "self-bootstrap",
+    "meta-testing",
+    "mechanical-enforcement"
+  ],
+  "sessionId": "98efc892-2821-40cf-b0a4-22aa257cbfa1",
+  "chunkIndices": [
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40
+  ],
+  "project": "opc",
+  "date": "2026-04-16",
+  "duration": "3h 30min",
+  "stats": {
+    "entries": 4699,
+    "messages": 41,
+    "chunks": 41
+  },
+  "lang": "zh"
+}

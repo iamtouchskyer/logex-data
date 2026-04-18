@@ -1,0 +1,35 @@
+{
+  "slug": "2026-04-12-repo-advisor-builder-knowledge-counselor",
+  "title": "用 6-Phase State Machine 量产代码库 Advisor：Builder 的编排逻辑与踩坑实录",
+  "summary": "repo-advisor-builder 不是手写知识文档的过程，而是一个自动化 pipeline：主 agent 调度 subagent 读代码、写文档、跑 audit gate。本文记录用它给 hermes-agent 构建 advisor 时遇到的真实问题——术语漂移、evidence 验证失败、subagent 分工边界。",
+  "body": "## 开场：一条命令，30 个文档\n\n`/build-advisor ~/Code/hermes-agent`——敲下这行，等着看 Claude Code 自己把一个代码库拆解成结构化知识。\n\n这不是第一次做 advisor。之前给 societas 做过，但那次基本是手工蒸馏：人读代码、人写文档、人校验 file:line 引用。这次不一样。这次用的是 `github-repo-advisor-builder`——一个 6-phase state machine，目标是把整个流程自动化到\"一条命令出结果\"。\n\n结果？出了结果，但中间踩的坑比预期多。\n\n## Builder 的架构：State Machine + Subagent 编排\n\n`SKILL.md` 定义了 6 个 phase：\n\n- **Phase 0: Discover** — 扫目录结构，生成候选文档列表，等人确认\n- **Phase 1: Framework** — 从 template 生成 skeleton 文件（`agent.md`, `SKILL.md`, `docs/*.md`）\n- **Phase 2: Write Docs** — 核心阶段，subagent 逐篇填充内容\n- **Phase 3: Batch Audit Gate** — `python scripts/validate-evidence.py --config advisor.yaml` 跑机械验证\n- **Phase 4: HTML Generation** — 生成静态站点\n- **Phase 5: Skill Installation** — 安装到 `~/.claude/skills/{project}-advisor/`\n\n每个 phase 结束都要更新 `STATE.md`。STATE.md 是接力棒——如果 context 用完了，下次 `--resume` 能从断点继续。这个设计解决了长 session 最头疼的问题：context window 不够用时不会丢失进度。\n\n关键的技术决策是 **Phase 3 用 Python 脚本做 audit，不用 LLM 判断**。`validate-evidence.py` 检查的是硬指标：`FILE_NOT_FOUND`、`LINE_OUT_OF_RANGE`、evidence density（每篇文档至少 5 个 `file:line` 引用）。LLM 说\"看起来不错\"没用，脚本说文件不存在就是不存在。\n\n## 真正的问题：Subagent 写文档时的术语漂移\n\nPhase 2 是最重的阶段。对 hermes-agent 这种规模的项目，候选文档列表有 20+ 篇，按 critical/high/medium 三档排序。Builder 的策略是一次写 1-3 篇，critical 单独写，medium 可以批量。\n\n问题出在：**每个 subagent 独立读代码、独立写文档，它们对同一个概念的命名会不一致。**\n\n举个例子：hermes-agent 里有一个核心的消息路由机制。负责写 `system-architecture.md` 的 subagent 叫它 \"message dispatcher\"，写 `agent-communication.md` 的叫它 \"event router\"，写 `task-system.md` 的又叫 \"message bus\"。三个名字指的是同一段代码，但读者看到三篇文档会以为是三个不同的东西。\n\n`writer-prompt.md` 里有规定\"Technical terms in English, explanations in Chinese\"，但没有规定**术语表**。每个 subagent 拿到的 context 是独立的——它读 `writer-prompt.md`、读目标文件的源码、读 `doc-template.md`，但不读其他 subagent 已经写好的文档。\n\n这是一个编排层面的设计缺陷：**subagent 之间没有共享术语上下文。**\n\n## Audit Gate 的真实输出\n\n第一轮 Phase 3 跑出来的结果不好看。`validate-evidence.py` 报了一堆 `FILE_NOT_FOUND`——有些是 subagent 编造了不存在的文件路径，有些是源码重构后路径变了但 subagent 不知道。\n\n`gate-protocol.md` 定义的 verdict 逻辑很清楚：\n\n```\nerrors > 0 AND audit_iteration < max_audit_loops → ITERATE → loopback to Phase 2\nerrors > 0 AND audit_iteration >= max_audit_loops → FORCE PASS ⚠️\n```\n\n实际跑了 2 轮 loopback 才把 evidence errors 清零。每次 loopback 只修被标记的文档，不重写通过的——这个设计很好，避免了无限重写。\n\n但 cross-reference check 暴露了另一个问题：Related Docs 里的链接经常断。`docs/03-tool-system.md` 引用了 `[Agent Spawning](01-agent-spawning.md)`，但实际文件叫 `01-agent-lifecycle.md`。原因还是术语漂移——Phase 0 定的文档名和 Phase 2 实际写出来的文档名有出入。\n\n## 设计复盘：什么值得保留，什么需要改\n\n**值得保留的：**\n\n1. **State Machine + STATE.md 接力** — context 断了能续，这对于大项目是刚需。hermes-agent 的完整 build 消耗了 30+ 个 LLM calls，单 session 根本装不下。\n2. **机械 audit gate** — Python 脚本验证 evidence 比让 LLM 自己检查自己靠谱得多。`FILE_NOT_FOUND` 就是 hard failure，没有商量余地。\n3. **6 个 phase 的分离** — 每个 phase 职责单一，出问题容易定位。\n\n**需要改的：**\n\n1. **术语表应该在 Phase 1 就锁定**，作为 shared context 传给所有 Phase 2 的 subagent。不是靠 prompt 约束，是靠一个 `glossary.yaml` 文件。\n2. **Subagent 应该能读已完成的文档**。当前的 writer-prompt 只给 subagent 喂源码，不给它看兄弟文档。这导致 cross-reference 链接靠猜。\n3. **主 agent 应该只调度，不动手写**。Session 里有一段讨论很直接：\"doc count 这个，可以靠不同的 subagent 来解决，你这是偷懒。而且就应该都 subagent 写，主 agent 来调度，并且再启动别 agent 来 audit，类似 OPC 的主 agent，尽量不要自己动手。\" 这个原则是对的——主 agent 一旦开始自己写文档，它的 context 就被占满了，调度能力下降。\n\n## 从手工蒸馏到 Pipeline 的距离\n\n给 societas 做 advisor 是手工活，给 hermes-agent 做是跑 pipeline。两者的知识密度其实差不多——最终都是 20-30 篇结构化文档，每篇有 file:line 引用，有 cross-reference。\n\n但 pipeline 的价值不在第一次跑得多快，而在**可重复性**。代码库更新后，`/build-advisor --resume` 能增量更新。换一个人来维护，不需要理解蒸馏过程，只需要理解 6 个 phase。\n\n当然，前提是 pipeline 本身得够 robust。目前的 builder 还不是——术语漂移、cross-reference 断裂、subagent context 隔离，这些问题在跑 hermes-agent 时全部暴露了。修完这些，才算是一个真正能量产 advisor 的工具。",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-repo-advisor-builder-knowledge-counselor.png",
+  "tags": [
+    "repo-advisor-builder",
+    "subagent-orchestration",
+    "state-machine",
+    "knowledge-distillation",
+    "claude-code",
+    "automation-pipeline"
+  ],
+  "sessionId": "unknown",
+  "project": "hermes-agent",
+  "date": "2026-04-12",
+  "duration": "",
+  "stats": {
+    "entries": 12359,
+    "messages": 1832,
+    "chunks": 130
+  },
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "lang": "zh"
+}

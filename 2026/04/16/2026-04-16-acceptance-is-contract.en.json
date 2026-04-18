@@ -1,0 +1,35 @@
+{
+  "slug": "2026-04-16-acceptance-is-contract",
+  "title": "Acceptance Criteria Aren't Checklists — They're Client Contracts",
+  "summary": "From \"defining done\" to \"mechanically enforcing acceptance\" — how OPC transforms fuzzy acceptance criteria into 14 lint rules and a gate command. The pickier the client, the cleaner the contractor's work.",
+  "body": "## Client and Contractor\n\nSomeone asked me why OPC's Definition of Done phase is so heavyweight — isn't it just listing a few bullet points?\n\nNot bullet points. Contracts.\n\nThink about the client-contractor relationship: the client pays, the contractor delivers. The client's core concern isn't \"you did good work\" — it's \"when I can prove you did bad work, I have grounds to withhold payment.\" Acceptance criteria are that contract — the more specific, testable, and interpretation-proof they are, the safer the client feels.\n\nIn OPC, the \"client\" is the person who'll ultimately use the product, and the \"contractor\" is the LLM agent executing the build. Here's the problem: LLMs write code fast, but when evaluating their own code quality, they naturally tend to give themselves high marks. So acceptance criteria can't be defined by the contractor — they must be established beforehand by an independent process, then enforced mechanically.\n\n## From Fuzzy to Mechanical\n\nOPC's acceptance-criteria.md requires 4 sections:\n\n```markdown\n## Outcomes\n- OUT-1: User can log in with email, session persists across refresh\n- OUT-2: After logout, session completely cleared, no residual cookies\n- OUT-3: Wrong password returns 401, doesn't leak whether user exists\n\n## Verification\nOUT-1: curl POST /login → 200, cookie set; refresh page → still logged in\nOUT-2: curl POST /logout → 200; curl GET /profile → 401\nOUT-3: curl POST /login wrong-pass → 401, response body identical for exist/not-exist\n\n## Quality Constraints\n- No PII in logs\n- Password bcrypt no less than 10 rounds\n\n## Out of Scope\n- OAuth third-party login\n- Password reset flow\n```\n\nEvery OUT-N maps to a concrete verification method — not \"test it out,\" but precise down to the curl command and expected HTTP status code.\n\n## 14 Lint Rules\n\n`criteria-lint` is the static checker for acceptance-criteria.md, with 14 rules across three layers:\n\n**Structure layer (7 rules)**: section presence, OUT-N count (3-7), complete verification mapping, quality and scope sections.\n\n**Content layer (4 rules)**:\n- `no-vague-outcomes`: Detects \"fast,\" \"clean,\" \"intuitive\" without a quantified threshold (\"under 200ms,\" \"WCAG AA\") — fails. You can't say \"system should be fast,\" you say \"P95 latency < 200ms.\"\n- `no-impossible-to-fail`: Detects \"should work,\" \"as expected\" without corresponding concrete assertions (returns/throws/status code) — just empty words.\n- `verification-not-manual`: Detects \"manual inspection,\" \"looks correct.\" If an outcome's verification method is human eyeballing, that's not verification.\n- `outcomes-unique`: Uses Jaccard similarity to detect duplicate outcomes. If two OUT-N have >80% word overlap, either merge or differentiate them.\n\n**Warning layer (3 rules)**: empty scope, no failure modes, excessive outcome count.\n\n## Gate Integration\n\n`init-loop` auto-detects `acceptance-criteria.md` and runs lint. Fail blocks initialization:\n\n```json\n{\n  \"initialized\": false,\n  \"errors\": [\"criteria-lint [no-vague-outcomes]: OUT-2 uses 'clean' without measurement\"],\n  \"hint\": \"fix acceptance-criteria.md or pass --skip-lint to bypass\"\n}\n```\n\n`--skip-lint` is an escape hatch, but leaves a warning in loop state when used — you skipped the quality gate, and all subsequent reviews can see it.\n\n## The Tenth Man Protocol\n\nWhen discussing OPC's evaluation phase, there's a key design decision: when all reviewers reach consensus, introduce a devil-advocate.\n\nThis comes from Israeli intelligence's \"Tenth Man\" protocol: if 9 analysts agree on a conclusion, the 10th person's job is to oppose it. Not because the conclusion is necessarily wrong, but because consensus itself is the biggest risk signal.\n\nIn OPC's discussion node, if Round 2 agents converge, the orchestrator automatically introduces a `devil-advocate` role in subsequent review passes. For irreversible decisions (data deletion, public API contracts, destructive migrations), devil-advocate is **mandatory**.\n\n## LLMs Don't Do Pricing\n\nThere's a deeper issue: LLMs inherently can't produce \"economic signals.\"\n\nWhat's an economic signal? When a human reviewer says \"this bug is critical,\" there's real stake behind it — their professional reputation, team trust, product success. That stake gives their judgment weight.\n\nLLMs have no stake. Saying \"🔴 critical\" costs exactly the same as saying \"🔵 suggestion.\" So they tend to either give everything high scores (people-pleasing) or randomly assign severity (uncalibrated).\n\nOPC's solution isn't making LLMs have stake, but **converting stake-requiring judgments into mechanical checks**:\n\n- Don't let LLM decide \"is this review deep enough?\" → Use line count / code reference count / finding density to measure\n- Don't let LLM decide \"are these acceptance criteria good?\" → Use 14 lint rules to check\n- Don't let LLM decide \"does this fix address review findings?\" → Use hash comparison to ensure review findings weren't tampered with\n\n**Every judgment that can be mechanized shouldn't be left to LLM judgment.** Save LLM judgment for where understanding is truly needed: architectural tradeoffs, user psychology, edge case prioritization.\n\n## The Power of Contracts\n\nBack to the client contract metaphor. A good contract isn't for going to court — it's for aligning expectations the moment both parties sign. When OUT-1 says \"curl POST /login → 200, cookie set,\" neither builder nor reviewer needs to guess — done is done, not-done is not-done.\n\nThat's why OPC invests so heavily in Definition of Done. Not because I love writing documentation, but because fuzzy acceptance criteria are the original sin of every subsequent phase. Reviewers don't know what to look for, testers don't know what to test, builders don't know what \"done\" means. The 14 lint rules look dogmatic, but they eliminate the most expensive waste: rework.\n\n---",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-acceptance-is-contract.png",
+  "tags": [
+    "opc",
+    "acceptance-criteria",
+    "mechanical-enforcement",
+    "quality-gates",
+    "llm-limitations"
+  ],
+  "sessionId": "98efc892-2821-40cf-b0a4-22aa257cbfa1",
+  "chunkIndices": [
+    14,
+    15,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+  ],
+  "project": "opc",
+  "date": "2026-04-16",
+  "duration": "3h 30min",
+  "stats": {
+    "entries": 4699,
+    "messages": 41,
+    "chunks": 41
+  },
+  "lang": "en"
+}

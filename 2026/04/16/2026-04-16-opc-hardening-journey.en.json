@@ -1,0 +1,44 @@
+{
+  "slug": "2026-04-16-opc-hardening-journey",
+  "title": "From 47/100 to Zero Failures: Three Weeks of Hardening an Agent Framework",
+  "summary": "Week 1: My own advisor scored my work 47/100. Week 2: I wrote 6 protocol specs. Week 3: 1686 lines of code + 21 test suites + 0 failures. The complete story of taking an agent framework from 'it works' to 'you can trust it.'",
+  "body": "## Getting Roasted by My Own Tool\n\nIt started with `/hermes-advisor review`.\n\nHermes is a code review advisor. I pointed it at OPC's main branch. It returned a report: 5 Critical issues, 8 High. Security score: 47/100.\n\nThe most painful findings:\n- **Command injection**: Flow template names concatenated directly into shell commands without escaping\n- **Path traversal**: `--flow-file` parameter had no boundary checks—could read arbitrary paths\n- **Eval file validation only counted files**: Review required ≥2 eval-*.md files but didn't validate content. Two empty files would pass\n- **No oscillation detection**: Gate loopback could bounce infinitely between two nodes\n\nThese weren't theoretical problems. OPC is a framework that lets LLM agents automatically execute build → review → gate loops. If eval files can be faked, the entire review process is theater.\n\n## Week 1: Stop the Bleeding\n\nFix Critical issues first. This didn't require design, just execution:\n\n**Command injection** → All shell-sensitive inputs get `validateRelativePath()` checks, blocking `..`, absolute paths, and special characters. Flow template names must match `/^[a-zA-Z0-9_-]+$/`.\n\n**Path traversal** → `--flow-file` gets parsed then checked with `resolvedPath.startsWith(cwd)`. Built-in template names (legacy-linear, review, build-verify, full-stack, pre-release) are protected—external flow files can't override them.\n\n**Eval file fakery** → Don't just count files, check content:\n1. Must contain severity markers (🔴🟡🔵 or LGTM)\n2. Line count ≥ 50 (thin eval detection)\n3. Must have file:line references (grounding in code)\n4. Pairwise distinctness: byte-identical → error, >70% line overlap → warning\n5. Role tags must differ\n\n**Oscillation** → `maxLoopsPerEdge = 3`—same edge traversed >3 times gets blocked. `maxNodeReentry = 5`—same node entered >5 times gets blocked.\n\nFixed. Test suites grew from 12 to 16. Pushed. Confidence jumped from 47 to roughly 75.\n\n## Week 2: Write the Specs\n\nAfter stopping the bleeding, time to figure out what we're actually building. Week 2: zero lines of code, all protocol specs:\n\n- **ux-simulation-protocol.md** — Complete UX simulation flow: new-user / active-user / churned-user roles tested independently, observer structured output (red flags, trust signals, tier fit, friction points), 7 schema rejection rules\n- **ux-observer-protocol.md** — Observer output format and quality bar: reasoning must be ≥40 characters, can't use \"users\" (too generic), red flag keys must come from closed enum\n- **criteria-lint.md** — 14 lint rules for acceptance-criteria.md\n- **quality-tiers.md** — functional / polished / delightful quality tiers with baseline checklists\n- **loop-protocol.md** — Complete execution rules for autonomous loops\n- **gate-protocol.md** — Gate node verdict calculation and loopback rules\n\nKey characteristic of these specs: **every rule is mechanically verifiable**. Don't write \"reviewer should look carefully\"—write \"eval file line count < 50 → warning, file:line reference count = 0 → warning.\"\n\n## Week 3: Turn It Into Code\n\n6 specs → 6 implementation deliverables:\n\n1. **RED_FLAGS enum** in `tier-baselines.mjs` — 10 red flags (default-favicon, stack-trace-visible, lorem-ipsum...), each with different severity across three tiers\n2. **ux-verdict.mjs** — 350 lines: parse observer JSON, validate schema (7 rejections), aggregate red flags, compute verdict (PASS/ITERATE/FAIL/BLOCKED), delta comparison (regression detection)\n3. **criteria-lint.mjs** — 250 lines: 14 lint rules, 7 structural + 4 content + 3 warning\n4. **Command registration** in `opc-harness.mjs`\n5. **test-ux-verdict.sh** — 44 assertions across 9 test groups\n6. **test-criteria-lint.sh** — full coverage of structure/content/warnings\n\nThen G1-G8 loop engine gap fixes:\n\n- **G1**: Review independence hardening — heading matches → error, role tag checks\n- **G2**: Synthesize verdict integration — review ticks auto-calculate verdicts, FAIL fallback\n- **G3**: Criteria-lint gate — must pass lint before init-loop\n- **G4**: Reinit-loop — can break down units and restart after stalls\n- **G5**: Context hints — tick output includes contextual hints\n- **G6**: UX-sim unit type recognition + backlog auto-accumulation\n- **G7**: Git commit content validation + external validator enforcement\n- **G8**: Anti-deferral — tick descriptions can't contain \"defer,\" \"future work,\" \"punt\"\n\n## The Numbers\n\n| Metric | Week 1 | Week 3 |\n|--------|--------|--------|\n| Test suites | 12 | 21 |\n| Assertions | ~150 | ~450 |\n| Failures | 3 (known) | 0 |\n| Harness commands | 12 | 21 |\n| Enforcement rules | ~20 | ~60 |\n| Security score | 47/100 | ~90/100 |\n\n## What's Still Missing\n\nHonestly, several gaps remain:\n\n**Runtime test execution**: Harness verifies \"you said you tested\" but not \"you actually tested.\" A fake test-results.json can fool all checks.\n\n**External validators**: Detects npm test exists but doesn't enforce execution. Knows the lock is on the door but doesn't check if it's actually locked.\n\n**Plan can't evolve during execution**: Plan hash is locked—change it and you must reinit. In real projects, plans are living documents.\n\n**Review independence**: All checks are formal (different role tags, different headings, different word frequency). Same LLM wearing two masks writing two evals passes all checks.\n\n## Hardening Isn't the Goal\n\nBiggest takeaway from three weeks: hardening an agent framework presents completely different challenges than hardening a traditional software system.\n\nTraditional systems have deterministic invariants—input A must produce output B. Agent frameworks have probabilistic invariants—you can't guarantee the LLM writes good code, but you can guarantee bad code won't pass the gate.\n\nSo OPC's philosophy: **Don't try to make LLMs better—make the consequences of LLMs being worse smaller.** Those 60 enforcement rules aren't designed to produce good output; they're designed to block bad output. This distinction drives the system's design direction—it's not a tool for making AI write better code, it's a tool for preventing AI's bad code from passing acceptance.",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-16-opc-hardening-journey.png",
+  "tags": [
+    "opc",
+    "testing",
+    "mechanical-enforcement",
+    "agent-framework",
+    "security-hardening"
+  ],
+  "sessionId": "98efc892-2821-40cf-b0a4-22aa257cbfa1",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    29,
+    30,
+    31,
+    32,
+    33
+  ],
+  "project": "opc",
+  "date": "2026-04-16",
+  "duration": "3h 30min",
+  "stats": {
+    "entries": 4699,
+    "messages": 41,
+    "chunks": 41
+  },
+  "lang": "en"
+}

@@ -1,0 +1,24 @@
+{
+  "slug": "2026-04-16-45a1a7f3-article-1",
+  "title": "When Three Vercel Aliases Point to the Same Deployment: A False Alarm Investigation",
+  "summary": "A user was convinced three Vercel aliases were showing different versions, but deep investigation revealed they all pointed to the same deployment. The real culprit was a phantom project causing confusion.",
+  "body": "## \"Three Domains, Three Versions\"\n\ndreamworks-x.vercel.app, dreamworks-y.vercel.app, dreamworks-z.vercel.app — three aliases all pointing to the same Vercel project `dreamworks-z`. But when the user opened them, they swore they saw different content.\n\n\"Can you check Vercel for me? I think two deployments are fighting each other.\"\n\nThe worst thing you can do here is trust gut instinct. Get evidence first.\n\n## Investigation: From Aliases to Deployment IDs\n\n```bash\nvercel inspect dreamworks-x.vercel.app --scope dreamworks\nvercel inspect dreamworks-y.vercel.app --scope dreamworks\nvercel inspect dreamworks-z.vercel.app --scope dreamworks\n```\n\nThree commands, three results. The deployment IDs were identical: `dpl_Cm8GGBKs11xGVyF7L7L1GedoFtSG`.\n\nThis proves the alias layer isn't \"fighting\" — they're all pointing to the same build artifact.\n\n## So Why Do They Look Different?\n\nContinuing the investigation with the project list:\n\n```bash\nvercel project ls --scope dreamworks\n```\n\nFound something suspicious: a project called `site` with 0 deployments. This was a phantom project from some previous mishap.\n\nThe phantom project doesn't directly affect existing aliases, but its presence makes `vercel deploy` scope resolution unpredictable. Without `--scope dreamworks`, the CLI might link to the wrong project. This is why we have that hard rule in CLAUDE.md:\n\n> **NEVER run `vercel deploy` without `--scope dreamworks`.** Omitting scope creates orphan projects.\n\n## Killing the Phantom\n\n```bash\necho \"y\" | vercel project rm site --scope dreamworks\n```\n\nNote that Vercel CLI's `project rm` doesn't support a `--yes` flag, so you need to pipe in `y`. Small gotcha.\n\n## Where Did the \"Different Versions\" Really Come From?\n\nWhat the user saw was actually **browser cache + different access times**. CDN edge nodes might purge at different times, and combined with local browser caching, the same deployment can briefly show different versions of HTML/CSS on different devices.\n\nVerification method:\n```bash\ncurl -sI https://dreamworks-x.vercel.app | grep x-vercel-id\ncurl -sI https://dreamworks-y.vercel.app | grep x-vercel-id\n```\n\nThe `x-vercel-id` header contains the request ID, not the deployment ID. To see the actual deployment, use `vercel inspect`.\n\n## Takeaways\n\n1. **Get deployment IDs before drawing conclusions**. `vercel inspect <url>` is the only authoritative source for \"what's serving this.\"\n2. **Phantom projects are time bombs**. They don't directly break things, but make scope resolution unpredictable. Clean them up.\n3. **CDN + browser cache creates illusions**. Same deployment looking different on different devices doesn't mean the aliases are broken.\n4. **Deploy commands must include scope**. This isn't a suggestion, it's a hard rule. Vercel CLI's default behavior in multi-project environments is unpredictable.",
+  "heroImage": "",
+  "tags": [
+    "vercel",
+    "deployment",
+    "debugging",
+    "CDN",
+    "alias"
+  ],
+  "sessionId": "45a1a7f3-40c9-4323-91ee-06ac26ef75a9",
+  "chunkIndices": [
+    1,
+    2
+  ],
+  "project": "dream-works",
+  "date": "2026-04-16",
+  "duration": "",
+  "stats": {},
+  "lang": "en"
+}

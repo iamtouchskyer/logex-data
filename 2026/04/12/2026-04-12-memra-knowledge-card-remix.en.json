@@ -1,0 +1,47 @@
+{
+  "slug": "2026-04-12-memra-knowledge-card-remix",
+  "title": "Memra: When Knowledge Cards Want to Be Remixed",
+  "summary": "From /dw evaluation to OPC loop implementation, documenting Memra's knowledge remix platform from 0-to-1. Including cluster radar feature development, the UX problem of \"cards everywhere, no action points,\" GitHub App integration architecture decisions, and multi-role user acceptance testing.",
+  "body": "# Memra: When Knowledge Cards Want to Be Remixed\n\nHere's how it started: after turning my memex cards into a book, I realized that \"books\" are just one form of knowledge remix. Cards can also be combined into blog posts, newsletters, slide decks, even interactive knowledge graphs. These different output formats needed a unified entry point—not a CLI command, but an actual product interface.\n\nAnd so the Memra project was born.\n\n## DW Evaluation: Three Directions, All Tempting\n\nBefore diving in, I used `/dw new` for direction evaluation. I had three directions in mind: 1) Knowledge clustering visualization (automatically group related cards and show relationships); 2) Remix workflow (pipeline from cards to finished products); 3) Publishing and sharing. dream-works concluded that all three directions were viable, but recommended starting with #1—because clustering visualization is the infrastructure for the other two. Without it, both remix and sharing lack a \"where to start\" entry point.\n\nThis recommendation aligned with my intuition. Cluster radar became the Tier 1 goal.\n\n## OPC Loop Construction: First Time Using Loop for a Complete Product\n\nI used `/opc loop` to drive Memra's development. This was my first time using OPC's loop mode for a from-scratch product. The approach was to give OPC a Tier 1 task description (cluster radar spec), then let it spawn roles, break down tasks, and execute implementation.\n\nThe first loop completed the basic data pipeline: read cards from memex → extract keywords and embeddings → cluster based on similarity → output cluster structure. This part was relatively straightforward since memex card format is standardized.\n\nThe problems emerged in the frontend.\n\n## \"Cards Everywhere, No Action Points!\"\n\nWhen the first UI version came out, my immediate reaction upon opening the page was: what is this? The entire screen was packed with card thumbnails, densely arranged and color-coded by cluster. Technically fine—each cluster was correctly identified and labeled. But from a user perspective, this interface had zero action points.\n\nI couldn't see \"where to start.\" Couldn't see \"what to do next.\" No call-to-action, no progressive disclosure, just a wall of information.\n\nThe root cause: during development, all roles (including the UX role in OPC) knew the system's internal structure too well. They knew what each cluster meant, knew what would happen when clicking cards, knew the mental model of this interface. But a user opening Memra for the first time knows nothing.\n\nMy feedback was direct: \"You haven't activated a real user's perspective, you need to go look at other apps that do remix.\" This wasn't a code-level problem, but a perspective-level problem. The solution wasn't tweaking CSS, but rethinking the first-time user experience.\n\nSubsequent changes focused on: 1) Adding an onboarding overlay explaining \"your cards have been grouped into N knowledge clusters\"; 2) Showing the most interesting (highest activity) cluster by default instead of displaying everything; 3) Each cluster getting a clear \"start remix\" button. These changes transformed \"information display\" into \"action guidance.\"\n\n## GitHub App Integration: One App or Two?\n\nDuring deployment, we hit an architecture question: Memra needs a GitHub App to authenticate users and read memex repos. The issue is that local development and Vercel production environments need different OAuth callback URLs. This means either using one GitHub App to handle both environments (through dynamic redirect), or creating two separate GitHub Apps.\n\nI initially thought we should use two—better isolation, won't break local dev when changing production config. But Claude checked and found that one GitHub App can work for Vercel since Vercel deployment URLs are predictable. We went with the single App approach to reduce maintenance overhead.\n\nThe decision process itself wasn't complex, but it illustrates a pattern: for deployment-related issues, \"simpler\" is almost always the better choice. An extra GitHub App to maintain means an extra secret that might expire, an extra config that might get inconsistent, an extra thing to explain in documentation.\n\n## Multi-Role User Acceptance\n\nAfter basic functionality was complete, I used OPC to spawn three virtual user roles for acceptance testing. These roles had different backgrounds: a heavy Zettelkasten user, a regular developer completely unfamiliar with knowledge management, and a content creator.\n\nThe heavy user's feedback was most valuable: they pointed out the cluster naming problem. Auto-generated cluster names were often keyword concatenations like \"AI-Tools-Workflow,\" lacking the natural feel of human language. A good cluster name should be narrative like \"Why I Ditched Notion for Plain Text,\" not categorical labels like \"Note-Taking-Tools-Comparison.\"\n\nThis circled back to the same issue encountered during the book writing process: LLMs excel at categorization and summarization, but when it comes to \"giving fragments a soulful name,\" human taste still needs to intervene.\n\n## Unfinished Parts\n\nWhen the session ended, Memra's Tier 1 was basically complete but not yet deployed to Vercel. Remaining work included ink-flow integration (so remix products can be published directly to blog) and formal production deployment. These were logged as TODOs, waiting for the next session to continue.\n\nLooking back, Memra's biggest gain wasn't the code itself, but a deepened understanding of \"knowledge products\": knowledge's value isn't in where it's stored, but in how many forms it can be re-expressed. Cards are one form, books are one form, visualized clusters are one form, remixed blog posts are yet another form. Memra's purpose isn't to be \"yet another note-taking tool,\" but a knowledge format transformer.",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-12-memra-knowledge-card-remix.png",
+  "tags": [
+    "memra",
+    "knowledge-remix",
+    "OPC-loop",
+    "cluster-radar",
+    "UX",
+    "GitHub-App",
+    "Vercel"
+  ],
+  "sessionId": "unknown",
+  "project": "memra",
+  "date": "2026-04-12",
+  "duration": "",
+  "stats": {
+    "entries": 12359,
+    "messages": 1832,
+    "chunks": 130
+  },
+  "chunkIndices": [
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92
+  ],
+  "lang": "en"
+}
