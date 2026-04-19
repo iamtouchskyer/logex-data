@@ -1,6 +1,35 @@
 {
   "articles": [
     {
+      "slug": "2026-04-19-pulse-fake-production-day-one",
+      "date": "2026-04-19",
+      "project": "pulse",
+      "tags": [
+        "pulse",
+        "vercel",
+        "ci-cd",
+        "e2e",
+        "postmortem",
+        "devops"
+      ],
+      "sessionId": "e9b042d7-894f-45cc-bd88-a922b29d3e46",
+      "heroImage": "",
+      "chunkIndices": [
+        10,
+        15
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Pulse 上线当天：一个假的 production",
+          "summary": "18/18 units PASS，7/7 OUTs 验收通过，prod 200 OK——结果用户打开 dashboard 第一句：『数据是不是 fake 的？』确实是。两个 bug 独立存在，合起来让这个『自动化 OSS radar』静悄悄地撒了好几个小时的谎。",
+          "path": "2026/04/19/2026-04-19-pulse-fake-production-day-one.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-19-opc-loop-fixes-7-distributed-bugs",
       "date": "2026-04-19",
       "project": "mitsein",
