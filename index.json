@@ -1,6 +1,104 @@
 {
   "articles": [
     {
+      "slug": "2026-04-19-adfd2343-article-2",
+      "date": "2026-04-19",
+      "project": "opc",
+      "tags": [
+        "opc",
+        "flows",
+        "extensibility",
+        "skill-architecture",
+        "project-scoped"
+      ],
+      "sessionId": "adfd2343-ea68-4bca-b09d-b464a4132c58",
+      "heroImage": "",
+      "chunkIndices": [
+        100,
+        101,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        113,
+        114,
+        115,
+        117,
+        118,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        128,
+        129
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "OPC flows 分离 + .opc/ 跟项目走：一个 skill 插件化的故事",
+          "summary": "OPC 做到一半发现问题：dreamworks、memra、ink-flow 都想基于 OPC 做扩展，但 flows 都塞在 skill 目录里会失控。分离 flows/extensions + 项目级 .opc/ 目录，让 OPC 成为可插件化的 flow 引擎。",
+          "path": "2026/04/19/2026-04-19-adfd2343-article-2.zh.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-19-adfd2343-article-1",
+      "date": "2026-04-19",
+      "project": "cli-x",
+      "tags": [
+        "cli-x",
+        "skill",
+        "playwright",
+        "vision-ai",
+        "architecture",
+        "runbook"
+      ],
+      "sessionId": "adfd2343-ea68-4bca-b09d-b464a4132c58",
+      "heroImage": "",
+      "chunkIndices": [
+        131,
+        132,
+        133,
+        134,
+        140,
+        141,
+        142,
+        146,
+        147,
+        148,
+        149,
+        150,
+        152,
+        156,
+        168,
+        169,
+        170,
+        171,
+        172,
+        174,
+        175,
+        176,
+        177
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "cli-x：把 ink-flow 里的 playwright 代码扒出来，做成一个独立 skill",
+          "summary": "从一句 \"ink-flow 应该调用一个 cli skill\" 出发，拆出 cli-x — 一个统一对接外部平台的 skill。MCP > CLI > Playwright 优先级链、shared-browser CDP、Vision AI 自愈。最后做出 23 个平台 runbook + 双 provider selector 自修复。",
+          "path": "2026/04/19/2026-04-19-adfd2343-article-1.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-19-8db25be6-article-1",
       "date": "2026-04-19",
       "project": "blog",
