@@ -1,0 +1,34 @@
+{
+  "slug": "2026-04-19-70e35617-article-1",
+  "title": "从 8% 到 55%：一个人的视觉回归测试体系是怎么长出来的",
+  "summary": "一句「我想做设计走查」，变成了 10 天、4 个主题、2 种模式、3 个 viewport、1100+ 张 baseline 截图。这是一篇关于从零构建 Playwright 视觉回归测试的实战记录——以及为什么「能截图」和「能回归」之间隔着一个数量级的工程量。",
+  "body": "# 从 8% 到 55%：一个人的视觉回归测试体系是怎么长出来的\n\n## 一句话引发的十天\n\n\"我想做设计走查。\"\n\n就是这句话。不是\"请帮我写一个 visual regression testing framework\"，不是\"请集成 Playwright screenshot comparison\"——是一个产品人的直觉：我们有 4 个主题（Obsidian, Nebula, Jade, Deep Sea），每个有 light/dark 两种模式，UI 有几十个 dialog 和 view，我怎么知道它们看起来是对的？\n\n这个问题的答案，最终变成了 1100+ 张 baseline 截图、一套完整的 Playwright visual test pipeline、以及对\"什么叫 UI 一致性\"的重新理解。\n\n## 第一步永远最简单：能截就截\n\nPlaywright 截图，技术上没什么难的：\n\n```typescript\nconst page = await browser.newPage();\nawait page.goto('http://localhost:3100/some-page');\nawait page.screenshot({ path: 'baseline.png', fullPage: true });\n```\n\n三行代码。但真正的问题不在截图，在于**你要截什么**。\n\nMitsein 是一个 AI agent 平台。它有 chat view、project list、agent config panel、file renderers、spreadsheet editor、workflow designer……每一个都有不同的状态组合。一个 chat view 就有：空状态、单条消息、多条消息、带文件附件、带 tool call、带 streaming 动画。乘以 4 themes × 2 modes × 3 viewports（desktop 1440px、tablet 768px、mobile 375px），组合爆炸。\n\n我没有试图覆盖所有组合。第一版只做了一件事：**遍历所有可到达的页面路由，每个路由截一张图**。不管状态，不管交互，先把\"地图\"画出来。\n\n## Loop 模式：让 Agent 自己跑\n\n手工截 1100 张图？不可能。\n\n实际做法是用 Claude Code 的 `/loop` 命令——每 30 分钟 agent 自动 tick 一次，按照 plan 逐步执行：启动 dev server（端口不能是 3000，因为同一台机器上还有别的 agent 在跑服务），切换 theme + mode，导航到目标页面，等 `networkidle`，截图，比对。\n\n```bash\n# Agent 自己找到可用端口\nVITE_PORT=3100 pnpm dev\n\n# 通过 localStorage 切换主题\nawait page.evaluate(() => {\n  localStorage.setItem('mitsein-theme-id', 'jade');\n  localStorage.setItem('mitsein-theme-mode', 'light');\n});\nawait page.reload();\nawait page.waitForLoadState('networkidle');\n```\n\n但 loop 不是万能的。Agent 的 context window 会 compact，compact 之后它不记得之前截了哪些、哪些 theme 还没覆盖。所以 plan 必须写得极其详细——不是\"截所有页面\"，而是一个明确的 checklist：\n\n1. Obsidian/dark/desktop → /projects\n2. Obsidian/dark/desktop → /projects/{id}/channels/{id}\n3. Obsidian/dark/tablet → /projects\n4. ...\n\n每完成一项就打勾。Agent compact 之后，只要读 plan 就知道从哪里继续。\n\n## 空白截图的陷阱\n\n截了 200 张之后我发现一个问题：大约 15% 的截图是空白的或者只有骨架屏。\n\n原因很多：\n- React hydration 没完成就截了\n- 需要认证的页面 redirect 到了 login\n- 某些组件依赖 API 数据，dev server 返回空\n- CSS animation 还在播放\n\n最后加了一个 audit 步骤：\n\n```bash\n# 检测空白截图（<6KB 的 PNG 基本是空白或纯色）\nBLANK=$(find tests/visual/__screenshots__ -name '*.png' -size -6k | wc -l)\n[ \"$BLANK\" -eq 0 ] || exit 1\n```\n\n这个检查后来成了 CI gate 之一。空白截图 = 测试无效 = build failure。\n\n## 真正的难题：认证\n\n大多数页面需要登录。Playwright 怎么处理？\n\n选项 A：mock 掉整个 auth 层。好处是不依赖后端。坏处是你截到的不是真正的 UI——没有真实数据，mock 出来的 agent list 和真实的长得不一样。\n\n选项 B：stress token。Mitsein 在 dev 模式下支持 stress token——一个预生成的 JWT，绕过正常 auth flow 但仍然走完整的后端逻辑。通过 `localStorage` 注入 token，页面就认为你已登录。\n\n```typescript\n// 注入 stress token\nawait page.evaluate((token) => {\n  localStorage.setItem('sb-access-token', token);\n}, devToken);\n```\n\n我选了 B。代价是必须有后端在跑。好处是截到的是真实 UI。\n\n## 从截图到回归\n\n截图只是一半。另一半是**比较**。\n\nPlaywright 内置了 `toHaveScreenshot()`，底层用 pixelmatch 做像素级比对。但直接用会被 anti-aliasing、字体渲染差异、动画帧差异淹没。\n\n调参：\n- `maxDiffPixelRatio: 0.01`——允许 1% 像素差异（字体渲染）\n- `animations: 'disabled'`——截图前冻结所有 CSS animation\n- `--workers=1`——串行执行，避免 GPU 争抢导致渲染不一致\n\n即便如此，第一次跑回归仍然有 30% 的 test fail。原因是 baseline 和 comparison 的 dev server 数据不同——有新消息进来了，thread 列表变了。\n\n这揭示了一个 fundamental tension：**visual regression 要求 UI 是确定性的，但真实应用的 UI 是动态的**。\n\n最终的 compromise：visual test 用独立的 seed 数据库，不连 production。但这个 seed 数据库的维护本身又是一个工程问题——暂时搁置，先用 update baselines 的方式推进。\n\n## 数字\n\n10 天结束时的状态：\n\n| Metric | Value |\n|--------|-------|\n| Baseline screenshots | 1,100+ |\n| Themes covered | 4 (Obsidian, Nebula, Jade, Deep Sea) |\n| Modes | 2 (light, dark) |\n| Viewports | 3 (desktop, tablet, mobile) |\n| Pages/routes covered | ~46 |\n| Coverage (visual) | ~55% of UI surface |\n| Blank audit pass rate | 100% |\n\n## Makefile 集成\n\n最后一步：让这些 test 能被任何人一行命令跑起来。\n\n```makefile\nfe\\:visual:\n\t@echo \"=== Visual Regression Tests ===\"\n\tcd frontend/apps/main-site && \\\n\t  VISUAL_TEST_URL=$${VISUAL_TEST_URL:-http://localhost:3200} pnpm test:visual\n\nfe\\:visual\\:update:\n\tcd frontend/apps/main-site && \\\n\t  VISUAL_TEST_URL=$${VISUAL_TEST_URL:-http://localhost:3200} pnpm test:visual:update\n\nfe\\:visual\\:audit:\n\tcd frontend/apps/main-site && pnpm test:visual:audit\n```\n\n三个 target，三个动作：比对、更新 baseline、审计空白。足够了。\n\n## 反思\n\n### 什么 work 了\n\n**Agent loop + detailed plan** 是这个项目的生命线。没有 loop，手工截 1100 张图要几天。没有 detailed plan，agent compact 后就迷路了。\n\n**Stress token** 解决了 auth 问题，避免了 mock 整个世界。\n\n**Blank audit** 是一个简单但关键的 gate——它让\"假装截了图\"变成不可能。\n\n### 什么没 work\n\n**确定性 UI** 的问题没有真正解决。目前靠 update baselines 来\"重新同步\"，但这意味着 genuine regression 可能被 update 掩盖。长期需要 seed database。\n\n**覆盖率计算**很粗糙。55% 是\"截到了多少路由\"，不是\"验证了多少交互状态\"。一个页面的 empty state 和 loaded state 看起来完全不同，目前只覆盖了一种。\n\n**CI 集成还没做**。这些 visual tests 目前只能本地跑，因为需要 dev server + 后端。要上 CI 需要 Docker compose 或者 service container。这是下一个 branch 的事。\n\n### 一个 insight\n\n\"能截图\"和\"能回归\"之间的距离，比你想象的大一个数量级。截图是 3 行 Playwright 代码。回归需要：确定性数据、稳定的渲染环境、合理的 diff 阈值、空白检测、theme/mode/viewport 矩阵管理、baseline 版本管理、CI 集成。每一个都是一个工程问题。\n\n但这正是 visual regression 的价值所在——它把\"看起来对\"从主观判断变成了可重复验证。1100 张截图不会骗人。",
+  "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-19-70e35617-article-1.png",
+  "tags": [
+    "visual-regression",
+    "playwright",
+    "testing",
+    "frontend",
+    "mitsein"
+  ],
+  "sessionId": "70e35617-9c0e-4f5c-b72c-2bd1662cf932",
+  "chunkIndices": [
+    1,
+    2,
+    10,
+    11,
+    58,
+    60,
+    113,
+    147,
+    260,
+    280,
+    284,
+    293,
+    375
+  ],
+  "project": "mitsein",
+  "date": "2026-04-19",
+  "duration": "",
+  "stats": {}
+}

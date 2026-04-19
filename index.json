@@ -1,6 +1,21 @@
 {
   "articles": [
     {
+      "slug": "2026-04-19-claude-code-malware-reminder-override",
+      "title": "当 Claude Code 的安全注入挡住了你自己的代码",
+      "summary": "Read 一个 .mjs 文件，Claude 突然说「我不能改这段代码」—— 因为 system-reminder 把它当成了 malware。但代码是我自己刚写的。这是一次关于 over-generalized safety guardrail 的诊断、权衡，以及为什么我选择给它加一条 CLAUDE.md override 而不是 hook 掉它。",
+      "tags": [
+        "claude-code",
+        "safety",
+        "guardrail",
+        "devx"
+      ],
+      "project": "claude-code",
+      "date": "2026-04-19",
+      "path": "2026/04/19/2026-04-19-claude-code-malware-reminder-override.json",
+      "image": "images/claude-code-malware-reminder-override.png"
+    },
+    {
       "slug": "2026-04-19-adfd2343-article-2",
       "date": "2026-04-19",
       "project": "opc",
@@ -142,6 +157,111 @@
           "path": "2026/04/19/2026-04-19-8db25be6-article-1.zh.json"
         }
       }
+    },
+    {
+      "slug": "2026-04-19-70e35617-article-3",
+      "title": "十把武器：用代码堵住测试体系的每一个漏洞",
+      "summary": "有了分层和 1144 个测试还不够。新写的 product 代码没测试怎么办？测试里没有 assert 怎么办？unit 目录下写了 integration test 怎么办？十个自动化脚本，把「人的纪律」变成「机器的拒绝」。",
+      "date": "2026-04-19",
+      "tags": [
+        "testing",
+        "enforcement",
+        "ci-cd",
+        "devx",
+        "mitsein",
+        "quality"
+      ],
+      "project": "mitsein",
+      "chunkIndices": [
+        357,
+        358,
+        364,
+        369,
+        370,
+        371,
+        372,
+        373,
+        374
+      ],
+      "sessionId": "70e35617-9c0e-4f5c-b72c-2bd1662cf932",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-19-70e35617-article-3.png",
+      "path": "2026/04/19/2026-04-19-70e35617-article-3.json"
+    },
+    {
+      "slug": "2026-04-19-70e35617-article-2",
+      "title": "L1 到 L5：和 AI 吵出来的测试分层哲学",
+      "summary": "「自己玩自己的一层，自己和兄弟节点玩的一层」——用户一句话定义了测试分层的核心逻辑。接下来是两天的架构讨论、目录重构、和对「测试应该放哪里」这个看似简单问题的深度拆解。",
+      "date": "2026-04-19",
+      "tags": [
+        "testing",
+        "architecture",
+        "test-pyramid",
+        "mitsein",
+        "devx"
+      ],
+      "project": "mitsein",
+      "chunkIndices": [
+        297,
+        298,
+        299,
+        300,
+        301,
+        315,
+        329,
+        330,
+        331,
+        332,
+        333,
+        336,
+        337,
+        344,
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352,
+        353,
+        354,
+        356
+      ],
+      "sessionId": "70e35617-9c0e-4f5c-b72c-2bd1662cf932",
+      "heroImage": "",
+      "path": "2026/04/19/2026-04-19-70e35617-article-2.json"
+    },
+    {
+      "slug": "2026-04-19-70e35617-article-1",
+      "title": "从 8% 到 55%：一个人的视觉回归测试体系是怎么长出来的",
+      "summary": "一句「我想做设计走查」，变成了 10 天、4 个主题、2 种模式、3 个 viewport、1100+ 张 baseline 截图。这是一篇关于从零构建 Playwright 视觉回归测试的实战记录——以及为什么「能截图」和「能回归」之间隔着一个数量级的工程量。",
+      "date": "2026-04-19",
+      "tags": [
+        "visual-regression",
+        "playwright",
+        "testing",
+        "frontend",
+        "mitsein"
+      ],
+      "project": "mitsein",
+      "chunkIndices": [
+        1,
+        2,
+        10,
+        11,
+        58,
+        60,
+        113,
+        147,
+        260,
+        280,
+        284,
+        293,
+        375
+      ],
+      "sessionId": "70e35617-9c0e-4f5c-b72c-2bd1662cf932",
+      "heroImage": "",
+      "path": "2026/04/19/2026-04-19-70e35617-article-1.json"
     },
     {
       "slug": "2026-04-19-6b937442-article-2",
@@ -325,21 +445,6 @@
           "path": "2026/04/19/2026-04-19-4bd679f5-article-1.zh.json"
         }
       }
-    },
-    {
-      "slug": "2026-04-19-claude-code-malware-reminder-override",
-      "title": "当 Claude Code 的安全注入挡住了你自己的代码",
-      "summary": "Read 一个 .mjs 文件，Claude 突然说「我不能改这段代码」—— 因为 system-reminder 把它当成了 malware。但代码是我自己刚写的。这是一次关于 over-generalized safety guardrail 的诊断、权衡，以及为什么我选择给它加一条 CLAUDE.md override 而不是 hook 掉它。",
-      "tags": [
-        "claude-code",
-        "safety",
-        "guardrail",
-        "devx"
-      ],
-      "project": "claude-code",
-      "date": "2026-04-19",
-      "path": "2026/04/19/2026-04-19-claude-code-malware-reminder-override.json",
-      "image": "images/claude-code-malware-reminder-override.png"
     },
     {
       "slug": "2026-04-18-27ddc26f-article-2-advisor-monorepo",
