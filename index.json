@@ -1,41 +1,47 @@
 {
   "articles": [
     {
-      "slug": "2026-04-19-4bd679f5-article-3-billfighter",
+      "slug": "2026-04-19-8db25be6-article-1",
       "date": "2026-04-19",
-      "project": "billfighter",
+      "project": "blog",
       "tags": [
-        "billfighter",
-        "stripe",
-        "fastapi",
         "opc-loop",
-        "tier-2",
-        "webhook",
-        "health-endpoint",
-        "schema-migration",
-        "playwright-e2e",
-        "review-independence"
+        "design-lint",
+        "tailwind",
+        "typography",
+        "playwright",
+        "code-review"
       ],
-      "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+      "sessionId": "8db25be6-6967-4e13-aba8-75026e619d75",
       "heroImage": "",
       "chunkIndices": [
-        240,
-        241,
-        242,
-        243,
-        244,
-        245,
-        246,
-        247
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        17,
+        18,
+        19,
+        20
       ],
       "duration": "",
       "stats": {},
       "primaryLang": "zh",
       "i18n": {
         "zh": {
-          "title": "BillFighter Tier 2 加固：OPC 自治 loop 跑出来的 5 个真问题",
-          "summary": "把 BillFighter 从 Tier 1 SPA 升到 Tier 2（Auth + DB + Stripe）之后，用 OPC loop 跑了一轮 7-unit 的加固审计。Stripe 2024-09 schema 静默改字段、HANDLED_EVENTS 漂移、health endpoint 泄漏隐患——每一个都是 review subagent 抓出来的，不是 implementer 自己看出来的。",
-          "path": "2026/04/19/2026-04-19-4bd679f5-article-3-billfighter.zh.json"
+          "title": "当 AI Review 比 AI Audit 更能发现问题",
+          "summary": "用 OPC Loop 驱动 blog 字体一致性修复。Playwright crawl 发现了 17 个问题，但真正改变设计方向的 insight 来自 designer role 的 review。",
+          "path": "2026/04/19/2026-04-19-8db25be6-article-1.zh.json"
         }
       }
     },
@@ -108,6 +114,45 @@
           "title": "六合二：当 AI Agent 学会做减法",
           "summary": "6 个 design skill 合并为 2 个的实战复盘。合并不是删代码，而是找到 interface 的最小正交集。OPC loop 驱动的 26 个 unit，87 小时，$197 的代价换来的认知：简单是可靠的前提。",
           "path": "2026/04/19/2026-04-19-6b937442-article-1.zh.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-19-4bd679f5-article-3-billfighter",
+      "date": "2026-04-19",
+      "project": "billfighter",
+      "tags": [
+        "billfighter",
+        "stripe",
+        "fastapi",
+        "opc-loop",
+        "tier-2",
+        "webhook",
+        "health-endpoint",
+        "schema-migration",
+        "playwright-e2e",
+        "review-independence"
+      ],
+      "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+      "heroImage": "",
+      "chunkIndices": [
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "BillFighter Tier 2 加固：OPC 自治 loop 跑出来的 5 个真问题",
+          "summary": "把 BillFighter 从 Tier 1 SPA 升到 Tier 2（Auth + DB + Stripe）之后，用 OPC loop 跑了一轮 7-unit 的加固审计。Stripe 2024-09 schema 静默改字段、HANDLED_EVENTS 漂移、health endpoint 泄漏隐患——每一个都是 review subagent 抓出来的，不是 implementer 自己看出来的。",
+          "path": "2026/04/19/2026-04-19-4bd679f5-article-3-billfighter.zh.json"
         }
       }
     },
