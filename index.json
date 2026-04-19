@@ -327,6 +327,21 @@
       }
     },
     {
+      "slug": "2026-04-19-claude-code-malware-reminder-override",
+      "title": "当 Claude Code 的安全注入挡住了你自己的代码",
+      "summary": "Read 一个 .mjs 文件，Claude 突然说「我不能改这段代码」—— 因为 system-reminder 把它当成了 malware。但代码是我自己刚写的。这是一次关于 over-generalized safety guardrail 的诊断、权衡，以及为什么我选择给它加一条 CLAUDE.md override 而不是 hook 掉它。",
+      "tags": [
+        "claude-code",
+        "safety",
+        "guardrail",
+        "devx"
+      ],
+      "project": "claude-code",
+      "date": "2026-04-19",
+      "path": "2026/04/19/2026-04-19-claude-code-malware-reminder-override.json",
+      "image": "images/claude-code-malware-reminder-override.png"
+    },
+    {
       "slug": "2026-04-18-27ddc26f-article-2-advisor-monorepo",
       "date": "2026-04-18",
       "project": "repo-advisors",
