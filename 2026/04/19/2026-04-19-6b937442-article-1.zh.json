@@ -1,0 +1,35 @@
+{
+  "slug": "2026-04-19-6b937442-article-1",
+  "lang": "zh",
+  "title": "六合二：当 AI Agent 学会做减法",
+  "summary": "6 个 design skill 合并为 2 个的实战复盘。合并不是删代码，而是找到 interface 的最小正交集。OPC loop 驱动的 26 个 unit，87 小时，$197 的代价换来的认知：简单是可靠的前提。",
+  "body": "# 六合二：当 AI Agent 学会做减法\n\n那天看着 `~/.claude/skills/` 下面的 6 个 design 目录，我突然意识到这事不对。\n\n`opc-extend-design-lint`、`opc-extend-brand-guidance`、`opc-extend-theme-factory`、`opc-extend-apple-style-ui`、`opc-extend-design-review`、`opc-extend-visual-eval` — 6 个 skill，每一个当初创建的时候都有充分的理由。design lint 检查视觉一致性，brand guidance 管理品牌规范，theme factory 生成主题变量，apple style 处理 Apple HIG 对齐，design review 做设计评审，visual eval 用 VLM 做截图评分。\n\n看起来很 MECE，对吧？但实际使用的时候，问题出现了：调用链太长，职责边界模糊，更要命的是每次 OPC review 要 fire 3-4 个 extension，每个都可能 timeout，circuit breaker 三次失败就 auto-disable。6 个里面经常有 2-3 个处于 disabled 状态。\n\n## 做减法比做加法难\n\n合并的第一步不是写代码，是画 interface 图。我把 6 个 skill 的输入输出全部列出来：\n\n| Skill | Input | Output |\n|-------|-------|--------|\n| design-lint | dev server URL | findings[] (font/color/spacing violations) |\n| brand-guidance | brand file path | validation report |\n| theme-factory | design tokens | CSS variables + Tailwind config |\n| apple-style-ui | component screenshots | HIG compliance score |\n| design-review | any UI artifact | structured eval |\n| visual-eval | screenshot(s) | VLM quality score |\n\n看到 pattern 了吗？前四个都是**规则驱动**的 — 给定规范，机械检查偏差。后两个是**判断驱动**的 — 需要\"品味\"来评估质量。\n\n这就是合并的切点：\n\n- **opc-extend-design** = 规则驱动的一切。Design lint + brand + theme + apple style，合并为一个 engine，通过 priority chain 决定哪些规则生效。\n- **opc-extend-visual-eval** = 判断驱动的一切。VLM-as-judge，用 DashScope qwen-vl-max 做视觉质量评估。\n\n## OPC Loop 执行：26 个 Unit\n\n合并不是我手动做的。我写了一个 OPC loop prompt，让 agent 分解任务、自主执行。最终分解为 7 个 focus group，26 个 unit：\n\n- F1: 创建 opc-extend-design SKILL.md（6 个 mode，creativity continuum）\n- F2: 创建 visual-eval prompt template（ui-quality.md，5 维度 zero-trust 扣分制）\n- F3: Standalone E2E 测试\n- F4: OPC 集成点验证（pre-hook, code-review, gate）\n- F5: Brand + theme composition 测试\n- F6: 清理旧目录\n- F7: 生成交付物\n\n整个过程跑了 **87 小时**，消耗 **377M tokens**，花了大约 **$197**。听起来很多，但这 87 小时里 agent 完全自主工作，我只在 gate 被 block 的时候介入了两次。\n\n## 关键 insight：Priority Chain 是合并的核心\n\n6 合 2 最关键的设计决策是 **priority chain**。当 brand file 说用 `#533afd`（Stripe 紫），而 apple-style 说用 SF Pro 的蓝色系，谁赢？\n\n答案是 priority chain：`brand override > project theme > skill default`。Brand file 总是赢，因为品牌是用户的意志，不是系统的默认值。\n\n这个决策看起来显然，但实际执行中暴露了一个有趣的问题：Stripe 在 2024 年 rebrand，主色从 `#635BFF` 改成了 `#533afd`。E2E 测试用的是 plan 阶段写的 expected value `#635BFF`，但 agent 在 build 阶段抓取了最新的 brand page，拿到了 `#533afd`。测试 fail 了。\n\n这不是 bug，是 **feature** — E2E 测试暴露了真实世界的 drift。如果我们用 mock data，永远不会发现这个问题。\n\n## ui-quality.md：零信任扣分制\n\n合并后的 visual-eval 需要一个评估 prompt。我设计了 `ui-quality.md`，5 个维度：\n\n1. **视觉层次** — 信息是否有清晰的 hierarchy\n2. **一致性** — 同类元素是否保持统一\n3. **间距与对齐** — 是否在隐形网格上\n4. **排版** — 字体层级、行高、对比度\n5. **色彩和谐** — 配色方案是否协调\n\n每个维度从 5 分开始扣，不是从 0 分开始加。这是刻意的设计选择 — **零信任**意味着默认认为质量合格，只在发现缺陷时扣分。这避免了 LLM 常见的\"好好好都很好\"倾向。\n\n关键区分写在 prompt 里：**设计意图 vs 质量缺陷**。故意的不对称布局不扣分，某个卡片比其他宽 10px 扣分。这个区分让 VLM 的评估准确率明显提升。\n\n## 合并后的架构收益\n\n```\nBefore: 6 skills × 2 hooks each = 12 hook calls per review\nAfter:  2 skills × 2 hooks each = 4 hook calls per review\n```\n\nCircuit breaker 触发率从 ~40% 降到接近 0 — 因为每个 extension 现在只做一件事，failure surface 小了。\n\n更重要的是**认知负担**的降低。6 个 skill 意味着 6 套 SKILL.md 要维护，6 组测试要跑，6 个 capability 要声明。合并后，维护成本直接砍掉 2/3。\n\n## 教训\n\n**Brand file 深度差异是 feature，不是 bug。** 有些 brand file 只有主色和 logo，有些有完整的 design system。priority chain 需要文档说明 override 行为，让用户知道\"为什么这个规则没生效\"。\n\n**opc-harness 的 eval 文件有严格机械检查。** 必须有 severity emoji（🔴🟡🔵）或 LGTM，review unit 需要至少 2 个 eval 文件。这些格式要求不在文档里，要读源码才知道。我把这个写进了 memex card，下次不再踩。\n\nDijkstra 说过：Simplicity is prerequisite for reliability。6 合 2 不是在砍功能，是在找到正确的抽象层次。当你的 interface 设计对了，实现自然收敛。",
+  "heroImage": "",
+  "tags": [
+    "opc",
+    "skill-design",
+    "refactoring",
+    "design-system",
+    "architecture"
+  ],
+  "sessionId": "6b937442-afe7-4140-8fa0-28b1e516d148",
+  "chunkIndices": [
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73
+  ],
+  "project": "opc",
+  "date": "2026-04-19",
+  "duration": "",
+  "stats": {}
+}

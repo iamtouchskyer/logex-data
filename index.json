@@ -1,6 +1,78 @@
 {
   "articles": [
     {
+      "slug": "2026-04-19-6b937442-article-2",
+      "date": "2026-04-19",
+      "project": "opc",
+      "tags": [
+        "opc",
+        "extension-system",
+        "graceful-degradation",
+        "debugging",
+        "architecture"
+      ],
+      "sessionId": "6b937442-afe7-4140-8fa0-28b1e516d148",
+      "heroImage": "",
+      "chunkIndices": [
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Graceful Degradation 的阴暗面：当优雅降级掩盖了 Dead Code",
+          "summary": "OPC extension 系统设计精良 — capability contract、circuit breaker、版本化、bypass 机制一应俱全。但两个 hook adapter 因为路径错误从未被调用过，而 graceful degradation 让一切看起来正常。静默失败比 crash 更危险。",
+          "path": "2026/04/19/2026-04-19-6b937442-article-2.zh.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-19-6b937442-article-1",
+      "date": "2026-04-19",
+      "project": "opc",
+      "tags": [
+        "opc",
+        "skill-design",
+        "refactoring",
+        "design-system",
+        "architecture"
+      ],
+      "sessionId": "6b937442-afe7-4140-8fa0-28b1e516d148",
+      "heroImage": "",
+      "chunkIndices": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "六合二：当 AI Agent 学会做减法",
+          "summary": "6 个 design skill 合并为 2 个的实战复盘。合并不是删代码，而是找到 interface 的最小正交集。OPC loop 驱动的 26 个 unit，87 小时，$197 的代价换来的认知：简单是可靠的前提。",
+          "path": "2026/04/19/2026-04-19-6b937442-article-1.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-19-4bd679f5-article-1",
       "date": "2026-04-19",
       "project": "billfighter",

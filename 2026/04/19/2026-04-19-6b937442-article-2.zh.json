@@ -1,0 +1,29 @@
+{
+  "slug": "2026-04-19-6b937442-article-2",
+  "lang": "zh",
+  "title": "Graceful Degradation 的阴暗面：当优雅降级掩盖了 Dead Code",
+  "summary": "OPC extension 系统设计精良 — capability contract、circuit breaker、版本化、bypass 机制一应俱全。但两个 hook adapter 因为路径错误从未被调用过，而 graceful degradation 让一切看起来正常。静默失败比 crash 更危险。",
+  "body": "# Graceful Degradation 的阴暗面：当优雅降级掩盖了 Dead Code\n\n\"我想要的是：我作为用户，需要用的时候，OPC 会自动找这些 extension 一起来工作。\"\n\n这句话是我在检查 OPC extension 系统时对 Claude 说的。我以为需要设计一个新的自动发现机制。结果发现，这个机制早就存在了 — 760 行的 `extensions.mjs`，完整的 capability contract、circuit breaker、版本化系统。但有两个 hook adapter 从来没有成功运行过。\n\n而我一直没发现。\n\n## 一个精心设计的系统\n\n先说好的部分。OPC extension 系统的设计相当优雅：\n\n**Capability Contract** — extension 声明 `meta.provides: [\"visual-consistency-check\"]`，flow template 在 node 上声明 `nodeCapabilities: [\"visual-consistency-check@1\"]`。运行时做 set intersection matching。Extension 永远不知道自己被哪个 node 调用，node 也不关心是哪个 extension 提供的能力。\n\n**版本化** — capability 名字带版本号 `name@N`。裸名自动升级到 `@1` 并打 warning。这意味着以后可以 breaking change 一个 capability 而不影响旧版 extension。\n\n**Circuit Breaker** — 3 次连续失败 → auto-disable extension，附带 failure report。不会因为一个坏掉的 extension 拖垮整个 review 流程。\n\n**Bypass 机制** — `--no-extensions`、`--extensions a,b`、`OPC_DISABLE_EXTENSIONS=1`。调试时可以精确控制。\n\n这是一个**生产级**的插件系统。如果你只看代码，你会觉得一切完美。\n\n## 两个断裂的连接\n\n然后我检查了实际的 hook adapter。\n\n`~/.opc/extensions/design-lint/hook.mjs` 第 31 行：\n\n```javascript\nconst ENGINE = join(\n  homedir(),\n  \".claude/skills/opc-extend-design-lint/bin/design-lint.mjs\"\n);\n```\n\n`opc-extend-design-lint` — 这个目录不存在。它在一周前的 6→2 合并中被删除了，engine 搬到了 `opc-extend-design`。\n\n`~/.opc/extensions/visual-eval/hook.mjs` 第 44 行：\n\n```javascript\nconst entrypoint = join(ENGINE_DIR, \"lib\", \"run.mjs\");\n```\n\n`lib/run.mjs` — 这个文件从未存在过。Visual eval skill 是 **Python** 写的（`lib/__main__.py`），而 hook 试图用 Node.js 运行它。\n\n两个 extension，两种不同的断裂方式。但结果一样：`existsSync()` 返回 `false` → `console.warn()` → `return []` → **静默跳过**。\n\n## Graceful Degradation 的代价\n\n这就是 graceful degradation 的阴暗面。\n\n代码写得很好 — 每一步都有 guard clause，找不到文件就 warn + 返回空数组，不会 crash。这是教科书式的防御性编程。\n\n但正是这种\"优雅\"让 bug 隐形了。`loadExtensions()` 成功加载两个 extension，`enabled: true`。OPC harness 运行正常，flow 正常推进，gate 正常通过。只是 extension 从来没有产出过任何 finding。\n\n如果这两个 hook 选择 **throw** 而不是 **return []**，我会在第一次运行就发现问题。但 graceful degradation 的设计意图就是\"不要因为 extension 的问题影响核心流程\" — 这是对的，但它创造了一个盲区。\n\n## 更深层的问题\n\n路径断裂的根因不是 typo，是**重构时没有同步 consumer**。\n\n6→2 skill 合并的 OPC loop 做了 26 个 unit，包括创建新 skill、迁移代码、删除旧目录、跑 E2E 测试。但 loop 的 scope 是 `~/.claude/skills/` 目录。`~/.opc/extensions/` 里的 hook adapter 不在 scope 内 — agent 不知道它们存在，不知道它们引用了旧路径。\n\n这是一个经典的 **fan-out 问题**：当一个模块被多个 consumer 引用时，重构这个模块必须 grep 所有 consumer。但如果 consumer 在不同的 repo、不同的目录、甚至不同的文件系统层级，grep 就不够了。\n\n我事后写的教训：**重构 skill 时必须 grep 所有 consumer 的路径引用。** 听起来显然。但在 87 小时的 autonomous loop 里，没有任何一个 agent 想到要做这个检查。\n\n## 四条设计原则\n\n这次经历让我重新梳理了 OPC extension 的设计原则：\n\n1. **OPC 作为稳定的 harness 系统，要业界领先** — core 不动，extension 随便迭代\n2. **Extension 是个人 preference** — 不需要开源，每个人可以有自己的一套\n3. **安装后像原生一样无缝** — 不需要额外配置，capability matching 自动激活\n4. **不安装时完全透明** — 别人用 OPC 感受不到 extension 的存在\n\n这四条原则和 CSS 的 progressive enhancement 一模一样：增强时无缝，降级时无痛。\n\n但这次事件提醒我：progressive enhancement 需要**可观测性**。CSS 的 `@supports` 可以让你在 DevTools 里看到哪些特性生效了。OPC extension 也需要类似的机制 — 不只是 `enabled: true`，还要有 `lastFired`、`lastResult`、`consecutiveEmpty` 这样的 metric。当一个 extension 连续 10 次返回空结果，应该有 warning，而不是静默接受。\n\n## 修复\n\n修复本身非常简单。\n\ndesign-lint：改一行路径，从 `opc-extend-design-lint` 到 `opc-extend-design`。\n\nvisual-eval：不只是路径问题，是**语言不匹配**。hook 用 Node.js 运行，但 engine 是 Python。改成 `python3 -m lib` 调用，加了 Playwright 截图步骤 — 先截图 dev server，再把图片传给 VLM 评估。\n\n修复后的验证：`loadExtensions()` 返回两个 extension，`enabled: true` — 但这次不再是空 shell。\n\n静默失败比 crash 更危险。Crash 会被修复。静默失败会被遗忘。",
+  "heroImage": "",
+  "tags": [
+    "opc",
+    "extension-system",
+    "graceful-degradation",
+    "debugging",
+    "architecture"
+  ],
+  "sessionId": "6b937442-afe7-4140-8fa0-28b1e516d148",
+  "chunkIndices": [
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80
+  ],
+  "project": "opc",
+  "date": "2026-04-19",
+  "duration": "",
+  "stats": {}
+}
