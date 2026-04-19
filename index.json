@@ -1,6 +1,45 @@
 {
   "articles": [
     {
+      "slug": "2026-04-19-4bd679f5-article-1",
+      "date": "2026-04-19",
+      "project": "billfighter",
+      "tags": [
+        "billfighter",
+        "stripe",
+        "fastapi",
+        "opc-loop",
+        "tier-2",
+        "webhook",
+        "health-endpoint",
+        "schema-migration",
+        "playwright-e2e",
+        "review-independence"
+      ],
+      "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+      "heroImage": "",
+      "chunkIndices": [
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "BillFighter Tier 2 加固：OPC 自治 loop 跑出来的 5 个真问题",
+          "summary": "把 BillFighter 从 Tier 1 SPA 升到 Tier 2（Auth + DB + Stripe）之后，用 OPC loop 跑了一轮 7-unit 的加固审计。Stripe 2024-09 schema 静默改字段、HANDLED_EVENTS 漂移、health endpoint 泄漏隐患——每一个都是 review subagent 抓出来的，不是 implementer 自己看出来的。",
+          "path": "2026/04/19/2026-04-19-4bd679f5-article-1.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-18-27ddc26f-article-2-advisor-monorepo",
       "date": "2026-04-18",
       "project": "repo-advisors",
@@ -1979,6 +2018,6 @@
       }
     }
   ],
-  "lastUpdated": "2026-04-18",
+  "lastUpdated": "2026-04-19",
   "totalArticles": 42
 }
