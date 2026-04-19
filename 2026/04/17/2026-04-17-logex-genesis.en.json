@@ -1,5 +1,5 @@
 {
-  "slug": "2026-04-18-2026-04-17-logex-genesis",
+  "slug": "2026-04-17-logex-genesis",
   "lang": "en",
   "title": "Building Logex: When Every Session Deserves to Become a Blog Post",
   "summary": "Memex and session-recap were humming along nicely when I suddenly realized each session was worth preserving—not as memo cards, but as proper blog posts. So I ported the bidirectional linking logic over, named it Engram (then changed it to Logex because it sounded better), packaged it into a GitHub repo for storage, and ended up giving myself a brutal UI critique.",
@@ -29,7 +29,7 @@
     37
   ],
   "project": "logex",
-  "date": "2026-04-18",
+  "date": "2026-04-17",
   "duration": "",
   "stats": {}
 }

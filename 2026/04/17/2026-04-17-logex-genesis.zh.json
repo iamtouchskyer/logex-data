@@ -1,5 +1,5 @@
 {
-  "slug": "2026-04-18-2026-04-17-logex-genesis",
+  "slug": "2026-04-17-logex-genesis",
   "lang": "zh",
   "title": "Logex 的诞生：从「session 该留存」到一个双链博客",
   "summary": "Memex 和 session-recap 跑得挺顺，突然意识到每一个 session 本身就值得留存——不是 memo card，是 blog。于是我把双链逻辑搬过来、起了个叫 Engram 的名字、又嫌不好听改成 Logex、打包塞进 GitHub repo 当 storage，最后还被自己狠狠地批评了一顿 UI。",
@@ -29,7 +29,7 @@
     37
   ],
   "project": "logex",
-  "date": "2026-04-18",
+  "date": "2026-04-17",
   "duration": "",
   "stats": {}
 }

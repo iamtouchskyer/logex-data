@@ -1,5 +1,5 @@
 {
-  "slug": "2026-04-18-2026-04-17-github-oauth-automation-dead-end",
+  "slug": "2026-04-17-github-oauth-automation-dead-end",
   "lang": "en",
   "title": "The Dead End of GitHub OAuth Automation: Why 'Full-Stack Skills' Are the Wrong Direction",
   "summary": "I wanted to build a Claude Code skill to automatically create GitHub OAuth Apps—no CLI method exists, GUI requires Playwright, then I realized this whole direction was wrong. The real problem isn't 'how to automate OAuth flow,' it's 'how to let Claude Code reuse my already-logged-in browser.'",
@@ -26,7 +26,7 @@
     26
   ],
   "project": "logex",
-  "date": "2026-04-18",
+  "date": "2026-04-17",
   "duration": "",
   "stats": {}
 }

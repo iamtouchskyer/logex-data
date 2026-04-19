@@ -1,5 +1,5 @@
 {
-  "slug": "2026-04-18-2026-04-17-github-oauth-automation-dead-end",
+  "slug": "2026-04-17-github-oauth-automation-dead-end",
   "lang": "zh",
   "title": "GitHub OAuth 自动化的死胡同：为什么「一条龙 skill」是错的方向",
   "summary": "想做一个 Claude Code skill 自动创建 GitHub OAuth App——CLI 方法没有、GUI 方法要 Playwright、然后我意识到这整个方向都是错的。真正的问题不是「如何自动化 OAuth flow」，是「如何让 Claude Code 复用我已经登录的 browser」。",
@@ -26,7 +26,7 @@
     26
   ],
   "project": "logex",
-  "date": "2026-04-18",
+  "date": "2026-04-17",
   "duration": "",
   "stats": {}
 }

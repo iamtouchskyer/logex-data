@@ -569,8 +569,8 @@
       }
     },
     {
-      "slug": "2026-04-18-2026-04-17-opc-extension-capability-contract",
-      "date": "2026-04-18",
+      "slug": "2026-04-17-opc-extension-capability-contract",
+      "date": "2026-04-17",
       "project": "opc",
       "tags": [
         "opc",
@@ -582,7 +582,7 @@
         "governance"
       ],
       "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-18-2026-04-17-opc-extension-capability-contract.png",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-17-opc-extension-capability-contract.png",
       "chunkIndices": [
         57,
         58,
@@ -614,18 +614,18 @@
         "zh": {
           "title": "OPC Extension 丝滑化改造：从 meta.nodes 硬编码到 capability contract",
           "summary": "OPC extension system 第一版能跑，但 activation 是 `meta.nodes = [\"code-review\"]` 这种硬编码——加一个 flow 就得改 extension code，双向耦合。重写成 capability contract（provides × requires）之后，extension 不再认识 OPC node 名字。顺手修了 4 个会让用户破防的坑。",
-          "path": "2026/04/18/2026-04-18-2026-04-17-opc-extension-capability-contract.zh.json"
+          "path": "2026/04/17/2026-04-17-opc-extension-capability-contract.zh.json"
         },
         "en": {
           "title": "Smoothing Out OPC Extensions: From Hardcoded meta.nodes to Capability Contracts",
           "summary": "The first version of OPC's extension system worked, but activation was hardcoded as `meta.nodes = [\"code-review\"]`—adding a new flow meant changing extension code, creating tight coupling. After rewriting it with capability contracts (provides × requires), extensions no longer know OPC node names. Also fixed 4 gotchas that would frustrate users.",
-          "path": "2026/04/18/2026-04-18-2026-04-17-opc-extension-capability-contract.en.json"
+          "path": "2026/04/17/2026-04-17-opc-extension-capability-contract.en.json"
         }
       }
     },
     {
-      "slug": "2026-04-18-2026-04-17-logex-genesis",
-      "date": "2026-04-18",
+      "slug": "2026-04-17-logex-genesis",
+      "date": "2026-04-17",
       "project": "logex",
       "tags": [
         "logex",
@@ -637,7 +637,7 @@
         "bidirectional-links"
       ],
       "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-18-2026-04-17-logex-genesis.png",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-17-logex-genesis.png",
       "chunkIndices": [
         1,
         2,
@@ -658,18 +658,18 @@
         "zh": {
           "title": "Logex 的诞生：从「session 该留存」到一个双链博客",
           "summary": "Memex 和 session-recap 跑得挺顺，突然意识到每一个 session 本身就值得留存——不是 memo card，是 blog。于是我把双链逻辑搬过来、起了个叫 Engram 的名字、又嫌不好听改成 Logex、打包塞进 GitHub repo 当 storage，最后还被自己狠狠地批评了一顿 UI。",
-          "path": "2026/04/18/2026-04-18-2026-04-17-logex-genesis.zh.json"
+          "path": "2026/04/17/2026-04-17-logex-genesis.zh.json"
         },
         "en": {
           "title": "Building Logex: When Every Session Deserves to Become a Blog Post",
           "summary": "Memex and session-recap were humming along nicely when I suddenly realized each session was worth preserving—not as memo cards, but as proper blog posts. So I ported the bidirectional linking logic over, named it Engram (then changed it to Logex because it sounded better), packaged it into a GitHub repo for storage, and ended up giving myself a brutal UI critique.",
-          "path": "2026/04/18/2026-04-18-2026-04-17-logex-genesis.en.json"
+          "path": "2026/04/17/2026-04-17-logex-genesis.en.json"
         }
       }
     },
     {
-      "slug": "2026-04-18-2026-04-17-github-oauth-automation-dead-end",
-      "date": "2026-04-18",
+      "slug": "2026-04-17-github-oauth-automation-dead-end",
+      "date": "2026-04-17",
       "project": "logex",
       "tags": [
         "claude-code",
@@ -681,7 +681,7 @@
         "zoom-out"
       ],
       "sessionId": "1854dbbd-13cd-4e6e-b298-628a27c8a1bf",
-      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-18-2026-04-17-github-oauth-automation-dead-end.png",
+      "heroImage": "https://raw.githubusercontent.com/iamtouchskyer/logex-data/main/images/2026-04-17-github-oauth-automation-dead-end.png",
       "chunkIndices": [
         19,
         20,
@@ -699,20 +699,20 @@
         "zh": {
           "title": "GitHub OAuth 自动化的死胡同：为什么「一条龙 skill」是错的方向",
           "summary": "想做一个 Claude Code skill 自动创建 GitHub OAuth App——CLI 方法没有、GUI 方法要 Playwright、然后我意识到这整个方向都是错的。真正的问题不是「如何自动化 OAuth flow」，是「如何让 Claude Code 复用我已经登录的 browser」。",
-          "path": "2026/04/18/2026-04-18-2026-04-17-github-oauth-automation-dead-end.zh.json"
+          "path": "2026/04/17/2026-04-17-github-oauth-automation-dead-end.zh.json"
         },
         "en": {
           "title": "The Dead End of GitHub OAuth Automation: Why 'Full-Stack Skills' Are the Wrong Direction",
           "summary": "I wanted to build a Claude Code skill to automatically create GitHub OAuth Apps—no CLI method exists, GUI requires Playwright, then I realized this whole direction was wrong. The real problem isn't 'how to automate OAuth flow,' it's 'how to let Claude Code reuse my already-logged-in browser.'",
-          "path": "2026/04/18/2026-04-18-2026-04-17-github-oauth-automation-dead-end.en.json"
+          "path": "2026/04/17/2026-04-17-github-oauth-automation-dead-end.en.json"
         }
       }
     },
     {
-      "slug": "2026-04-18-2026-04-17-dw-to-dreamworks-plugin-namespace",
+      "slug": "2026-04-17-dw-to-dreamworks-plugin-namespace",
       "title": "把 dw 变成 dreamworks：一次 skill plugin 的 namespace 重构",
       "summary": "一句漫不经心的 \"symbolic link 可以干掉了？\"，拐了几个弯，最后拆掉三个 symlink、建一个 plugin、吃掉 dw-templates，学到 Claude Code skill 分发的两个隐藏机制 + repo 剪枝的三变量判断框架（audience/cadence/blast radius）。",
-      "date": "2026-04-18",
+      "date": "2026-04-17",
       "tags": [
         "claude-code",
         "plugin",
@@ -732,8 +732,8 @@
         7
       ],
       "sessionId": "916a122a-283d-4d55-8ee4-a9052fda900a",
-      "heroImage": "/images/2026-04-18-2026-04-17-dw-to-dreamworks-plugin-namespace.png",
-      "path": "2026/04/18/2026-04-18-2026-04-17-dw-to-dreamworks-plugin-namespace.json"
+      "heroImage": "/images/2026-04-17-dw-to-dreamworks-plugin-namespace.png",
+      "path": "2026/04/17/2026-04-17-dw-to-dreamworks-plugin-namespace.json"
     },
     {
       "slug": "2026-04-17-e123eeaf-article-1",

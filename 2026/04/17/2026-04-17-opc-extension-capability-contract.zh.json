@@ -1,5 +1,5 @@
 {
-  "slug": "2026-04-18-2026-04-17-opc-extension-capability-contract",
+  "slug": "2026-04-17-opc-extension-capability-contract",
   "lang": "zh",
   "title": "OPC Extension 丝滑化改造：从 meta.nodes 硬编码到 capability contract",
   "summary": "OPC extension system 第一版能跑，但 activation 是 `meta.nodes = [\"code-review\"]` 这种硬编码——加一个 flow 就得改 extension code，双向耦合。重写成 capability contract（provides × requires）之后，extension 不再认识 OPC node 名字。顺手修了 4 个会让用户破防的坑。",
@@ -40,7 +40,7 @@
     81
   ],
   "project": "opc",
-  "date": "2026-04-18",
+  "date": "2026-04-17",
   "duration": "",
   "stats": {}
 }

@@ -1,5 +1,5 @@
 {
-  "slug": "2026-04-18-2026-04-17-opc-extension-capability-contract",
+  "slug": "2026-04-17-opc-extension-capability-contract",
   "lang": "en",
   "title": "Smoothing Out OPC Extensions: From Hardcoded meta.nodes to Capability Contracts",
   "summary": "The first version of OPC's extension system worked, but activation was hardcoded as `meta.nodes = [\"code-review\"]`—adding a new flow meant changing extension code, creating tight coupling. After rewriting it with capability contracts (provides × requires), extensions no longer know OPC node names. Also fixed 4 gotchas that would frustrate users.",
@@ -40,7 +40,7 @@
     81
   ],
   "project": "opc",
-  "date": "2026-04-18",
+  "date": "2026-04-17",
   "duration": "",
   "stats": {}
 }
