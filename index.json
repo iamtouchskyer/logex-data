@@ -1,6 +1,39 @@
 {
   "articles": [
     {
+      "slug": "2026-04-19-opc-loop-fixes-7-distributed-bugs",
+      "date": "2026-04-19",
+      "project": "mitsein",
+      "tags": [
+        "opc",
+        "distributed-systems",
+        "redis",
+        "concurrency",
+        "mitsein"
+      ],
+      "sessionId": "bfef8646-26bd-463e-b6a5-4daa225c6d7b",
+      "heroImage": "",
+      "chunkIndices": [
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 OPC Loop 修了 7 个分布式 bug：Redis 死锁、TOCTOU、和 AI 自我审计",
+          "summary": "一个多 agent channel 系统拿到 4/10 的生产就绪评分。9 个 OPC 自主单元，3 个阶段，5 个 commit，让 AI 自己发现并修复自己写的并发 bug。其中一个 Redis SET NX 双重锁死锁，差点把整个 dispatch 链搞瘫。",
+          "path": "2026/04/19/2026-04-19-opc-loop-fixes-7-distributed-bugs.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-19-claude-code-malware-reminder-override",
       "title": "当 Claude Code 的安全注入挡住了你自己的代码",
       "summary": "Read 一个 .mjs 文件，Claude 突然说「我不能改这段代码」—— 因为 system-reminder 把它当成了 malware。但代码是我自己刚写的。这是一次关于 over-generalized safety guardrail 的诊断、权衡，以及为什么我选择给它加一条 CLAUDE.md override 而不是 hook 掉它。",
@@ -14,6 +47,36 @@
       "date": "2026-04-19",
       "path": "2026/04/19/2026-04-19-claude-code-malware-reminder-override.json",
       "image": "images/claude-code-malware-reminder-override.png"
+    },
+    {
+      "slug": "2026-04-19-channel-is-a-primitive-not-a-feature",
+      "date": "2026-04-19",
+      "project": "mitsein",
+      "tags": [
+        "architecture",
+        "multi-agent",
+        "mitsein",
+        "channel"
+      ],
+      "sessionId": "bfef8646-26bd-463e-b6a5-4daa225c6d7b",
+      "heroImage": "",
+      "chunkIndices": [
+        1,
+        2,
+        12,
+        13,
+        14
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Channel 不是一个功能，是一个 primitive",
+          "summary": "12000 行代码，97 个文件，一个看起来像 Slack channel 的东西。但它不是功能。一次 branch 考古引发的架构反思：多 agent 协同的正确抽象层级在哪里？",
+          "path": "2026/04/19/2026-04-19-channel-is-a-primitive-not-a-feature.zh.json"
+        }
+      }
     },
     {
       "slug": "2026-04-19-adfd2343-article-2",

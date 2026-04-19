@@ -1,0 +1,26 @@
+{
+  "slug": "2026-04-19-channel-is-a-primitive-not-a-feature",
+  "lang": "zh",
+  "title": "Channel 不是一个功能，是一个 primitive",
+  "summary": "12000 行代码，97 个文件，一个看起来像 Slack channel 的东西。但它不是功能。一次 branch 考古引发的架构反思：多 agent 协同的正确抽象层级在哪里？",
+  "body": "# Channel 不是一个功能，是一个 primitive\n\n## 一个 branch 的考古\n\n事情从一个简单的问题开始：`agentic-os` 这个 branch 上有 12000 行代码，它们还有用吗？\n\n这个 branch 实现了一套 channel 系统——看起来像 Slack 的群聊，但参与者是 AI agent。你可以创建一个 channel，拉进去几个 agent（比如 companion、presenter、data analyst），然后发消息，@mention 某个 agent 或者 @all，所有被提到的 agent 会并行响应。\n\n听起来很酷。但 12000 行代码是不是太重了？\n\n## 四种交互模式之争\n\n仔细想下来，我们的产品里其实存在四种人机交互模式：\n\n1. **直接对话** — 用户和一个 agent 一对一聊天，指定任务\n2. **Companion** — 和一个 \"管家\" agent 交流，它可以 delegate 和 spawn 子 agent\n3. **Channel** — 群聊，多个 agent 平等参与，用户 @mention 触发\n4. **Project** — 定义一组 agent，下面有若干 channel\n\n问题来了：这四种都需要吗？\n\n引入 devil's advocate 视角后，答案变得清晰。模式 1 和 2 是同一个东西的两种用法——Companion 就是一个有 spawn 权限的 agent，本质上还是 1:1 对话。模式 4（Project）是一个组织容器，不是交互模式。\n\n真正新的东西只有模式 3：**多个 agent 在同一个上下文里平等协作**。\n\n## Channel = Thread + Multi-Agent\n\n关键的架构决策是：channel 不应该是一个独立的数据模型。\n\n我们已经有了 `Thread` 这个概念——它是所有对话的底层抽象，有消息列表、有状态、有 ownership。Channel 只是 `Thread(thread_type=\"channel\")` 加上一层多 agent 的 dispatch 逻辑。\n\n这个决定砍掉了大量代码。不需要新的数据库表来存 channel，不需要新的 CRUD 路由，不需要新的权限模型。Thread 已经有了这些。Channel 需要的额外能力只有：\n\n- **agent 列表管理** — 谁在这个 channel 里（`thread_agents` 表）\n- **mention 解析** — 谁被 @了（`ChannelDispatcher`）\n- **并行 dispatch** — 同时唤醒多个 agent（Redis SET NX 防重复）\n- **SSE 多路复用** — 多个 agent 的流式输出合并到一个 SSE 连接（`ChannelStreamManager`）\n\n四个能力，四个模块。其余的全部复用 Thread。\n\n## Activation 策略：mention vs always\n\n第二个争论点：agent 什么时候应该响应？\n\n**Always** 模式意味着 channel 里每条消息都会触发所有 agent。听起来很智能，但实际效果是灾难性的——如果有 3 个 agent 设置为 always，一条消息会触发 3 个并行回复，每个回复又会被其他 agent 看到（通过 EventListener），形成级联反应。这就是 \"thundering herd\" 问题。\n\n**Mention only** 是更安全的默认值。用户明确 @mention 谁，谁就回复。@all 是显式的广播。这给了用户控制权，也避免了无限循环。\n\n最终决策：默认 mention only，agent 可以配置为 always（但需要明确知道后果）。\n\n## SDK primitive，不是 Feature\n\n最有趣的认知转变是把 channel 从 \"一个 feature\" 重新定位为 \"一个 SDK primitive\"。\n\n这意味着 channel 不仅仅是一个用户看到的群聊界面。它是一个可编程的多 agent 协同环境：\n\n- 别的 agent（比如 companion）可以创建 channel，拉入专家 agent，然后在里面协调工作\n- CLI 可以用 channel API 来实现多 agent 工作流\n- 将来 project 可以用 channel 作为底层的协作空间\n\n这个定位影响了 API 设计。Channel API 不是 \"聊天室 CRUD\"，而是 \"多 agent 环境的生命周期管理\"：create → add agents → send message → dispatch → stream → cleanup。\n\n## 12000 行值不值？\n\n回到最初的问题。12000 行代码里，真正的新逻辑大概 3000 行（dispatcher、event listener、sweeper、stream manager）。剩下的是测试（92 个 L1 unit tests）、配置、类型定义、API 路由（复用 Thread 的脚手架）。\n\n值得。因为这 3000 行解决了一个真实的问题：**让多个 agent 在同一个上下文里协作，而不是每个 agent 都是一个孤岛**。\n\n但前提是把它做成 primitive，而不是 feature。Feature 会膨胀。Primitive 会收敛。",
+  "heroImage": "/images/channel-is-a-primitive-not-a-feature.png",
+  "tags": [
+    "architecture",
+    "multi-agent",
+    "mitsein",
+    "channel"
+  ],
+  "sessionId": "bfef8646-26bd-463e-b6a5-4daa225c6d7b",
+  "chunkIndices": [
+    1,
+    2,
+    12,
+    13,
+    14
+  ],
+  "project": "mitsein",
+  "date": "2026-04-19",
+  "duration": "",
+  "stats": {}
+}

@@ -1,0 +1,29 @@
+{
+  "slug": "2026-04-19-opc-loop-fixes-7-distributed-bugs",
+  "lang": "zh",
+  "title": "用 OPC Loop 修了 7 个分布式 bug：Redis 死锁、TOCTOU、和 AI 自我审计",
+  "summary": "一个多 agent channel 系统拿到 4/10 的生产就绪评分。9 个 OPC 自主单元，3 个阶段，5 个 commit，让 AI 自己发现并修复自己写的并发 bug。其中一个 Redis SET NX 双重锁死锁，差点把整个 dispatch 链搞瘫。",
+  "body": "# 用 OPC Loop 修了 7 个分布式 bug\n\n## 4/10 的评分\n\n一个多 agent channel 系统，12000 行代码，92 个 unit test 全过，11 个 API integration test 全过，OPC 三轮 review 也做了。听起来不错？\n\n然后跑了一次全维度产品评估，拿到 4/10。\n\n评估覆盖 13 个维度：数据安全、并发控制、幂等性、前端容错、可观测性、安全、性能……结果是 7 个 must-fix blocker。不是 \"nice-to-have\" 的建议，是 \"不修就别上线\" 的硬伤。\n\n## OPC Loop：让 AI 自己修自己的 bug\n\nOPC（One Person Company）是一个 AI 自主工作流引擎。核心原则：**做事的 agent 不评审自己的产出**。\n\n我用 `/opc loop` 启动了一个自主修复循环。它把 7 个 blocker 分解成 9 个执行单元，分 3 个阶段：\n\n- **Phase 1 (P1.1-P1.3)**: Backend Data Safety — 分布式锁、竞态、幂等\n- **Phase 2 (P2.1-P2.3)**: Frontend Reliability — SSE 超时、去重、错误恢复\n- **Phase 3 (P3.1-P3.3)**: Observability — 健康检查端点、心跳监控\n\n每个阶段都是 implement → review → fix 的三拍子。Review 必须由独立的 subagent 执行——不能自己审自己。\n\n## Bug #1: Redis SET NX 双重锁死锁\n\n这是最有趣的 bug，在 P1.2 review 阶段被发现。\n\n背景：`ChannelEventListener` 监听 Redis Pub/Sub，当一个 agent 的消息 @mention 了另一个 idle agent，就唤醒它。为了防止重复唤醒，P1.1 给 `_try_wake_agent` 加了一个 Redis SET NX 锁。\n\n看起来合理？问题出在调用链：\n\n```\nEventListener._try_wake_agent  (持有 dispatch_lock:{channel}:{agent})\n  → ChannelWakeAdapter.dispatch_one\n    → ChannelDispatcher.dispatch_one  (尝试 SET NX 同一个 key)\n      → 永远失败，因为 key 已经被上游持有了\n```\n\n`ChannelDispatcher.dispatch_one` 本身就有一个 SET NX 锁来防止重复 dispatch。上游再加一个相同 key 的锁 = 死锁。每次 `_try_wake_agent` 调用都会走到 `dispatch_one`，发现 key 已存在，认为 \"别人已经在 dispatch 了\"，直接跳过。结果：agent 永远不会被唤醒。\n\n修复很简单：删掉上游的锁。下游的 `dispatch_one` 已经是原子性的并发守卫，上游不需要再加一层。\n\n**教训**：在分布式系统里加锁之前，**trace 完整的调用链**。Redis SET NX 不支持 re-entrancy——如果下游已经用了同一个 key 的锁，上游加锁就是在制造死锁。这是经典的可重入互斥锁问题的分布式版本。\n\n## Bug #2: GET-then-SET 幂等性竞态\n\n消息发送端点 `/channels/{id}/send` 支持幂等性 key。P1.1 的实现是：\n\n```python\nexisting = await redis.get(idem_key)\nif existing:\n    return cached_response\nawait redis.set(idem_key, message_id)\n```\n\n经典的 TOCTOU（Time-of-Check-to-Time-of-Use）。两个并发请求可以同时通过 GET 检查，然后都创建消息。\n\n修复用 SET NX 做原子门：\n\n```python\nacquired = await redis.set(idem_key, \"pending\", ex=300, nx=True)\nif not acquired:\n    existing = await redis.get(idem_key)\n    if existing != \"pending\":\n        return cached_response  # 已完成，返回缓存\n    raise HTTPException(409)  # 正在创建中，让客户端重试\n# ... 创建消息 ...\nawait redis.set(idem_key, real_message_id, ex=300)  # 替换 \"pending\"\n```\n\nNX 标志让 check+set 变成原子操作。\"pending\" 哨兵值区分 \"正在创建\" 和 \"已完成\"。409 告诉客户端 \"别急，等一下再试\"。\n\nSecurity review 还发现了一个额外问题：幂等 key 没有包含 `account_id`，在共享 channel 里可能跨用户碰撞。修复：`channel_idem:{channel_id}:{account_id}:{user_key}`。\n\n## Bug #3-5: 前端的静默失败\n\nSSE 流没有超时——如果服务器停止发送，前端会无限等待。加了 `AbortSignal.timeout(30_000)`。\n\n重连后没有去重——断线重连时会收到已经显示过的消息。加了 `seenIdsRef` (Set) 按 `message_id` 过滤。\n\n发送失败没有反馈——optimistic 更新后如果 API 返回错误，消息留在界面上但实际没发出去。加了 `removeMessage` 回滚 + error toast。\n\n还包了一个 React ErrorBoundary，防止 channel 页面整体 crash 时用户只能刷新。\n\n这些都不是 \"高级\" 的修复，但少了任何一个，用户体验就是 \"app 卡住了\" 或 \"消息消失了\" 而不知道为什么。\n\n## Bug #6-7: 可观测性 = 零\n\n系统有两个后台循环：EventListener（监听 agent 间 @mention）和 Sweeper（清理崩溃的 agent run）。它们跑在后台 asyncio task 里，如果挂了，没人知道。\n\n修复：给两个循环加 class-level 的 `last_heartbeat` 时间戳，每次迭代更新。然后加一个 `/api/health/channels` 端点暴露这两个时间戳。监控系统可以 poll 这个端点，如果时间戳太旧就报警。\n\n一个小细节：Sweeper 的心跳应该在 `_sweep_once()` 之前更新，不是之后。如果 sweep 本身崩溃了（比如 DB 连接断了），心跳还是会更新——这样监控可以区分 \"循环在跑但 sweep 失败\" 和 \"循环本身挂了\"。\n\n## OPC Harness 的 meta-learning\n\n跑完整个 loop 之后，对 OPC harness 本身也有一些认知：\n\n1. **Review unit 必须有 ≥2 个独立 eval 文件**。Harness 会拒绝只有一个 reviewer 的 complete-tick。这是 \"做事的不评审自己\" 原则的机械化执行。\n\n2. **Gate verdict 是机械判定**：任何 🔴 → FAIL，任何 🟡 → ITERATE，全 🔵 → PASS。没有 LLM 参与——verdict 是基于 emoji 的 deterministic rule。所以 review 有 🟡 就必然触发 fix 单元，即使 reviewer 认为 \"可以先不修\"。\n\n3. **Artifacts 需要完整路径**。`complete-tick --artifacts channel_sweeper.py` 会被拒绝，必须是 `backend/apps/mitsein-api-service/services/channel_sweeper.py`。\n\n## 结果\n\n9 个 unit，5 个 commit，40/40 channel tests pass。\n\n| Outcome | Before | After |\n|---------|--------|-------|\n| Dispatch lock TTL vs RUN_TIMEOUT | TTL < timeout (race) | TTL=750 > timeout=600 |\n| EventListener TOCTOU | Double-lock deadlock | Removed upstream lock |\n| Idempotency | GET-then-SET race | Atomic SET NX gate |\n| SSE timeout | None (infinite hang) | 30s AbortSignal |\n| Error recovery | Silent failures | ErrorBoundary + toast + rollback |\n| Health endpoint | None | /api/health/channels with heartbeats |\n| Test regressions | N/A | 0 (40/40 pass) |\n\n从 4/10 到修完所有 must-fix blocker，花了大约 2 小时。不是因为修复本身复杂，而是因为**发现问题**需要独立的眼睛。OPC 的价值不在于写代码快，而在于强制 \"第二双眼睛\" 去看——而且这双眼睛有自己的 context，不会被原作者的思维惯性带着走。",
+  "heroImage": "/images/opc-loop-fixes-7-distributed-bugs.png",
+  "tags": [
+    "opc",
+    "distributed-systems",
+    "redis",
+    "concurrency",
+    "mitsein"
+  ],
+  "sessionId": "bfef8646-26bd-463e-b6a5-4daa225c6d7b",
+  "chunkIndices": [
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65
+  ],
+  "project": "mitsein",
+  "date": "2026-04-19",
+  "duration": "",
+  "stats": {}
+}
