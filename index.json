@@ -73,40 +73,73 @@
       }
     },
     {
-      "slug": "2026-04-19-4bd679f5-article-1",
+      "slug": "2026-04-19-4bd679f5-article-2",
       "date": "2026-04-19",
-      "project": "billfighter",
+      "project": "opc",
       "tags": [
-        "billfighter",
-        "stripe",
-        "fastapi",
-        "opc-loop",
-        "tier-2",
-        "webhook",
-        "health-endpoint",
-        "schema-migration",
-        "playwright-e2e",
-        "review-independence"
+        "opc",
+        "extension-system",
+        "graceful-degradation",
+        "debugging",
+        "architecture"
       ],
       "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
       "heroImage": "",
       "chunkIndices": [
-        240,
-        241,
-        242,
-        243,
-        244,
-        245,
-        246,
-        247
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80
       ],
       "duration": "",
       "stats": {},
       "primaryLang": "zh",
       "i18n": {
         "zh": {
-          "title": "BillFighter Tier 2 加固：OPC 自治 loop 跑出来的 5 个真问题",
-          "summary": "把 BillFighter 从 Tier 1 SPA 升到 Tier 2（Auth + DB + Stripe）之后，用 OPC loop 跑了一轮 7-unit 的加固审计。Stripe 2024-09 schema 静默改字段、HANDLED_EVENTS 漂移、health endpoint 泄漏隐患——每一个都是 review subagent 抓出来的，不是 implementer 自己看出来的。",
+          "title": "Graceful Degradation 的阴暗面：当优雅降级掩盖了 Dead Code",
+          "summary": "OPC extension 系统设计精良 — capability contract、circuit breaker、版本化、bypass 机制一应俱全。但两个 hook adapter 因为路径错误从未被调用过，而 graceful degradation 让一切看起来正常。静默失败比 crash 更危险。",
+          "path": "2026/04/19/2026-04-19-4bd679f5-article-2.zh.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-19-4bd679f5-article-1",
+      "date": "2026-04-19",
+      "project": "opc",
+      "tags": [
+        "opc",
+        "skill-design",
+        "refactoring",
+        "design-system",
+        "architecture"
+      ],
+      "sessionId": "4bd679f5-2936-477a-8384-15f7a523c51c",
+      "heroImage": "",
+      "chunkIndices": [
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "六合二：当 AI Agent 学会做减法",
+          "summary": "6 个 design skill 合并为 2 个的实战复盘。合并不是删代码，而是找到 interface 的最小正交集。OPC loop 驱动的 26 个 unit，87 小时，$197 的代价换来的认知：简单是可靠的前提。",
           "path": "2026/04/19/2026-04-19-4bd679f5-article-1.zh.json"
         }
       }
