@@ -1,38 +1,29 @@
 {
   "slug": "2026-04-20-872bd411-article-1",
   "lang": "zh",
-  "title": "一个下午，5 个 AI 维权工具从 Reddit 吐槽到 HuggingFace 上线",
-  "summary": "从 Reddit r/personalfinance 的吐槽出发，用 AI pipeline 发现痛点、评估、pivot、批量构建 5 个消费者维权工具，全部部署到 HuggingFace Spaces。过程中踩了 Claude API JSON 解析、HF metadata 限制、Vercel serverless timeout 等坑。",
-  "body": "# 一个下午，5 个 AI 维权工具从 Reddit 吐槽到 HuggingFace 上线\n\n## 从 Reddit 吐槽开始\n\n下午两点，我对 Claude Code 说了一句：「帮我去搜索一个 consumer facing 的产品，重点是 Reddit 上用户吐槽的但是还没有被解决的。」\n\n这不是随便一句话。背后是一套叫 dream-works 的 AI 产品 pipeline——从发现痛点到上线产品的全自动化流水线。`/dw` 一个命令，跑完 discover → evaluate → build → pitch → publish 全流程。\n\nReddit 的 r/personalfinance 和 r/HealthInsurance 给了最强信号：**美国人看不懂自己的医疗账单**。1.5 亿美国人每年收到让人崩溃的 EOB（Explanation of Benefits），a16z 的数据说每年 150 万消费者因为看不懂账单而逾期。没有一个主流产品做「EOB → 人话翻译」。\n\n方向锁定：Medical Bill Decoder。\n\n## ClearBill：一个漂亮的 NO-GO\n\n第一个原型叫 ClearBill——上传 EOB，AI 翻译成人话，解释保险付了多少、你欠多少。idea-factory pipeline 跑完 9 个 node（discover → evaluate → synthesize → build → code-review → validate → review → gate → pitch），评分 HOT 49/70。\n\n然后 Devil's Advocate 一句话杀死了它：**「Zero moat. It's a feature, not a company.」**\n\n说得对。「翻译账单」这件事，任何一个 LLM wrapper 都能做。GPT-4 直接贴进去就行。没有数据壁垒，没有网络效应，没有用户会为「看懂账单」持续付费。\n\nGate verdict：NO-GO。但 pipeline 不会因为 NO-GO 停下——它 pivot。\n\n## Pivot：从「看懂」到「打回去」\n\n关键洞察：价值不在 comprehension，在 action。看懂账单是第一步，但真正的痛点是——**我知道被多收了，然后呢？**\n\nBillFighter 诞生了。不只翻译账单，而是：\n1. 上传 EOB → OCR + Claude 识别 9 类常见计费错误\n2. 生成现成的 appeal letter（申诉信）\n3. 生成电话 call script（打电话给保险公司的话术）\n4. 生成 CMS complaint guide（向联邦政府投诉的指南）\n\n从「我看不懂」变成「我要打回去」。这不是 feature，这是 workflow。\n\n## 一生五：批量制造维权工具\n\n做完 BillFighter，一个模式浮现了：**消费者被占便宜的场景到处都是，而且解决方案高度同构**——上传证据 → AI 分析 → 生成维权文书。\n\n于是我决定批量做 5 个：\n\n| App | 场景 | 核心能力 |\n|-----|------|----------|\n| 🥊 BillFighter | 医疗账单错误 | 9 类错误检测 + 申诉信 |\n| 🎫 TicketFighter | 罚单/停车单 | 申诉理由分析 + 申诉信 |\n| 🏠 DepositBack | 租房押金追回 | 州法律查询 + demand letter |\n| ✂️ Unsubscribe | 反 dark pattern 取消订阅 | 服务商取消流程 + 取消请求 |\n| 📉 PriceDrop | 价格保护退款 | 价格政策匹配 + 退款请求 |\n\n每个 app 的架构完全一样：FastAPI + Claude API + 单页 HTML 前端。区别只在 prompt 和业务逻辑。这就是模板的力量——`fastapi-claude` template 让每个 app 的 scaffolding 时间趋近于零。\n\n## 为什么选 HuggingFace Spaces 而不是 Vercel\n\n部署到哪？这个选型值得说说。\n\n**Vercel 的致命问题：serverless timeout。** Hobby plan 10 秒，Pro plan 60 秒。而 Claude API 一次分析调用需要 15-30 秒。用户上传一张 EOB 照片 → OCR → Claude 分析 → 生成三种文书，整个链路 30 秒起步。Vercel 的 timeout 直接把核心功能杀死了。\n\n**Fly.io 可以，但 N×3 operational overhead。** Fly 没有 timeout 问题，但 5 个 app 意味着 5 个 `fly.toml`、5 个 deploy、5 个 monitoring。对一个人来说太重了。\n\n**HuggingFace Spaces 的甜蜜点：**\n- 免费 tier：2 vCPU / 16GB RAM，**没有 timeout**\n- Docker SDK：写个 Dockerfile 就行，不需要学新 runtime\n- 部署 = `git push`，每个 Space 就是一个 git repo\n- 自带 HTTPS + 域名（`touchskyer-dw-billfighter.hf.space`）\n\n唯一代价：冷启动慢（免费 tier 会 sleep），但对 demo 级产品完全可以接受。\n\n## 批量部署：5 个 App 一次上线\n\n部署模式也是批量的。每个 app 需要：\n\n1. **Dockerfile**（BillFighter 需要 tesseract-ocr，其他 4 个更简单）\n2. **README.md**（HF 的 metadata header，指定 SDK 和端口）\n3. **HF Space 创建 + secret 注入**（ANTHROPIC_API_KEY）\n4. **Git push 到 HF**\n\nHF 的 metadata header 有一些坑：\n- `colorTo: orange` 被拒绝——HF 只接受 8 种颜色（red, yellow, green, blue, indigo, purple, pink, gray）\n- `short_description` 超过 60 字符被拒绝——DepositBack 和 PriceDrop 的描述必须砍短\n\n因为 dream-works 是 monorepo，不能直接 push 子目录到 HF，所以用了 temp git repo 的模式：\n\n```bash\n# 对每个 app\ntmp=$(mktemp -d)\ncp -r apps/billfighter/* $tmp/\ncd $tmp && git init && git add . && git commit -m \"deploy\"\ngit remote add hf https://huggingface.co/spaces/touchskyer/dw-billfighter\ngit push hf main --force\n```\n\n5 个 app，5 分钟全部推完。\n\n## Claude API 的 JSON 输出陷阱\n\n5 个 app 全部上线后，smoke test 发现 TicketFighter 挂了。错误信息：\n\n```\njson.decoder.JSONDecodeError: Invalid control character at: line 3 column 42\n```\n\nRoot cause：Claude API 返回的 JSON 字符串里包含**字面量换行符**（`\\n` 变成了真正的 newline）。Python 的 `json.loads()` 默认 strict 模式不允许 string value 里出现控制字符。\n\n修复很简单——**只在 Claude API 返回的地方**用 `json.loads(raw, strict=False)`：\n\n```python\n# 只对 Claude 输出放宽\nresult = json.loads(response_text, strict=False)\n\n# 用户输入和文件加载保持 strict（安全考虑）\nconfig = json.loads(file_content)  # 默认 strict=True\n```\n\n这个 fix 应用到了全部 5 个 app。写了一张 memex 卡片 `claude-json-strict-false-pattern` 记录这个模式，以后不会再踩。\n\n## 最终成果\n\n一个下午的输出：\n\n- 5 个 live 的 AI consumer advocacy 工具\n- 全部部署在 HuggingFace Spaces，免费运行\n- 每个都通过了 E2E smoke test（真实 Claude API 调用）\n- Showcase 站（Vercel）的 manifest 全部更新为 `status: \"live\"`\n- 总花费：Claude API 调用费 ~$53（包含 pipeline 运行 + smoke test）\n\n最有价值的不是 5 个 app 本身，而是验证了一个模式：**同构的消费者维权工具可以模板化批量生产**。下一批 5 个，可能只需要写 prompt 和业务逻辑。\n\n---\n\n*这篇文章由 [logex](https://logex-io.vercel.app) 从 Claude Code session 自动提取。Session 跨度 7 天，469 次 LLM 调用，20 个 subagent，消耗 58M tokens。*",
+  "title": "用 OPC 审视 OPC：一个 AI 工作流框架的自我验证之旅",
+  "summary": "用 OPC 的 full-stack flow 对 suri-counsel 做 14-node review，然后反过来评估 OPC 本身。Happy path 100% 但 failure path 0%，synthesize 的 emoji parsing 有 bug，P0 finding disposition tracking 是最高 ROI 改进。框架验证框架——一次 meta-level 的诚实评估。",
+  "body": "## 14 个 Node，3 小时\n\n那天的计划很简单：用 OPC 的 full-stack template 对 suri-counsel 的 E2E 测试套件做一次完整 review。14 个 node 的 flow graph，从 discuss 到 post-launch-sim，走一遍全链路。\n\n```\n▶ discuss → build → code-review → test-design → test-execute\n  → gate-test → acceptance → gate-acceptance → audit\n  → gate-audit → e2e-user → gate-e2e → post-launch-sim → gate-final\n```\n\n3 小时后，flow 跑完了。但最有价值的不是 review 的结论——是 OPC 自身暴露的问题。\n\n## Discussion Protocol 真的有用\n\n3-round discussion protocol（Round 1 独立输出 → Round 2 只写 diff → Round 3 facilitator 收敛）确实产出了有区分度的内容。4 个 agent（architect, engineer, tester, devil's advocate）在 Round 1 各自发现了不同的问题，Round 2 的 diff-only 机制避免了 echo chamber，Round 3 的 facilitator 把分歧收敛成了可执行的决策。\n\nReview independence 也得到了验证：code-review 用独立 subagent 做，quality reviewer 和 DA 确实发现了 builder 没注意到的问题——`make_tool_call` 缺失、Tier 3 测试覆盖太薄。这不是 theater，是真实的 signal。\n\n## 但 Happy Path 100%，Failure Path 0%\n\n所有 gate 都是一次 PASS。\n\ngate-test PASS。gate-acceptance PASS。gate-audit PASS。gate-e2e PASS。gate-final PASS。\n\n**FAIL/ITERATE loopback 一次都没触发。** `maxLoopsPerEdge=3` 的限制从未被考验。这意味着 OPC 的核心价值主张——「做的人不评，评的人不做，不过不放行」——只验证了前半句。「不过不放行」这个最关键的机制，完全没被测过。\n\n## synthesize 的 Emoji Parsing Bug\n\n在手动检查 review 结果时发现一个 bug：`opc-harness synthesize` 的 verdict 计算逻辑按 emoji 计数（🔴 = critical, 🟡 = warning, 🔵 = info），但有一种 edge case：\n\n```markdown\n### 🔴 Must Fix: None.\n```\n\nReviewer 写了「没有 critical finding」，但 synthesize 扫到了 🔴 emoji，判定为 critical finding。结果整个 verdict 变成 FAIL。\n\n这是一个 mechanical gate 的典型 failure mode：**内容理解和格式解析不匹配**。修复方案是让 synthesize 同时看 emoji 和后面的 status text（如 \"None\"），但这暴露了一个更深的问题——emoji-based parsing 本身就是 brittle 的。\n\n## Full-Stack Template 选型过重\n\n14 个 node 里 skip 了 5 个（audit, e2e-user, post-launch-sim, gate-e2e, gate-final 手动补的 handshake）。一个文档级别的 deliverable（E2E test skill）根本不该用 full-stack template——build-verify 就够了。\n\nSkip 不是问题。问题是 **finalize 需要手动补 handshake**——gate-final 没有 handshake.json 导致 finalize 失败，必须手动创建空的 handshake 才能完成 flow。这说明 skip → finalize 的路径没有被正确处理。\n\n## P0 Finding Disposition Tracking\n\n所有这些问题指向一个最高 ROI 的改进：**P0 finding disposition tracking**。\n\n当前的 flow：Review 发现 🔴 findings → Gate 判定 FAIL → Loopback 到 build/review → ???\n\n「???」就是断裂点。没有机制追踪：\n1. 哪些 finding 被 fix 了？\n2. 哪些被 acknowledged but deferred？\n3. 哪些被 reviewer 误判需要 dismiss？\n4. Re-review 时 reviewer 能看到上一轮的 disposition 吗？\n\n没有 disposition tracking，FAIL → fix → re-evaluate 的核心 loop 是断的。Reviewer 每轮都从零开始，可能重复提同样的 finding，或者漏掉上一轮 critical 的 follow-up。\n\n这不是一个 nice-to-have feature。这是 gate loopback 能真正工作的前提条件。\n\n## 诚实的评估\n\n作为一次 happy path end-to-end 验证，这是成功的——证明了 flow-state + harness + subagent dispatch + gate 的整条链路能跑通。\n\n但作为 OPC 框架本身的验证是不够的：\n- 覆盖了 breadth（14 node 都碰到了），缺 depth（每个 node 只走了一次、一条路径）\n- Happy path 100%，failure path 0%\n- 没有验证 loop protocol、external flow templates、oscillation detection、context recovery、goto/stop escape hatches、contextSchema validation\n\n**一个框架不能通过一次 happy path run 证明自己可靠。** 就像测试一个 database 不能只写入再读取——你得测崩溃恢复、并发冲突、磁盘满了的时候。\n\nOPC 需要的不是更多的 happy path runs，而是 **deliberately triggered failure paths**：强制让 reviewer 给 🔴，看 loopback 是否正确；强制触发 edge limit，看 escape hatch 是否工作；强制断开 context，看 resume 是否靠谱。\n\n这些才是下一步要做的事。",
   "heroImage": "",
   "tags": [
-    "dream-works",
-    "huggingface",
-    "claude-api",
-    "consumer-advocacy",
-    "batch-deploy",
-    "fastapi"
+    "opc",
+    "framework-validation",
+    "ai-workflow",
+    "meta-testing",
+    "gate-mechanism"
   ],
   "sessionId": "872bd411-b2f7-4090-998b-24a1045fba18",
   "chunkIndices": [
-    1,
-    2,
     3,
     4,
     5,
     6,
     7,
     8,
-    9,
-    10,
-    11,
-    12,
     13,
-    26,
-    27,
-    28
+    14
   ],
-  "project": "dream-works",
+  "project": "opc",
   "date": "2026-04-20",
   "duration": "",
   "stats": {}

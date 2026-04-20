@@ -1,0 +1,27 @@
+{
+  "slug": "2026-04-20-872bd411-article-3",
+  "lang": "zh",
+  "title": "从 11 个 E2E Case 到通用 Agent 测试方法论",
+  "summary": "给 suri-counsel 写了 11 个 E2E test case，然后用 OPC 把经验提炼成通用的 agent-e2e-test skill。核心发现：方法论比代码生成重要、五层测试架构（Plumbing → Behavior → Guard → Stress → Eval）、DA kill switch 必须存在。",
+  "body": "## 从家长视角设计 Test Case\n\nsuri-counsel 是给女儿用的 ISB 高中升学顾问 agent。测试不能只测技术指标——得从真实用户场景出发。\n\n我站在两个角色设计 case：**家长**（关心选课策略、毕业要求、大学规划）和**学生**（关心课程描述、IB 选科、GPA 追踪）。\n\n11 个 case 覆盖了从初次对话（intake profile collection）到复杂多轮对话（IB strategy + university admissions cross-reference）的完整用户旅程：\n\n```\nCase 01: Intake — 首次对话，收集用户 profile\nCase 02: 必修课咨询 — 查询 Grade 9 必修课\nCase 03: IB Physics 选课 — 带 prerequisite 链的课程推荐\nCase 04: 添加课程到计划 — write tool 测试\nCase 05: 计划校验 — 学分 + 毕业要求检查\nCase 06: 大学录取数据 — 查询历史录取\nCase 07: 多轮对话 — context 保持 + 话题切换\nCase 08: IB 选科策略 — 多维度分析推荐\nCase 09: Profile 更新 — 状态变更后的行为变化\nCase 10: Error recovery — 异常输入处理\nCase 11: Coverage gaps — 补充工具覆盖\n```\n\n## ScriptedLLM：在 LLM Decision 处切一刀\n\n测试 AI agent 的难点在于 LLM 输出不确定。全 mock 太假，全 live 太贵且不可重复。\n\n我们的方案是 **ScriptedLLM**——在 LLM decision boundary 处切一刀。Mock 替换 `llm_chat_with_tools` 函数，按预设脚本返回 tool calls 和 final response。Tool 执行是真实的（读真实的知识库文件、写真实的 DB）。\n\n```python\nclass ScriptedLLMResponse:\n    def __init__(self, tool_calls=None, content=None):\n        self.tool_calls = tool_calls or []\n        self.content = content\n\ndef make_scripted_llm(script: list[ScriptedLLMResponse]):\n    idx = 0\n    def _llm(*args, **kwargs):\n        nonlocal idx\n        resp = script[idx]\n        idx += 1\n        return resp\n    return _llm\n```\n\n配合 `ToolCallTracker` 记录每次 tool 调用的参数和返回值，既能断言调用了正确的 tool，又能验证 tool 的输入输出。\n\n关键设计决策：**mock 只在 LLM decision boundary，不 mock tool execution**。这样 tool 里的 bug（比如文件路径错误、DB query 错误）在测试中会真实暴露。\n\n## OPC Review 发现的问题\n\n用 OPC review flow 审查这套测试时，3 个独立 reviewer（backend, tester, architect）发现了 builder 没注意到的问题：\n\n1. **`remove_from_plan` 零覆盖** — 唯一的 destructive write tool，没有任何测试\n2. **`get_suri_grades` 零覆盖** — GPA 追踪功能完全没测\n3. **Tool loop 9-round limit 没测** — 关键安全机制，防止 LLM 无限循环调用 tool\n4. **`llm_chat` fallback 路径没 guard** — 如果 ScriptedLLM 脚本用完了，会 fallback 到真实 LLM API\n\n第 4 点特别致命——测试环境没有 LLM API key，fallback 会直接报错。但如果某天有人设了 API key 环境变量，测试会静默调用真实 API，烧真钱还给出不可重复的结果。\n\n修复：在 conftest.py 里加了 guard fixture，确保 `OPENAI_API_KEY` 和 `DASHSCOPE_API_KEY` 在测试期间被清空。\n\n## 提炼成通用方法论\n\n写完 suri-counsel 的测试后，我意识到这套模式对任何 LLM-based agent 都适用。于是用 OPC 把经验蒸馏成通用的 `agent-e2e-test` skill。\n\n核心是**五层测试架构**：\n\n```\nL1: Plumbing   — 工具注册、API 连通性、DB 连接\nL2: Behavior   — 单工具调用、多工具链、tool loop\nL3: Guard      — 安全边界（循环限制、fallback 隔离、权限检查）\nL4: Stress     — 并发、大上下文、timeout\nL5: Eval       — LLM 输出质量（需要 rubric + judge）\n```\n\nL1-L3 是必须的基线。L4-L5 按项目成熟度决定。大多数 agent 项目在 L1-L2 就已经能发现大部分 bug。\n\n## DA Kill Switch\n\n在 OPC discussion 阶段，devil's advocate 提出了一个尖锐的问题：「如果 skill 生成的测试代码有 bug，而 agent 不知道怎么 debug，会不会进入无限修复循环？」\n\n这催生了一个关键设计：**DA kill switch**——skill 必须包含明确的退出条件。如果生成的测试连续 3 次无法通过，停下来输出诊断信息，让人来决定，而不是继续盲目修复。\n\n这个 pattern 适用于所有 code-generating skill：**生成代码的 agent 必须有自我终止机制**，否则一个小 bug 会被 retry loop 放大成大问题。\n\n## 方法论 > 代码生成\n\n最初我想让 skill 直接生成完整的测试代码。OPC review 后改了方向：**skill 输出方法论和 scaffold，不输出完整实现**。\n\n理由：\n- 每个 agent 的 tool 接口不同，通用模板不可能覆盖所有 case\n- 生成的代码需要 agent 理解才能 debug，不如教会 agent 思路\n- 方法论的保质期远长于代码——Python mock API 会变，pytest 版本会升级，但「在 LLM boundary 切一刀」的思路不会过时\n\n最终的 skill 提供的是：\n1. 五层架构框架（帮 agent 决定该测什么）\n2. ScriptedLLM pattern 的伪代码（帮 agent 理解 mock 边界）\n3. Guard checklist（常见的 fallback、timeout、并发陷阱）\n4. DA kill switch 的实现规范\n\n这比直接给一堆 pytest 文件有用得多。",
+  "heroImage": "",
+  "tags": [
+    "e2e-testing",
+    "ai-agent",
+    "testing-methodology",
+    "opc",
+    "scripted-llm"
+  ],
+  "sessionId": "872bd411-b2f7-4090-998b-24a1045fba18",
+  "chunkIndices": [
+    1,
+    9,
+    10,
+    11,
+    12
+  ],
+  "project": "suri-counsel",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}
