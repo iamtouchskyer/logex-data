@@ -1,0 +1,35 @@
+{
+  "slug": "2026-04-20-223d3167-article-2",
+  "lang": "zh",
+  "title": "写一篇博客的全过程：Agent Era Sustained Evolution",
+  "summary": "从一个去年画的 Cognition Ladder 图出发，到今年写一篇关于 L3→L4 跨越的博客。全程用 Claude Code + ink-flow + image-x + OPC review 完成，包括 HTML 图表生成、双语内容、cover image、六平台分发。这不是写博客的教程，是一个 agent-era 内容创作的实况记录。",
+  "body": "## 起因：去年的一张图\n\n去年我画了一张图叫 Cognition Ladder，把团队对 AI/Agent 的认知分成五个层级：Awareness → Serious Reading → Demo → Product → Business。\n\n当时我们在 L3（Demo）做得很好 —— 大量讨论，前沿实验，内部孵化。但 L4（Product，生产环境部署），我们很少够到。大部分尝试停在了 L3。\n\n一年后，两件事发生了：\n\n1. 我们发布了 Societas —— Microsoft first agent product。99% AI-coded，开源架构，GAIA benchmark 业界领先。真正跨过了 L3→L4 的鸿沟。\n2. 业界也在变 —— Claude Code、OpenClaw、各种 agent 工具从不同维度拓展了能力边界。\n\n我想写一篇博客，记录这个跨越，以及我对「持续进化」的理解。\n\n## The L3 Trap：60% 和 40%\n\n博客的核心论点之一：\n\n> When building with LLMs/Agents, the first 60% comes fast — you nail a happy path and feel great about yourself. But the remaining 40% is where the real difficulty lies, and every time a major model upgrade happens, that 40% shifts.\n\nDemo 只需要跑通 happy path。但生产环境里用户的输入千奇百怪，edge case 是无底洞。你以为覆盖了 90% 的场景，上线后发现剩下 10% 才是真正的挑战。\n\n这就是 L3 和 L4 之间的鸿沟。\n\n## HTML 图表：image-x Mode B\n\n博客里需要几张结构化图表 —— Cognition Ladder、capability matrix、evolution timeline。这些不适合用 AI 生成（结构太精确），但也不想手动用 Figma 画。\n\n解决方案：用 HTML 写图表，然后用 image-x skill 的 Mode B（html2png）截图。\n\n```\n/image-x Mode B: 截图这个 HTML 文件\n```\n\nimage-x 背后是 Playwright headless browser：打开 HTML → 等 networkidle → 截取指定区域 → 输出 PNG。因为是 HTML，所以中英文各写一份，各截一张图。\n\n这个 skill 本身也经历了 OPC review。review 发现了几个问题：DashScope API 的 size 参数已经 deprecated（`832*480` 不再支持），GIF pipeline 的 ffmpeg 参数需要调整。修完后 skill 变得更 robust。\n\n## 双语内容：不是翻译，是重写\n\n博客中英文版本不是互相翻译的。中文版面向国内读者，假设他们了解微软内部语境；英文版面向全球开发者，需要更多背景解释。\n\n约定：\n- 中文版：`agent-era-sustained-evolution.md`\n- 英文版：`agent-era-sustained-evolution--en.md`（双横线）\n- 图片共享：`public/images/{slug}/`，英文版专属图加 `-en.png` 后缀\n\n技术术语保留英文（L3 Trap、happy path、edge case），这是 ink-flow SKILL.md 里写的规则。英文版的标题要 compelling 不要 literal —— 「持续进化」不翻译成 \"Continuous Evolution\"，而是 \"Sustained Evolution\"（更有张力）。\n\n## Cover Image 生成\n\ncover image 用 image-x 的 Mode A（AI 生成）：\n\n```\n/image-x 一个深色背景的抽象科技插画，表达\"认知阶梯\"和\"进化\"的概念\n```\n\nDashScope 的 wan 模型生成了几个候选，选了一个渐变色+几何形状的，resize 到各平台需要的尺寸（微信 900×383、知乎 1920×1080、LinkedIn 1200×627）。\n\n每个平台的 cover 尺寸不同，这也是 `platforms/wechat/spec.py` 里定义的知识。\n\n## 六平台分发\n\n写完之后，用 ink-flow 的 distribute 流程发到六个平台：\n\n1. **Blog（中文）** —— `git push` 触发 Vercel auto-deploy\n2. **Blog（EN）** —— 同上，英文版\n3. **微信公众号** —— HTML 格式，lint.py 检查 `<pre>` 和 `<style>` 问题\n4. **知乎** —— HTML 格式，lint.py 检查知乎特有的规则\n5. **Twitter Thread** —— markdown 拆分成 tweet chain\n6. **LinkedIn Post** —— markdown 格式的单篇 post\n\npreview.py 的 dashboard 在分发前用来最终确认：每个平台的预览都对了，没有格式崩坏。\n\n## OPC Review 博客内容\n\n发布前，我用 `/opc` review 了博客内容本身。选了 PM、new-user、active-user 三个角色。\n\n交叉信号比单角色建议有价值得多：\n- PM 觉得 L3 Trap 的论述太抽象\n- new-user 说看不懂 Societas 是什么\n- active-user 觉得结尾太弱\n\n三个角色都指出结尾需要加强 —— 这就是 P0 优先级。修了。\n\n## 回头看\n\n整个过程 —— 从起念到六平台发布 —— 跨了多个 session，总共大概 5-6 个小时。如果没有 ink-flow + image-x + OPC review，同样的事情至少要一整天，而且格式错误会更多。\n\n但最大的感受不是效率提升，是**创作体验的改变**。我不用再纠结「微信的格式对不对」「知乎的 style 标签会不会被吃掉」这些 L3 级别的问题。我只需要关注内容本身 —— 论点是否成立，故事是否有力。\n\n这就是 agent-era 的内容创作：把 mechanical work 交给 pipeline，把 creative work 留给自己。",
+  "heroImage": "",
+  "tags": [
+    "content-creation",
+    "blogging",
+    "ink-flow",
+    "image-x",
+    "opc-review",
+    "bilingual",
+    "agent-era"
+  ],
+  "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "project": "ink-flow",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}

@@ -1,0 +1,41 @@
+{
+  "slug": "2026-04-20-223d3167-article-3",
+  "lang": "zh",
+  "title": "三轮 OPC Review 打磨一个 Preview Dashboard",
+  "summary": "用 apple-style-ui skill 构建 ink-flow 的 preview dashboard —— frosted glass、dark theme、channel sidebar、live preview iframe。经历 3 轮 OPC review，从 P0 bug 修到 pixel-perfect。一个关于「用 agent review 提升 UI 质量」的实操记录。",
+  "body": "## 需求\n\nink-flow 需要一个 preview dashboard。发布前，我想看到每个平台的内容长什么样 —— 微信公众号 375px 宽的手机屏效果，知乎 690px 的桌面效果，Twitter thread 的分段效果。\n\n之前的方案是手动打开 HTML 文件看。但平台多了之后（6 个），每次都要打开 6 个文件太痛苦。\n\n所以需要一个 dashboard：左侧 sidebar 列出所有 channel，点击切换，右侧 iframe 实时预览。\n\n## apple-style-ui Skill 驱动设计\n\n我用 apple-style-ui skill 来定义视觉风格：\n\n```\n/apple-style-ui Build an ink-flow preview dashboard with Apple aesthetic.\nLayout: left sidebar with channel list, right side split into top\n(materials/files area) and bottom (live preview iframe).\nFirst channel in sidebar shows all raw materials.\nOther channels: WeChat (375px), Zhihu (690px), Twitter Thread, LinkedIn Post.\nUse frosted glass, SF Pro, dark theme, vibrancy effects.\n```\n\nSkill 提供了完整的设计 token：\n- Surface: `rgba() + blur(40px) saturate(180%)`\n- Border: `rgba(0,0,0,0.08-0.18)`，永远不用硬边框\n- Radius: sidebar 用 16px，dock 用 20px\n- Font: `-apple-system, 'SF Pro Text'`\n- Motion: `cubic-bezier(0.34,1.2,0.64,1)` spring curve\n\npreview.py 是一个单文件 Python HTTP server —— 全部 HTML/CSS/JS 都内联在 Python 字符串里。这听起来很 hack，但对于一个 dev tool 来说，单文件 = 零依赖 = 零配置。\n\n## Round 1：基础功能\n\n第一版实现了核心功能：\n- sidebar 显示 All Materials + 各平台 channel\n- All Materials 视图：文件卡片网格，显示文件名、大小、类型\n- Platform 视图：iframe 加载 `/api/preview/{platform}`\n- Dark theme + frosted glass sidebar\n\n但 OPC review（frontend + designer 角色）发现了一堆问题：\n\n**P0（必修）：**\n- covers 图片没有在 All Materials 视图显示\n- 微信预览是全屏宽度，应该限制在 375px\n\n**P1（应修）：**\n- a11y：nav items 没有 `role=\"button\"` 和 `tabindex=\"0\"`\n- 状态 badge 缺少语义色（ready = green, published = blue）\n- topbar 在切换 channel 时没有更新标题\n\n## Round 2：修 P0 + 大部分 P1\n\n修了 covers 显示、iframe 宽度限制、a11y 属性。同时把 channel metadata 接口（`/api/platforms`）做了安全加固 —— 不泄露 `basedir` 路径。\n\n第二轮 review 发现新问题：\n- frosted glass blur 在某些 channel 切换时有闪烁\n- 文件卡片的 hover 效果缺少 spring animation\n- scrollbar 在 dark theme 下太显眼\n\n## Round 3：Polish\n\n第三轮纯粹是 visual polish：\n- `scrollbar-width: none` 隐藏滚动条\n- `.material-card:hover` 加 spring transition（`transform: translateY(-2px)`）\n- sidebar 的 `.nav-item.active` 加 subtle glow 效果\n- `<html lang=\"zh\">` 加上 lang attribute（a11y 合规）\n\n三轮之后，dashboard 和 macOS Sonoma 的设计语言几乎一致：深色背景、frosted glass sidebar、内容区域实色背景保证可读性、所有交互元素都有 spring curve。\n\n## 测试覆盖\n\n这个 dashboard 不只是「看着好」—— 它有 36 个自动化测试：\n\n**API 层（21 个 test）：**\n- `GET /` 返回 dashboard HTML，包含 slug 和平台数据\n- `GET /api/platforms` 返回 JSON，不泄露 server path\n- `GET /api/files` 返回文件列表，包含 size 和 ext\n- `GET /api/file/{name}` 返回文件内容，path traversal 被拦截\n- `GET /api/image/{path}` 返回 PNG，带 cache header\n- `GET /api/preview/{platform}` 返回渲染后的 HTML\n- 404 routes 正确返回 404\n\n**Browser UI 层（15 个 test，Playwright headless Chromium）：**\n- sidebar 可见，channel 数量 ≥ 3\n- All Materials 默认选中，显示文件卡片\n- 点击微信 channel → iframe 加载 → topbar 更新\n- 点击知乎 channel → 切换成功\n- 返回 All Materials → 视图恢复\n- dark background 验证（RGB 值低）\n- sidebar backdrop-filter blur 验证\n- scrollbar 隐藏验证\n- keyboard navigation（tabindex）验证\n- 全页截图 artifact\n\n测试用了一个 module-scoped fixture 启动 server（用非默认端口 19877 避免冲突），所有 API 和 UI 测试共享同一个 server instance。这样 36 个 test 跑完只需要几秒。\n\n## Takeaway\n\n三轮 OPC review 的价值不在于发现 bug（虽然确实发现了）—— 而在于**它逼你从不同角色的视角审视 UI**。frontend 角色关注实现质量，designer 角色关注视觉一致性。单靠自己 review，很难同时兼顾两个维度。\n\n另一个 insight：**preview server 这种 dev tool，单文件胜过一切框架。** 零依赖意味着任何环境都能跑，`python3 preview.py /path/to/crosspost` 就启动了。不需要 npm install，不需要 vite config。",
+  "heroImage": "",
+  "tags": [
+    "ui-design",
+    "opc-review",
+    "apple-style",
+    "preview",
+    "testing",
+    "playwright",
+    "ink-flow"
+  ],
+  "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+  "chunkIndices": [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34
+  ],
+  "project": "ink-flow",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}

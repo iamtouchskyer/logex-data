@@ -208,6 +208,184 @@
       }
     },
     {
+      "slug": "2026-04-20-223d3167-article-3",
+      "date": "2026-04-20",
+      "project": "ink-flow",
+      "tags": [
+        "ui-design",
+        "opc-review",
+        "apple-style",
+        "preview",
+        "testing",
+        "playwright",
+        "ink-flow"
+      ],
+      "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+      "heroImage": "",
+      "chunkIndices": [
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "三轮 OPC Review 打磨一个 Preview Dashboard",
+          "summary": "用 apple-style-ui skill 构建 ink-flow 的 preview dashboard —— frosted glass、dark theme、channel sidebar、live preview iframe。经历 3 轮 OPC review，从 P0 bug 修到 pixel-perfect。一个关于「用 agent review 提升 UI 质量」的实操记录。",
+          "path": "2026/04/20/2026-04-20-223d3167-article-3.zh.json"
+        },
+        "en": {
+          "title": "Three Rounds of OPC Review to Polish a Preview Dashboard",
+          "summary": "Building ink-flow's preview dashboard with apple-style-ui — frosted glass, dark theme, channel sidebar, live preview iframe. Three rounds of OPC review took it from P0 bugs to pixel-perfect. A practical account of using agent review to elevate UI quality.",
+          "path": "2026/04/20/2026-04-20-223d3167-article-3.en.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-20-223d3167-article-2",
+      "date": "2026-04-20",
+      "project": "ink-flow",
+      "tags": [
+        "content-creation",
+        "blogging",
+        "ink-flow",
+        "image-x",
+        "opc-review",
+        "bilingual",
+        "agent-era"
+      ],
+      "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+      "heroImage": "",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "写一篇博客的全过程：Agent Era Sustained Evolution",
+          "summary": "从一个去年画的 Cognition Ladder 图出发，到今年写一篇关于 L3→L4 跨越的博客。全程用 Claude Code + ink-flow + image-x + OPC review 完成，包括 HTML 图表生成、双语内容、cover image、六平台分发。这不是写博客的教程，是一个 agent-era 内容创作的实况记录。",
+          "path": "2026/04/20/2026-04-20-223d3167-article-2.zh.json"
+        },
+        "en": {
+          "title": "Writing a Blog Post End-to-End: Agent Era Sustained Evolution",
+          "summary": "Starting from a Cognition Ladder diagram drawn last year, to writing a blog post about crossing the L3→L4 chasm. The entire process — HTML diagrams, bilingual content, cover images, six-platform distribution — was done with Claude Code + ink-flow + image-x + OPC review. Not a tutorial, but a field recording of agent-era content creation.",
+          "path": "2026/04/20/2026-04-20-223d3167-article-2.en.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-20-223d3167-article-1",
+      "date": "2026-04-20",
+      "project": "ink-flow",
+      "tags": [
+        "ink-flow",
+        "product-incubation",
+        "opc-loop",
+        "testing",
+        "skill-architecture",
+        "agent-era"
+      ],
+      "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+      "heroImage": "",
+      "chunkIndices": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        35,
+        36,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "ink-flow: 一个 Skill 如何长成一个产品",
+          "summary": "从一个博客发布的 Claude Code Skill，到一个完整的多平台内容分发产品。OPC Loop 驱动 8 轮迭代，platforms/ 共享知识层设计，四层测试体系（UT/CT/API/Browser UI），以及 agent-era 产品孵化的真实体感。",
+          "path": "2026/04/20/2026-04-20-223d3167-article-1.zh.json"
+        },
+        "en": {
+          "title": "ink-flow: How a Skill Grew Into a Product",
+          "summary": "From a simple blog-publishing Claude Code Skill to a full multi-platform content distribution product. OPC Loop drove 8 iterations, a platforms/ shared knowledge layer emerged, four-layer testing (UT/CT/API/Browser UI) was demanded and delivered, and the real texture of agent-era product incubation became clear.",
+          "path": "2026/04/20/2026-04-20-223d3167-article-1.en.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-20-12311cf2-article-1",
       "date": "2026-04-20",
       "project": "personal",

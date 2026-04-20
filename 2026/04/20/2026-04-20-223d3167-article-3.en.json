@@ -1,0 +1,41 @@
+{
+  "slug": "2026-04-20-223d3167-article-3",
+  "lang": "en",
+  "title": "Three Rounds of OPC Review to Polish a Preview Dashboard",
+  "summary": "Building ink-flow's preview dashboard with apple-style-ui — frosted glass, dark theme, channel sidebar, live preview iframe. Three rounds of OPC review took it from P0 bugs to pixel-perfect. A practical account of using agent review to elevate UI quality.",
+  "body": "## The Need\n\nink-flow needed a preview dashboard. Before publishing, I wanted to see what content looked like on each platform — WeChat's 375px mobile view, Zhihu's 690px desktop view, Twitter thread's segmented layout.\n\nThe previous approach was opening HTML files manually. With 6 platforms, opening 6 files every time was painful.\n\nSo I needed a dashboard: left sidebar listing all channels, click to switch, right side with live iframe preview.\n\n## apple-style-ui Skill Driving Design\n\nI used the apple-style-ui skill to define the visual style:\n\n```\n/apple-style-ui Build an ink-flow preview dashboard with Apple aesthetic.\nLayout: left sidebar with channel list, right side split into top\n(materials/files area) and bottom (live preview iframe).\n```\n\nThe skill provides a complete design token system:\n- Surface: `rgba() + blur(40px) saturate(180%)`\n- Border: `rgba(0,0,0,0.08-0.18)` — never hard borders\n- Radius: sidebar 16px, dock 20px\n- Font: `-apple-system, 'SF Pro Text'`\n- Motion: `cubic-bezier(0.34,1.2,0.64,1)` spring curve\n\npreview.py is a single-file Python HTTP server — all HTML/CSS/JS inline in Python strings. Sounds hacky, but for a dev tool: single file = zero dependencies = zero configuration.\n\n## Round 1: Core Functionality\n\nThe first version implemented:\n- Sidebar showing All Materials + platform channels\n- All Materials view: file card grid with filename, size, type\n- Platform view: iframe loading `/api/preview/{platform}`\n- Dark theme + frosted glass sidebar\n\nOPC review (frontend + designer roles) found issues:\n\n**P0 (must fix):**\n- Cover images not showing in All Materials view\n- WeChat preview was full-width, should be limited to 375px\n\n**P1 (should fix):**\n- a11y: nav items missing `role=\"button\"` and `tabindex=\"0\"`\n- Status badges lacking semantic colors (ready = green, published = blue)\n- Topbar not updating title on channel switch\n\n## Round 2: Fix P0 + Most P1\n\nFixed cover display, iframe width limits, a11y attributes. Also hardened the channel metadata endpoint (`/api/platforms`) — no `basedir` path leaking.\n\nSecond review found new issues:\n- Frosted glass blur flickering on some channel switches\n- File card hover effect missing spring animation\n- Scrollbar too visible in dark theme\n\n## Round 3: Polish\n\nPure visual polish:\n- `scrollbar-width: none` to hide scrollbars\n- `.material-card:hover` with spring transition (`transform: translateY(-2px)`)\n- Sidebar `.nav-item.active` with subtle glow\n- `<html lang=\"zh\">` for a11y compliance\n\nAfter three rounds, the dashboard matched macOS Sonoma's design language: dark background, frosted glass sidebar, solid content areas for readability, spring curves on all interactive elements.\n\n## Test Coverage\n\nThis dashboard isn't just \"looks good\" — it has 36 automated tests:\n\n**API layer (21 tests):**\n- `GET /` returns dashboard HTML with slug and platform data\n- `GET /api/platforms` returns JSON without server path leaks\n- `GET /api/files` returns file list with size and ext\n- `GET /api/file/{name}` returns content, path traversal blocked\n- `GET /api/image/{path}` returns PNG with cache headers\n- `GET /api/preview/{platform}` returns rendered HTML\n- Unknown routes correctly return 404\n\n**Browser UI layer (15 tests, Playwright headless Chromium):**\n- Sidebar visible, channel count ≥ 3\n- All Materials selected by default, showing file cards\n- Click WeChat channel → iframe loads → topbar updates\n- Click Zhihu channel → switch succeeds\n- Return to All Materials → view restores\n- Dark background verification (low RGB values)\n- Sidebar backdrop-filter blur verification\n- Scrollbar hidden verification\n- Keyboard navigation (tabindex) verification\n- Full-page screenshot artifact\n\nTests use a module-scoped fixture starting the server (non-default port 19877 to avoid conflicts), all API and UI tests sharing one server instance. The 36 tests complete in seconds.\n\n## Takeaway\n\nThe value of three OPC review rounds isn't bug-finding (though it did find bugs) — it's that **it forces you to examine UI from different role perspectives.** The frontend role cares about implementation quality; the designer role cares about visual consistency. Reviewing alone, it's hard to cover both dimensions simultaneously.\n\nAnother insight: **for dev tools like preview servers, single-file beats any framework.** Zero dependencies means it runs anywhere. `python3 preview.py /path/to/crosspost` and you're up. No npm install, no vite config.",
+  "heroImage": "",
+  "tags": [
+    "ui-design",
+    "opc-review",
+    "apple-style",
+    "preview",
+    "testing",
+    "playwright",
+    "ink-flow"
+  ],
+  "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+  "chunkIndices": [
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34
+  ],
+  "project": "ink-flow",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}

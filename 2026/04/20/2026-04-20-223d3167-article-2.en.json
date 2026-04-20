@@ -1,0 +1,35 @@
+{
+  "slug": "2026-04-20-223d3167-article-2",
+  "lang": "en",
+  "title": "Writing a Blog Post End-to-End: Agent Era Sustained Evolution",
+  "summary": "Starting from a Cognition Ladder diagram drawn last year, to writing a blog post about crossing the L3→L4 chasm. The entire process — HTML diagrams, bilingual content, cover images, six-platform distribution — was done with Claude Code + ink-flow + image-x + OPC review. Not a tutorial, but a field recording of agent-era content creation.",
+  "body": "## The Trigger: A Diagram from Last Year\n\nLast year I drew a diagram called the Cognition Ladder, categorizing our team's AI/Agent understanding into five levels: Awareness → Serious Reading → Demo → Product → Business.\n\nAt the time, we performed well at L1-L3 — lots of discussions, cutting-edge experiments, internal incubation. But L4 (production deployment), we rarely reached. Most attempts stopped at L3.\n\nA year later, two things happened:\n\n1. We launched Societas — Microsoft's first agent product. 99% AI-coded, open-source stack, industry-leading GAIA benchmark results. We genuinely crossed the L3-to-L4 chasm.\n2. The industry shifted — Claude Code, OpenClaw, various agent tools extended capability boundaries from different angles.\n\nI wanted to write a blog post documenting this crossing, and my understanding of \"sustained evolution.\"\n\n## The L3 Trap: 60% and 40%\n\nOne of the blog's core arguments:\n\n> When building with LLMs/Agents, the first 60% comes fast — you nail a happy path and feel great about yourself. But the remaining 40% is where the real difficulty lies, and every time a major model upgrade happens, that 40% shifts.\n\nDemos only need the happy path. Production users input things you never imagined. You think you've covered 90% of scenarios, then discover the remaining 10% is the real challenge.\n\nThat's the chasm between L3 and L4.\n\n## HTML Diagrams: image-x Mode B\n\nThe blog needed structured diagrams — Cognition Ladder, capability matrix, evolution timeline. These aren't suited for AI generation (too structurally precise), but I didn't want to manually draw them in Figma either.\n\nSolution: write diagrams in HTML, then use image-x skill's Mode B (html2png) for screenshots.\n\n```\n/image-x Mode B: screenshot this HTML file\n```\n\nUnder the hood it's Playwright headless: open HTML → wait for networkidle → capture specified region → output PNG. Since it's HTML, I write one version per language, screenshot each.\n\nThe image-x skill itself went through OPC review. The review caught issues: DashScope API's size parameter was deprecated (`832*480` no longer works), GIF pipeline's ffmpeg parameters needed adjustment. After fixes, the skill became more robust.\n\n## Bilingual Content: Rewriting, Not Translating\n\nThe Chinese and English versions aren't translations of each other. The Chinese version targets domestic readers who understand Microsoft's internal context; the English version targets global developers who need more background.\n\nConventions:\n- Chinese: `agent-era-sustained-evolution.md`\n- English: `agent-era-sustained-evolution--en.md` (double dash)\n- Shared images: `public/images/{slug}/`, English-specific images get `-en.png` suffix\n\nTechnical terms stay in English (L3 Trap, happy path, edge case) — this is a rule in ink-flow's SKILL.md. English titles should be compelling, not literal — 「持续进化」 becomes \"Sustained Evolution\" (more tension) rather than \"Continuous Evolution.\"\n\n## Cover Image Generation\n\nCover image used image-x Mode A (AI generation):\n\n```\n/image-x A dark-themed abstract tech illustration expressing \"cognition ladder\" and \"evolution\"\n```\n\nDashScope's wan model generated candidates. Picked one with gradient colors and geometric shapes, resized to each platform's requirements (WeChat 900×383, Zhihu 1920×1080, LinkedIn 1200×627).\n\nEach platform has different cover dimensions — this knowledge lives in `platforms/wechat/spec.py`.\n\n## Six-Platform Distribution\n\nAfter writing, ink-flow's distribute workflow pushed to six platforms:\n\n1. **Blog (Chinese)** — `git push` triggers Vercel auto-deploy\n2. **Blog (EN)** — same mechanism, English version\n3. **WeChat Official Account** — HTML format, lint.py checks `<pre>` and `<style>` issues\n4. **Zhihu** — HTML format, lint.py checks Zhihu-specific rules\n5. **Twitter Thread** — markdown split into tweet chain\n6. **LinkedIn Post** — single markdown post\n\npreview.py's dashboard was used for final confirmation before distribution: every platform's preview looked correct, no formatting breakage.\n\n## OPC Review of Blog Content\n\nBefore publishing, I ran `/opc` to review the blog content itself. Selected PM, new-user, and active-user roles.\n\nCross-signals were far more valuable than any single role's suggestions:\n- PM felt the L3 Trap argument was too abstract\n- new-user couldn't understand what Societas was\n- active-user felt the ending was weak\n\nAll three roles flagged the ending — that's P0 priority. Fixed it.\n\n## Looking Back\n\nThe entire process — from initial idea to six-platform publication — spanned multiple sessions, roughly 5-6 hours total. Without ink-flow + image-x + OPC review, the same work would take at least a full day, with more formatting errors.\n\nBut the biggest takeaway isn't efficiency. It's **the shift in creative experience.** I no longer worry about \"is the WeChat formatting correct\" or \"will Zhihu strip the style tags\" — those are L3-level problems. I focus on content: is the argument sound, is the story compelling.\n\nThat's agent-era content creation: hand mechanical work to the pipeline, keep creative work for yourself.",
+  "heroImage": "",
+  "tags": [
+    "content-creation",
+    "blogging",
+    "ink-flow",
+    "image-x",
+    "opc-review",
+    "bilingual",
+    "agent-era"
+  ],
+  "sessionId": "223d3167-fb5d-475f-bf4c-3f775119418b",
+  "chunkIndices": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+  ],
+  "project": "ink-flow",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}
