@@ -194,6 +194,52 @@
       }
     },
     {
+      "slug": "2026-04-20-12311cf2-article-1",
+      "date": "2026-04-20",
+      "project": "personal",
+      "tags": [
+        "ghostty",
+        "tmux",
+        "terminal",
+        "workflow",
+        "context-rot",
+        "dotfiles"
+      ],
+      "sessionId": "12311cf2-e008-43e5-a946-3aca25521251",
+      "heroImage": "",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从 Terminal.app 到 Ghostty + tmux：一次治 context rot 的两小时",
+          "summary": "三个看起来一模一样的终端 tab，是 context rot 最诚实的症状。这篇记录一次从 Terminal.app + 多窗口，迁到 Ghostty + tmux + 自写 cc-session launcher 的 2 小时，包括中途被砍掉的 dotfiles repo 和好几次架构返工。",
+          "path": "2026/04/20/2026-04-20-12311cf2-article-1.zh.json"
+        },
+        "en": {
+          "title": "From Terminal.app to Ghostty + tmux: A Two-Hour Fix for Context Rot",
+          "summary": "Three terminal tabs that look identical are the most honest symptom of context rot. This is a log of a two-hour migration from Terminal.app with sprawling windows to Ghostty + tmux + a homegrown cc-session launcher — including a dotfiles repo I built and then got told to tear down, and a few architecture U-turns.",
+          "path": "2026/04/20/2026-04-20-12311cf2-article-1.en.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-19-pulse-fake-production-day-one",
       "date": "2026-04-19",
       "project": "pulse",
