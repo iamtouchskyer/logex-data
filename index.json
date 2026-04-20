@@ -1,6 +1,199 @@
 {
   "articles": [
     {
+      "slug": "2026-04-20-d57fa0fe-article-3",
+      "date": "2026-04-20",
+      "project": "suri-counsel",
+      "tags": [
+        "e2e-testing",
+        "ai-agent",
+        "testing-methodology",
+        "opc",
+        "scripted-llm"
+      ],
+      "sessionId": "d57fa0fe-f03b-4bb3-aaa6-a0f844c10530",
+      "heroImage": "",
+      "chunkIndices": [
+        1,
+        9,
+        10,
+        11,
+        12
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "从 11 个 E2E Case 到通用 Agent 测试方法论",
+          "summary": "给 suri-counsel 写了 11 个 E2E test case，然后用 OPC 把经验提炼成通用的 agent-e2e-test skill。核心发现：方法论比代码生成重要、五层测试架构（Plumbing → Behavior → Guard → Stress → Eval）、DA kill switch 必须存在。",
+          "path": "2026/04/20/2026-04-20-d57fa0fe-article-3.zh.json"
+        },
+        "en": {
+          "title": "From 11 E2E Cases to a Universal Agent Testing Methodology",
+          "summary": "Built 11 E2E test cases for suri-counsel, then used OPC to distill the experience into a universal agent-e2e-test skill. Key findings: methodology matters more than code generation, five-layer test architecture (Plumbing → Behavior → Guard → Stress → Eval), and DA kill switch must exist.",
+          "path": "2026/04/20/2026-04-20-d57fa0fe-article-3.en.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-20-d57fa0fe-article-2",
+      "date": "2026-04-20",
+      "project": "opc",
+      "tags": [
+        "opc",
+        "framework-validation",
+        "ai-workflow",
+        "meta-testing",
+        "gate-mechanism"
+      ],
+      "sessionId": "d57fa0fe-f03b-4bb3-aaa6-a0f844c10530",
+      "heroImage": "",
+      "chunkIndices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        13,
+        14
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "用 OPC 审视 OPC：一个 AI 工作流框架的自我验证之旅",
+          "summary": "用 OPC 的 full-stack flow 对 suri-counsel 做 14-node review，然后反过来评估 OPC 本身。Happy path 100% 但 failure path 0%，synthesize 的 emoji parsing 有 bug，P0 finding disposition tracking 是最高 ROI 改进。框架验证框架——一次 meta-level 的诚实评估。",
+          "path": "2026/04/20/2026-04-20-d57fa0fe-article-2.zh.json"
+        },
+        "en": {
+          "title": "Using OPC to Review OPC: An AI Workflow Framework's Self-Validation Journey",
+          "summary": "Ran OPC's full-stack flow (14 nodes) to review suri-counsel, then turned the lens back on OPC itself. Happy path 100% but failure path 0%. The synthesize command has an emoji parsing bug. P0 finding disposition tracking is the highest-ROI improvement. A framework reviewing itself — an honest meta-level assessment.",
+          "path": "2026/04/20/2026-04-20-d57fa0fe-article-2.en.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-20-d57fa0fe-article-1",
+      "date": "2026-04-20",
+      "project": "suri-counsel",
+      "tags": [
+        "testing",
+        "coverage",
+        "refactoring",
+        "a11y",
+        "python",
+        "litellm",
+        "ai-agent"
+      ],
+      "sessionId": "d57fa0fe-f03b-4bb3-aaa6-a0f844c10530",
+      "heroImage": "",
+      "chunkIndices": [
+        18,
+        19,
+        20
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "145 Tests, 88% Coverage：一个人如何系统性改进一个 AI Agent 项目",
+          "summary": "suri-counsel 是给女儿做的 ISB 高中升学顾问 agent。125 个测试全绿，但不知道覆盖率。从 pytest-cov 开始，经历 litellm namespace package 的坑、counselor.py 三文件拆分、全站 A11y 改造，最终 145 tests / 88% coverage。",
+          "path": "2026/04/20/2026-04-20-d57fa0fe-article-1.zh.json"
+        },
+        "en": {
+          "title": "145 Tests, 88% Coverage: How One Person Systematically Improves an AI Agent Project",
+          "summary": "suri-counsel is an ISB high school counselor agent built for my daughter. 125 tests passing green, but zero coverage visibility. Starting from pytest-cov, battling litellm namespace package bugs, splitting counselor.py into 3 files, and adding full A11y support — ending at 145 tests / 88% coverage.",
+          "path": "2026/04/20/2026-04-20-d57fa0fe-article-1.en.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-20-872bd411-article-2",
+      "date": "2026-04-20",
+      "project": "dream-works",
+      "tags": [
+        "monorepo",
+        "architecture",
+        "dream-works",
+        "devils-advocate",
+        "opc",
+        "template"
+      ],
+      "sessionId": "872bd411-b2f7-4090-998b-24a1045fba18",
+      "heroImage": "",
+      "chunkIndices": [
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "Monorepo 还是 Multi-repo？一个人做 N 个产品的仓库架构抉择",
+          "summary": "5 个 AI 产品同时在线，代码放一个 repo 还是五个？从 spike 到商业化的 gap 分析催生了 fastapi-tier2 模板，Devil's Advocate 辩论催生了毕业机制。最终答案：monorepo 孵化 + 独立 repo 毕业。",
+          "path": "2026/04/20/2026-04-20-872bd411-article-2.zh.json"
+        }
+      }
+    },
+    {
+      "slug": "2026-04-20-872bd411-article-1",
+      "date": "2026-04-20",
+      "project": "dream-works",
+      "tags": [
+        "dream-works",
+        "huggingface",
+        "claude-api",
+        "consumer-advocacy",
+        "batch-deploy",
+        "fastapi"
+      ],
+      "sessionId": "872bd411-b2f7-4090-998b-24a1045fba18",
+      "heroImage": "",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        26,
+        27,
+        28
+      ],
+      "duration": "",
+      "stats": {},
+      "primaryLang": "zh",
+      "i18n": {
+        "zh": {
+          "title": "一个下午，5 个 AI 维权工具从 Reddit 吐槽到 HuggingFace 上线",
+          "summary": "从 Reddit r/personalfinance 的吐槽出发，用 AI pipeline 发现痛点、评估、pivot、批量构建 5 个消费者维权工具，全部部署到 HuggingFace Spaces。过程中踩了 Claude API JSON 解析、HF metadata 限制、Vercel serverless timeout 等坑。",
+          "path": "2026/04/20/2026-04-20-872bd411-article-1.zh.json"
+        }
+      }
+    },
+    {
       "slug": "2026-04-19-pulse-fake-production-day-one",
       "date": "2026-04-19",
       "project": "pulse",
@@ -738,33 +931,6 @@
       }
     },
     {
-      "slug": "2026-04-17-dw-to-dreamworks-plugin-namespace",
-      "title": "把 dw 变成 dreamworks：一次 skill plugin 的 namespace 重构",
-      "summary": "一句漫不经心的 \"symbolic link 可以干掉了？\"，拐了几个弯，最后拆掉三个 symlink、建一个 plugin、吃掉 dw-templates，学到 Claude Code skill 分发的两个隐藏机制 + repo 剪枝的三变量判断框架（audience/cadence/blast radius）。",
-      "date": "2026-04-17",
-      "tags": [
-        "claude-code",
-        "plugin",
-        "skill",
-        "namespace",
-        "refactor",
-        "dreamworks"
-      ],
-      "project": "dreamworks",
-      "chunkIndices": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7
-      ],
-      "sessionId": "916a122a-283d-4d55-8ee4-a9052fda900a",
-      "heroImage": "/images/2026-04-17-dw-to-dreamworks-plugin-namespace.png",
-      "path": "2026/04/17/2026-04-17-dw-to-dreamworks-plugin-namespace.json"
-    },
-    {
       "slug": "2026-04-17-e123eeaf-article-1",
       "date": "2026-04-17",
       "project": "cli-x",
@@ -810,6 +976,33 @@
           "path": "2026/04/17/2026-04-17-e123eeaf-article-1.en.json"
         }
       }
+    },
+    {
+      "slug": "2026-04-17-dw-to-dreamworks-plugin-namespace",
+      "title": "把 dw 变成 dreamworks：一次 skill plugin 的 namespace 重构",
+      "summary": "一句漫不经心的 \"symbolic link 可以干掉了？\"，拐了几个弯，最后拆掉三个 symlink、建一个 plugin、吃掉 dw-templates，学到 Claude Code skill 分发的两个隐藏机制 + repo 剪枝的三变量判断框架（audience/cadence/blast radius）。",
+      "date": "2026-04-17",
+      "tags": [
+        "claude-code",
+        "plugin",
+        "skill",
+        "namespace",
+        "refactor",
+        "dreamworks"
+      ],
+      "project": "dreamworks",
+      "chunkIndices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "sessionId": "916a122a-283d-4d55-8ee4-a9052fda900a",
+      "heroImage": "/images/2026-04-17-dw-to-dreamworks-plugin-namespace.png",
+      "path": "2026/04/17/2026-04-17-dw-to-dreamworks-plugin-namespace.json"
     },
     {
       "slug": "2026-04-17-design-lint-surgery-discovery-vs-gate",
@@ -2517,6 +2710,6 @@
       }
     }
   ],
-  "lastUpdated": "2026-04-19",
+  "lastUpdated": "2026-04-20",
   "totalArticles": 42
 }

@@ -1,0 +1,30 @@
+{
+  "slug": "2026-04-20-d57fa0fe-article-2",
+  "lang": "zh",
+  "title": "用 OPC 审视 OPC：一个 AI 工作流框架的自我验证之旅",
+  "summary": "用 OPC 的 full-stack flow 对 suri-counsel 做 14-node review，然后反过来评估 OPC 本身。Happy path 100% 但 failure path 0%，synthesize 的 emoji parsing 有 bug，P0 finding disposition tracking 是最高 ROI 改进。框架验证框架——一次 meta-level 的诚实评估。",
+  "body": "## 14 个 Node，3 小时\n\n那天的计划很简单：用 OPC 的 full-stack template 对 suri-counsel 的 E2E 测试套件做一次完整 review。14 个 node 的 flow graph，从 discuss 到 post-launch-sim，走一遍全链路。\n\n```\n▶ discuss → build → code-review → test-design → test-execute\n  → gate-test → acceptance → gate-acceptance → audit\n  → gate-audit → e2e-user → gate-e2e → post-launch-sim → gate-final\n```\n\n3 小时后，flow 跑完了。但最有价值的不是 review 的结论——是 OPC 自身暴露的问题。\n\n## Discussion Protocol 真的有用\n\n3-round discussion protocol（Round 1 独立输出 → Round 2 只写 diff → Round 3 facilitator 收敛）确实产出了有区分度的内容。4 个 agent（architect, engineer, tester, devil's advocate）在 Round 1 各自发现了不同的问题，Round 2 的 diff-only 机制避免了 echo chamber，Round 3 的 facilitator 把分歧收敛成了可执行的决策。\n\nReview independence 也得到了验证：code-review 用独立 subagent 做，quality reviewer 和 DA 确实发现了 builder 没注意到的问题——`make_tool_call` 缺失、Tier 3 测试覆盖太薄。这不是 theater，是真实的 signal。\n\n## 但 Happy Path 100%，Failure Path 0%\n\n所有 gate 都是一次 PASS。\n\ngate-test PASS。gate-acceptance PASS。gate-audit PASS。gate-e2e PASS。gate-final PASS。\n\n**FAIL/ITERATE loopback 一次都没触发。** `maxLoopsPerEdge=3` 的限制从未被考验。这意味着 OPC 的核心价值主张——「做的人不评，评的人不做，不过不放行」——只验证了前半句。「不过不放行」这个最关键的机制，完全没被测过。\n\n## synthesize 的 Emoji Parsing Bug\n\n在手动检查 review 结果时发现一个 bug：`opc-harness synthesize` 的 verdict 计算逻辑按 emoji 计数（🔴 = critical, 🟡 = warning, 🔵 = info），但有一种 edge case：\n\n```markdown\n### 🔴 Must Fix: None.\n```\n\nReviewer 写了「没有 critical finding」，但 synthesize 扫到了 🔴 emoji，判定为 critical finding。结果整个 verdict 变成 FAIL。\n\n这是一个 mechanical gate 的典型 failure mode：**内容理解和格式解析不匹配**。修复方案是让 synthesize 同时看 emoji 和后面的 status text（如 \"None\"），但这暴露了一个更深的问题——emoji-based parsing 本身就是 brittle 的。\n\n## Full-Stack Template 选型过重\n\n14 个 node 里 skip 了 5 个（audit, e2e-user, post-launch-sim, gate-e2e, gate-final 手动补的 handshake）。一个文档级别的 deliverable（E2E test skill）根本不该用 full-stack template——build-verify 就够了。\n\nSkip 不是问题。问题是 **finalize 需要手动补 handshake**——gate-final 没有 handshake.json 导致 finalize 失败，必须手动创建空的 handshake 才能完成 flow。这说明 skip → finalize 的路径没有被正确处理。\n\n## P0 Finding Disposition Tracking\n\n所有这些问题指向一个最高 ROI 的改进：**P0 finding disposition tracking**。\n\n当前的 flow：Review 发现 🔴 findings → Gate 判定 FAIL → Loopback 到 build/review → ???\n\n「???」就是断裂点。没有机制追踪：\n1. 哪些 finding 被 fix 了？\n2. 哪些被 acknowledged but deferred？\n3. 哪些被 reviewer 误判需要 dismiss？\n4. Re-review 时 reviewer 能看到上一轮的 disposition 吗？\n\n没有 disposition tracking，FAIL → fix → re-evaluate 的核心 loop 是断的。Reviewer 每轮都从零开始，可能重复提同样的 finding，或者漏掉上一轮 critical 的 follow-up。\n\n这不是一个 nice-to-have feature。这是 gate loopback 能真正工作的前提条件。\n\n## 诚实的评估\n\n作为一次 happy path end-to-end 验证，这是成功的——证明了 flow-state + harness + subagent dispatch + gate 的整条链路能跑通。\n\n但作为 OPC 框架本身的验证是不够的：\n- 覆盖了 breadth（14 node 都碰到了），缺 depth（每个 node 只走了一次、一条路径）\n- Happy path 100%，failure path 0%\n- 没有验证 loop protocol、external flow templates、oscillation detection、context recovery、goto/stop escape hatches、contextSchema validation\n\n**一个框架不能通过一次 happy path run 证明自己可靠。** 就像测试一个 database 不能只写入再读取——你得测崩溃恢复、并发冲突、磁盘满了的时候。\n\nOPC 需要的不是更多的 happy path runs，而是 **deliberately triggered failure paths**：强制让 reviewer 给 🔴，看 loopback 是否正确；强制触发 edge limit，看 escape hatch 是否工作；强制断开 context，看 resume 是否靠谱。\n\n这些才是下一步要做的事。",
+  "heroImage": "",
+  "tags": [
+    "opc",
+    "framework-validation",
+    "ai-workflow",
+    "meta-testing",
+    "gate-mechanism"
+  ],
+  "sessionId": "d57fa0fe-f03b-4bb3-aaa6-a0f844c10530",
+  "chunkIndices": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    13,
+    14
+  ],
+  "project": "opc",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}

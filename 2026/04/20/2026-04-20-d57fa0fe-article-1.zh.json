@@ -1,0 +1,27 @@
+{
+  "slug": "2026-04-20-d57fa0fe-article-1",
+  "lang": "zh",
+  "title": "145 Tests, 88% Coverage：一个人如何系统性改进一个 AI Agent 项目",
+  "summary": "suri-counsel 是给女儿做的 ISB 高中升学顾问 agent。125 个测试全绿，但不知道覆盖率。从 pytest-cov 开始，经历 litellm namespace package 的坑、counselor.py 三文件拆分、全站 A11y 改造，最终 145 tests / 88% coverage。",
+  "body": "## 从「全绿」到「真绿」\n\nsuri-counsel 的 CI dashboard 一直是绿的。125 个 test，全部 pass。\n\n但有一天我跑了 `pytest --cov`，看到 `llm.py` 的覆盖率是 **16%**。这个文件是整个 agent 的 LLM 调用层——retry、fallback、JSON 解析——核心中的核心，几乎全是盲区。\n\n全绿不等于全覆盖。这是一个经典的 false confidence trap。\n\n## 五步改进计划\n\n改进不是拍脑袋想出来的。先跑覆盖率看到盲区，再按 ROI 排优先级：\n\n| # | Task | 价值 | 工作量 |\n|---|------|------|--------|\n| 1 | pytest-cov 集成 | 知道盲区在哪 | 小 |\n| 2 | llm.py 单元测试 | 核心依赖零测试 | 中 |\n| 3 | counselor.py 拆分 | 清晰架构 | 中 |\n| 4 | A11y 基线 | 可用性 | 中 |\n| 5 | Auth 小修 | 锦上添花 | 小 |\n\n关键发现：Auth 实际上比初始评估好得多（PBKDF2-SHA256 310k 迭代 + JWT + 生产强制认证），不需要大改。真正的优先级是测试覆盖和代码架构。\n\n## Step 1: 覆盖率可视化\n\n加 `pytest-cov` 到 `requirements-dev.txt`，配 `pyproject.toml`：\n\n```toml\n[tool.pytest.ini_options]\naddopts = \"--cov=server --cov-report=term-missing\"\n```\n\n第一次跑的结果：\n\n```\nserver/llm.py        16%   ← 最大的洞\nserver/counselor.py  94%   ← 比预期好\nserver/plan.py       70%   ← 有些路径没覆盖\n总体                 83%\n```\n\n覆盖率数字的价值不在于追求 100%，而在于**让盲区可见**。16% 的 llm.py 立刻变成了 Step 2 的靶心。\n\n## Step 2: litellm 的 Namespace Package 陷阱\n\n给 `llm.py` 写测试时，第一个 `@patch(\"litellm.completion\")` 就炸了：\n\n```\nAttributeError: <module 'litellm' (namespace)> does not have the attribute 'completion'\n```\n\nlitellm v1.82.6 安装后缺少 `__init__.py`，Python 把它当成 namespace package。`litellm.completion` 作为属性不存在，`@patch` 无法工作。\n\n**第一次尝试**：改 patch target 为 `server.llm.litellm.completion`——还是失败，因为底层引用的还是同一个 namespace module 对象。\n\n**最终方案**：autouse fixture 手动注入属性：\n\n```python\n@pytest.fixture(autouse=True)\ndef _mock_litellm():\n    import litellm\n    if not hasattr(litellm, \"completion\"):\n        litellm.completion = MagicMock()\n        yield\n        delattr(litellm, \"completion\")\n    else:\n        yield\n```\n\n这个 pattern 的核心思路是：如果模块缺属性，先给它一个 stub，让 `@patch` 能正常 swap。测试结束后清理。\n\n20 个新测试覆盖了 retry、DashScope fallback、JSON fence 清理、tool-based 调用等所有路径。llm.py 覆盖率从 16% 到 **95%**。\n\n## Step 3: 210 行拆成三个文件\n\n`counselor.py` 是整个 agent 的大脑——profile 检测、system prompt 构建、LLM 消息格式化、tool 循环引擎、session 管理。210 行不算太多，但五种职责挤在一起，每次改动都要在心里 hold 住全部上下文。\n\n拆分方案：\n\n```\ncounselor.py         → 入口 + orchestration (54 行)\ncounselor_prompt.py  → system prompt 构建 (47 行)\ncounselor_tools.py   → tool loop 引擎 (77 行)\n```\n\n拆分本身不难，难的是**不破坏现有测试**。14 个测试文件里有 68+ 处 mock patch target 指向 `server.counselor.llm_chat_with_tools`、`server.counselor.execute_tool` 等。模块一拆，这些 patch target 全部失效。\n\n解法很机械但必须精确：全局 sed 替换 14 个文件的 patch target，从 `server.counselor.*` 到 `server.counselor_tools.*`。一个都不能漏。\n\n拆完后 145 tests 全过，每个文件 <80 行，职责清晰。\n\n## Step 4: A11y 不是锦上添花\n\n这是一个给 13 岁女儿用的 app。她不需要 screen reader，但好的 A11y 实践意味着更好的键盘导航、更清晰的语义结构、更好的 UX。\n\n改了四个核心组件：\n\n**App.jsx** — sidebar navigation：\n- `<div onClick>` → `<button>` + `aria-current=\"page\"`\n- `<span onClick>` toggle → `<button className=\"apple-sidebar__icon-btn\">` + `aria-label`\n- `<div className=\"apple-sidebar\">` → `<aside aria-label=\"主导航\">`\n- 加了 `useEffect` 更新 `document.title` 和 Escape 键关闭移动端 sidebar\n\n**ChatMessages.jsx** — 聊天区域：\n- 容器加 `role=\"log\"` + `aria-live=\"polite\"`\n- 每条消息加 `role=\"article\"` + `aria-label`\n- 发送中指示器加 `role=\"status\"`\n\n**ChatInputBar.jsx** — 输入区域：\n- 所有 icon button 加 `aria-label`\n- Hidden file input 加 `aria-hidden=\"true\" tabIndex={-1}`\n- 表单 wrapper 加 `role=\"form\"`\n\n把 `<div onClick>` 转成 `<button>` 需要 CSS reset（background: none, border: none, width: 100%），否则 button 的默认样式会破坏布局。\n\n## Step 5: Auth 一行改动\n\n```python\nTOKEN_TTL_SECONDS = 24 * 60 * 60  # 24 hours (was 7 days)\n```\n\n个人项目，7 天也行。但 24 小时是更好的默认值——如果 token 泄露，窗口更小。\n\n## 最终结果\n\n- **145/145 tests pass**（新增 20 个 llm.py 测试）\n- **覆盖率 83% → 88%**\n- **llm.py 16% → 95%**\n- **counselor.py 210 行 → 3 文件各 <80 行**\n- **全站 A11y baseline**：语义 HTML、ARIA、键盘导航\n- **Frontend 编译通过**\n\n一个 commit，794 insertions / 259 deletions。\n\n## 反思\n\n最大的教训：**覆盖率数字的价值不在数字本身，而在于让盲区可见**。没有 pytest-cov，llm.py 的 16% 会一直是隐形的。而 litellm 的 namespace package 问题，如果不是在写测试时撞上，可能永远不会发现。\n\n另一个教训：**模块拆分的成本不在拆分本身，而在于更新所有引用**。68 个 mock patch target 的全局替换比写拆分代码本身花了更多时间。这就是为什么 test 覆盖率要先做——它既是改进的度量，也是重构的安全网。",
+  "heroImage": "",
+  "tags": [
+    "testing",
+    "coverage",
+    "refactoring",
+    "a11y",
+    "python",
+    "litellm",
+    "ai-agent"
+  ],
+  "sessionId": "d57fa0fe-f03b-4bb3-aaa6-a0f844c10530",
+  "chunkIndices": [
+    18,
+    19,
+    20
+  ],
+  "project": "suri-counsel",
+  "date": "2026-04-20",
+  "duration": "",
+  "stats": {}
+}
